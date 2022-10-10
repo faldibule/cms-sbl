@@ -5,15 +5,8 @@
   "version": "1.5.0",
   "private": false,
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint --ext .js,.jsx ./src",
-    "lint:fix": "eslint --fix --ext .js,.jsx ./src",
-    "clear-all": "rm -rf build node_modules",
-    "re-start": "rm -rf build node_modules && yarn install && yarn start",
-    "re-build": "rm -rf build node_modules && yarn install && yarn build"
+    "start": "vite",
+    "build": "vite build"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +40,7 @@
     "@mui/lab": "^5.0.0-alpha.88",
     "@mui/material": "^5.8.6",
     "@testing-library/jest-dom": "^5.16.4",
+    "@vitejs/plugin-react": "^2.1.0",
     "apexcharts": "^3.35.3",
     "change-case": "^4.1.2",
     "date-fns": "^2.28.0",
@@ -63,6 +57,7 @@
     "react-scripts": "^5.0.1",
     "simplebar": "^5.3.8",
     "simplebar-react": "^2.4.1",
+    "vite": "^3.1.6",
     "web-vitals": "^2.1.4",
     "yup": "^0.32.11"
   },
