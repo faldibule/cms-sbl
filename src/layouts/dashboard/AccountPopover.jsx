@@ -18,7 +18,7 @@ const MENU_OPTIONS = [
   //   linkTo: '/',
   // },
   {
-    label: 'Profile',
+    label: 'Change Password',
     icon: 'eva:person-fill',
     linkTo: '#',
   },

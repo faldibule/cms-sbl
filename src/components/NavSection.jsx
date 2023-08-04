@@ -72,21 +72,21 @@ function NavItem({ item, active }) {
           {info && info}
           <Iconify
             icon={open ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
-            sx={{ width: 16, height: 16, ml: 1 }}
+            sx={{ width: 16, height: 16, mr: 1 }}
           />
         </ListItemStyle>
 
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
             {children.map((item) => {
-              const { title, path } = item;
-              const isActiveSub = active(path);
+              const { title, path: childPath } = item;
+              const isActiveSub = active(`${path}/${childPath}`);
 
               return (
                 <ListItemStyle
                   key={title}
                   component={RouterLink}
-                  to={path}
+                  to={`${path}/${childPath}`}
                   sx={{
                     ...(isActiveSub && activeSubStyle),
                   }}

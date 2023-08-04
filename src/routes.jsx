@@ -16,22 +16,36 @@ import DashboardApp from './pages/DashboardApp';
 export default function Router() {
   return useRoutes([
     {
-      path: '/dashboard',
-      element: <DashboardLayout />,
-      children: [
-        { path: '', element: <DashboardApp /> },
-        { path: 'user', element: <User /> },
-        { path: 'products', element: <Products /> },
-        { path: 'blog', element: <Blog /> },
-      ],
-    },
-    {
       path: 'login',
       element: <Login />,
     },
     {
       path: 'register',
       element: <Register />,
+    },
+    {
+      path: '/dashboard',
+      element: <DashboardLayout />,
+      children: [
+        { path: '', element: <DashboardApp /> },
+      ],
+    },
+    {
+      path: '/user',
+      element: <DashboardLayout />,
+      children: [
+        { path: 'user-role', element: <DashboardApp /> },
+        { path: 'user-list', element: <DashboardApp /> },
+        { path: 'user-list', element: <DashboardApp /> },
+      ],
+    },
+    {
+      path: '/master-data',
+      element: <DashboardLayout />,
+      children: [
+        { path: 'category', element: <DashboardApp /> },
+        { path: 'site-location', element: <DashboardApp /> },
+      ],
     },
     {
       path: '/',
