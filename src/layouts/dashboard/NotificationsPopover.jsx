@@ -108,10 +108,10 @@ export default function NotificationsPopover() {
         ref={anchorRef}
         color={open ? 'primary' : 'default'}
         onClick={handleOpen}
-        sx={{ width: 40, height: 40 }}
+        sx={{ width: 60, height: 60 }}
       >
         <Badge badgeContent={totalUnRead} color="error">
-          <Iconify icon="eva:bell-fill" width={20} height={20} />
+          <Iconify sx={{ color: 'white' }} icon="eva:bell-fill" width={25} height={25} />
         </Badge>
       </IconButton>
 
