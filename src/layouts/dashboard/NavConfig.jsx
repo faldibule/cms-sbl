@@ -67,16 +67,16 @@ const navConfig = [
   },
   {
     title: 'Purchase Request',
-    icon: getIcon('bx:purchase-tag'),
+    icon: getIcon('bxs:purchase-tag'),
     path: '/purchase-request',
     children: [
       {
         title: 'Input PR',
-        path: 'input-purchase-requset'
+        path: 'input-purchase-request'
       },
       {
         title: 'Approval PR',
-        path: 'approval-purchase-requset'
+        path: 'approval-purchase-request'
       },
     ]
   },
@@ -131,7 +131,7 @@ const navConfig = [
   },
   {
     title: 'Stock Management',
-    icon: getIcon('vaadin:stock'),
+    icon: getIcon('iconamoon:box-fill'),
     path: '/stock-management',
     children: [
       {
@@ -147,11 +147,11 @@ const navConfig = [
   {
     title: 'Activity Log',
     path: '/activity-log',
-    icon: getIcon('radix-icons:activity-log'),
+    icon: getIcon('material-symbols:browse-activity-sharp'),
   },
   {
     title: 'Report',
-    icon: getIcon('vaadin:stock'),
+    icon: getIcon('icon-park-solid:table-report'),
     path: '/report',
     children: [
       {

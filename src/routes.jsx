@@ -2,16 +2,18 @@ import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
-//
-import Blog from './pages/Blog';
-import User from './pages/User';
+
+// Not Auth
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
-import Products from './pages/Products';
-import DashboardApp from './pages/DashboardApp';
 
 // ----------------------------------------------------------------------
+import DashboardApp from './pages/DashboardApp';
+import ActivityLog from './pages/activity-log'
+
+// Purchase Order
+import InputPurchaseRequest from './pages/purchase-request/input-purchase-request'
 
 export default function Router() {
   return useRoutes([
@@ -45,6 +47,21 @@ export default function Router() {
       children: [
         { path: 'category', element: <DashboardApp /> },
         { path: 'site-location', element: <DashboardApp /> },
+      ],
+    },
+    {
+      path: '/purchase-request',
+      element: <DashboardLayout />,
+      children: [
+        { path: 'input-purchase-request', element: <InputPurchaseRequest /> },
+        { path: 'approval-purchase-request', element: <InputPurchaseRequest /> },
+      ],
+    },
+    {
+      path: '/activity-log',
+      element: <DashboardLayout />,
+      children: [
+        { path: '', element: <ActivityLog /> },
       ],
     },
     {

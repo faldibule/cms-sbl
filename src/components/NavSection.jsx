@@ -11,7 +11,7 @@ import Iconify from './Iconify';
 
 const ListItemStyle = styled((props) => <ListItemButton disableGutters {...props} />)(({ theme }) => ({
   ...theme.typography.body2,
-  height: 48,
+  height: 50,
   position: 'relative',
   textTransform: 'capitalize',
   color: theme.palette.text.secondary,
@@ -48,7 +48,7 @@ function NavItem({ item, active }) {
   };
 
   const activeRootStyle = {
-    color: 'primary.main',
+    color: '#0D4C92',
     fontWeight: 'fontWeightMedium',
     bgcolor: alpha(theme.palette.primary.main, theme.palette.action.selectedOpacity),
   };
