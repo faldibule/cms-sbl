@@ -272,11 +272,8 @@ const index = () => {
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                Input Purchase Request
+                                Approval Purchase Request
                             </Typography>
-                            <Button onClick={() => navigate('/purchase-request/input-purchase-request/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
-                                Input
-                            </Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={12}>
@@ -318,7 +315,7 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/purchase-request/input-purchase-request/edit/1')}>{v.pr_number}</TableCell>
+                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/purchase-request/approval-purchase-request/edit/1')}>{v.pr_number}</TableCell>
                                                         <TableCell>{v.customer_name}</TableCell>
                                                         <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>
                                                         <TableCell>{v.user}</TableCell>

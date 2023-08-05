@@ -12,8 +12,13 @@ import Register from './pages/Register';
 import DashboardApp from './pages/DashboardApp';
 import ActivityLog from './pages/activity-log'
 
-// Purchase Order
+// Purchase Request
 import InputPurchaseRequest from './pages/purchase-request/input-purchase-request'
+import AddInputPurchaseRequest from './pages/purchase-request/input-purchase-request/Add'
+import EditInputPurchaseRequest from './pages/purchase-request/input-purchase-request/Edit'
+
+import ApprovalPurchaseRequest from './pages/purchase-request/approval-purchase-request'
+import EditApprovalPurchaseRequest from './pages/purchase-request/approval-purchase-request/Edit'
 
 export default function Router() {
   return useRoutes([
@@ -53,8 +58,14 @@ export default function Router() {
       path: '/purchase-request',
       element: <DashboardLayout />,
       children: [
+        // input PR
         { path: 'input-purchase-request', element: <InputPurchaseRequest /> },
-        { path: 'approval-purchase-request', element: <InputPurchaseRequest /> },
+        { path: 'input-purchase-request/add', element: <AddInputPurchaseRequest /> },
+        { path: 'input-purchase-request/edit/:id', element: <EditInputPurchaseRequest /> },
+
+        // Approval PR
+        { path: 'approval-purchase-request', element: <ApprovalPurchaseRequest /> },
+        { path: 'approval-purchase-request/edit/:id', element: <EditApprovalPurchaseRequest /> },
       ],
     },
     {

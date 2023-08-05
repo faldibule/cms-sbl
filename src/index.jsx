@@ -9,6 +9,8 @@ import { HelmetProvider } from 'react-helmet-async';
 import App from './App';
 // import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
+import { SnackbarProvider, closeSnackbar } from 'notistack';
+import { Button } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
@@ -16,10 +18,20 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
    <HelmetProvider>
-   <BrowserRouter>
-     <App />
-   </BrowserRouter>
- </HelmetProvider>
+    <BrowserRouter>
+      <SnackbarProvider 
+          action={(snackbarId) => (
+            <Button sx={{ color: 'white' }} onClick={() => closeSnackbar(snackbarId)}>
+              Dismiss
+            </Button>
+          )} 
+          maxSnack={3} 
+          autoHideDuration={3000}
+        >
+        <App />
+      </SnackbarProvider>
+    </BrowserRouter>
+  </HelmetProvider>
   
 );
 
