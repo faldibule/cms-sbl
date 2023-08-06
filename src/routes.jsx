@@ -20,6 +20,19 @@ import EditInputPurchaseRequest from './pages/purchase-request/input-purchase-re
 import ApprovalPurchaseRequest from './pages/purchase-request/approval-purchase-request'
 import EditApprovalPurchaseRequest from './pages/purchase-request/approval-purchase-request/Edit'
 
+// Purchase Order
+import InputPurchaseOrder from './pages/purchase-order/input-purchase-order'
+import AddInputPurchaseOrder from './pages/purchase-order/input-purchase-order/Add'
+import EditInputPurchaseOrder from './pages/purchase-order/input-purchase-order/Edit'
+
+import ApprovalPurchaseOrder from './pages/purchase-order/approval-purchase-order'
+import EditApprovalPurchaseOrder from './pages/purchase-order/approval-purchase-order/Edit'
+
+// Delivery Order
+import DeliveryOrderKeluar from './pages/delivery-order/do-keluar'
+import AddDeliveryOrderKeluar from './pages/delivery-order/do-keluar/Add'
+import EditDeliveryOrderKeluar from './pages/delivery-order/do-keluar/Edit'
+
 export default function Router() {
   return useRoutes([
     {
@@ -66,6 +79,36 @@ export default function Router() {
         // Approval PR
         { path: 'approval-purchase-request', element: <ApprovalPurchaseRequest /> },
         { path: 'approval-purchase-request/edit/:id', element: <EditApprovalPurchaseRequest /> },
+      ],
+    },
+    {
+      path: '/purchase-order',
+      element: <DashboardLayout />,
+      children: [
+        // input PR
+        { path: 'input-purchase-order', element: <InputPurchaseOrder /> },
+        { path: 'input-purchase-order/add', element: <AddInputPurchaseOrder /> },
+        { path: 'input-purchase-order/edit/:id', element: <EditInputPurchaseOrder /> },
+
+        // Approval PR
+        { path: 'approval-purchase-order', element: <ApprovalPurchaseOrder /> },
+        { path: 'approval-purchase-order/edit/:id', element: <EditApprovalPurchaseOrder /> },
+      ],
+    },
+    {
+      path: '/delivery-order',
+      element: <DashboardLayout />,
+      children: [
+        // DO Masuk
+        { path: 'do-masuk', element: <DeliveryOrderKeluar /> },
+        
+        // DO Keluar
+        { path: 'do-keluar', element: <DeliveryOrderKeluar /> },
+        { path: 'do-keluar/add', element: <AddDeliveryOrderKeluar /> },
+        { path: 'do-keluar/edit/:id', element: <EditDeliveryOrderKeluar /> },
+
+        // Do Approval
+        { path: 'do-approval', element: <DeliveryOrderKeluar /> },
       ],
     },
     {
