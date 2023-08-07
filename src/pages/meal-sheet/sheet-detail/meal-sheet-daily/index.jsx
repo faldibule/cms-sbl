@@ -111,7 +111,7 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell onClick={() => navigate('/meal-sheet/sheet-detail/1/edit/1')} sx={{ color: 'blue', cursor: 'pointer' }}>{v.name}</TableCell>
+                                                        <TableCell>{v.name}</TableCell>
                                                         <TableCell>{v.position}</TableCell>
                                                         <TableCell>{v.company}</TableCell>
                                                         <TableCell align='center'>
