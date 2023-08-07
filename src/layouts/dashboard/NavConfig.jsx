@@ -74,10 +74,10 @@ const navConfig = [
         title: 'Input PR',
         path: 'input-purchase-request'
       },
-      {
-        title: 'Approval PR',
-        path: 'approval-purchase-request'
-      },
+      // {
+      //   title: 'Approval PR',
+      //   path: 'approval-purchase-request'
+      // },
     ]
   },
   {
@@ -86,13 +86,17 @@ const navConfig = [
     path: '/purchase-order',
     children: [
       {
+        title: 'Terima PO Customer',
+        path: 'receive-purchase-order'
+      },
+      {
         title: 'Input PO',
         path: 'input-purchase-order'
       },
-      {
-        title: 'Approval PO',
-        path: 'approval-purchase-order'
-      },
+      // {
+      //   title: 'Approval PO',
+      //   path: 'approval-purchase-order'
+      // },
     ]
   },
   {
@@ -108,10 +112,10 @@ const navConfig = [
         title: 'DO Keluar',
         path: 'do-keluar'
       },
-      {
-        title: 'Approval DO',
-        path: 'do-approval'
-      },
+      // {
+      //   title: 'Approval DO',
+      //   path: 'do-approval'
+      // },
     ]
   },
   {
@@ -123,10 +127,6 @@ const navConfig = [
         title: 'Sheet Detail',
         path: 'sheet-detail'
       },
-      {
-        title: 'Sheet Summary',
-        path: 'sheet-summary'
-      },
     ]
   },
   {
@@ -135,8 +135,8 @@ const navConfig = [
     path: '/stock-management',
     children: [
       {
-        title: 'Stock',
-        path: 'stock'
+        title: 'Stock List',
+        path: 'stock-list'
       },
       {
         title: 'Stock Opname',
@@ -167,7 +167,7 @@ const navConfig = [
         path: 'Do-report'
       },
       {
-        title: 'Meal Sheet Report',
+        title: 'Meal Sheet Summary',
         path: 'meal-report'
       },
       {

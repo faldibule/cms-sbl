@@ -5,6 +5,7 @@ import Iconify from '../../../components/Iconify'
 import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
 import { NumberFormat } from '../../../utils/Format'
+import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -156,7 +157,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        {props.type === 'input' ? 'Form Input Purchase Order' : 'Form Approval Purchase Order' }
+                        {props.type === 'input' ? 'Form Input Delivery Order' : 'Form Input Delivery Order' }
                     </Typography>
                 </Grid>
             </Grid>
@@ -168,22 +169,17 @@ const Form = (props) => {
                             <TextField
                                 fullWidth 
                                 label='DO Number'
-                                select
-                                onChange={() => setItem([...itemDataEdit])}
-                            >
-                                <MenuItem value='1'>DO Number 1</MenuItem>
-                                <MenuItem value='2'>DO Number 2</MenuItem>
-                            </TextField> 
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PO Number'
+                                label='PO Number Customer'
                                 select
                                 onChange={() => setItem([...itemDataEdit])}
                             >
-                                <MenuItem value='1'>PR Number 1</MenuItem>
-                                <MenuItem value='2'>PR Number 2</MenuItem>
+                                <MenuItem value='1'>PO Number Customer 1</MenuItem>
+                                <MenuItem value='2'>PO Number Customer 2</MenuItem>
                             </TextField> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -260,9 +256,97 @@ const Form = (props) => {
                             /> 
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <LoadingButton variant='contained' type='submit' sx={{ ml: 'auto' }}>
-                                submit
-                            </LoadingButton>
+                            {item.length > 0 ? 
+                                <TableContainer sx={{ maxWidth: 2000 }}>
+                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow
+                                                sx={{
+                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                    bgcolor: '#d6e9ff'
+                                                }}
+                                            >
+
+                                                {props.type === 'approval' ? 
+                                                <TableCell></TableCell>
+                                                : null
+                                                }
+                                                <TableCell>No.</TableCell>
+                                                <TableCell>Item Name</TableCell>
+                                                <TableCell>Item Brand</TableCell>
+                                                <TableCell>Description</TableCell>
+                                                <TableCell>Harga</TableCell>
+                                                <TableCell>Quantity</TableCell>
+                                                <TableCell>Current Stock</TableCell>
+                                                <TableCell>Tax</TableCell>
+                                                <TableCell>Shipment Charge</TableCell>
+                                                <TableCell>Total Price</TableCell>
+                                                <TableCell>Action</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {item.map((v, i) => {
+                                                const temp = parseInt(v.shipment_charge)
+                                                const total = (v.harga * v.quantity) 
+                                                const grand_total = total + (total * 11 / 100) + temp
+                                                return (
+                                                    <TableRow key={i}>
+                                                        {/* {props.type === 'approval' ? 
+                                                            <TableCell>
+                                                                <Checkbox
+                                                                    checked={v.status}
+                                                                    onChange={(e) => onChangeCheckTable(e, v.code)}
+                                                                />
+                                                            </TableCell>
+                                                            : null
+                                                        } */}
+                                                        <TableCell>{i + 1}</TableCell>
+                                                        <TableCell>{v.name}</TableCell>
+                                                        <TableCell>{v.brand}</TableCell>
+                                                        <TableCell>{v.description}</TableCell>
+                                                        <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
+                                                        <TableCell>{v.quantity}</TableCell>
+                                                        <TableCell>20</TableCell>
+                                                        <TableCell>{v.tax}%</TableCell>
+                                                        <TableCell>
+                                                            <TextField
+                                                                fullWidth 
+                                                                label='Shipment Charge'
+                                                                name='shipment_charge'
+                                                                value={NumberFormat(v.shipment_charge, 'Rp')}
+                                                                onChange={(e) => onChangeItemTable(e, v.code)}
+                                                            /> 
+                                                        </TableCell>
+                                                        <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
+                                                        <TableCell align='center'>
+                                                            <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
+                                            })}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            : 
+                            null
+                            }
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <CustomGrandTotalComponent item={itemDataEdit} />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <Stack direction='row' spacing={2}>
+                                <LoadingButton variant='contained' type='submit'>
+                                    submit
+                                </LoadingButton>
+                                {props.title == 'edit' ?
+                                    <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
+                                        Print
+                                    </LoadingButton>
+                                : null
+                                }
+                            </Stack>    
                         </Grid>
                     </Grid>
                 </Card>

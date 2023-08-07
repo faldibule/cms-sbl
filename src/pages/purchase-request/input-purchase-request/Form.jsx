@@ -1,10 +1,11 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Iconify from '../../../components/Iconify'
 import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
 import { NumberFormat } from '../../../utils/Format'
+import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -272,9 +273,10 @@ const Form = (props) => {
                                                 <TableCell>Description</TableCell>
                                                 <TableCell>Harga</TableCell>
                                                 <TableCell>Quantity</TableCell>
+                                                <TableCell>Current Stock</TableCell>
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Total</TableCell>
-                                                <TableCell>Grand Total</TableCell>
+                                                <TableCell>Total Price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -307,6 +309,7 @@ const Form = (props) => {
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
+                                                        <TableCell>10</TableCell>
                                                         <TableCell>{v.tax}%</TableCell>
                                                         <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
                                                         <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
@@ -325,9 +328,20 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <LoadingButton variant='contained' type='submit' sx={{ ml: 'auto' }}>
-                                submit
-                            </LoadingButton>
+                            <CustomGrandTotalComponent item={item} />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <Stack direction='row' spacing={2}>
+                                <LoadingButton variant='contained' type='submit'>
+                                    submit
+                                </LoadingButton>
+                                {props.title == 'edit' ?
+                                    <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
+                                        Print
+                                    </LoadingButton>
+                                : null
+                                }
+                            </Stack>
                         </Grid>
                     </Grid>
                 </Card>

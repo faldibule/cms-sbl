@@ -1,11 +1,11 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import Iconify from '../../components/Iconify'
+import Iconify from '../../../components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../utils/Format'
-import CustomGrandTotalComponent from '../../components/CustomGrandTotalComponent'
+import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
+import { NumberFormat } from '../../../utils/Format'
+import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -18,7 +18,6 @@ const itemData = [
         tax: 11,
         total: 1000000,
         grand_total: 1000000,
-        status: false,
     },
     {
         code: '2',
@@ -30,7 +29,6 @@ const itemData = [
         tax: 11,
         total: 2000000,
         grand_total: 2000000,
-        status: true,
     },
     {
         code: '3',
@@ -42,27 +40,44 @@ const itemData = [
         tax: 11,
         total: 3000000,
         grand_total: 3000000,
-        status: false,
     }
 ]
 
-let itemDataEdit = []
-for(let i = 0; i < 4; i++){
-    const index = i + 1
-    itemDataEdit[i] = {
-        code: i + index,
-        name: 'item '+ index,
-        brand: 'brand '+ index,
-        description: 'Test '+ index,
-        harga: index * 1000000,
-        quantity: 5 + index,
+const itemDataEdit = [
+    {
+        code: '1',
+        name: 'item 1',
+        brand: 'brand 1',
+        description: 'Test 1',
+        harga: 1000000,
+        quantity: 5,
         tax: 11,
-        total: 0,
-        shipment_charge: 0,
-        grand_total: 0,
-        status: true,
+        total: 1000000,
+        grand_total: 1000000,
+    },
+    {
+        code: '2',
+        name: 'item 2',
+        brand: 'brand 2',
+        description: 'test 2',
+        harga: 2000000,
+        quantity: 3,
+        tax: 11,
+        total: 2000000,
+        grand_total: 2000000,
+    },
+    {
+        code: '3',
+        name: 'item 3',
+        brand: 'brand 3',
+        description: 'test 3',
+        harga: 3000000,
+        quantity: 1,
+        tax: 11,
+        total: 3000000,
+        grand_total: 3000000,
     }
-}
+]
 
 const Form = (props) => {
     const sb = useCustomSnackbar()
@@ -119,32 +134,12 @@ const Form = (props) => {
         setItem([...item.filter(v => v.code !== id)])
     }
 
-    const onChangeCheckTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                return {
-                    ...v,
-                    status: e.target.checked
-                }
-            }
-            return v
-        })
-        setItem([...newItem])
-    }
-
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        if(props.type === 'input'){
-            navigate('/purchase-order/input-purchase-order', {
-                variant: 'success'
-            })
-        }
-        if(props.type ==='approval'){
-            navigate('/purchase-order/approval-purchase-order', {
-                variant: 'success'
-            })
-        }
+        navigate('/purchase-request/input-purchase-request', {
+            variant: 'success'
+        })
     }
 
     useEffect(() => {
@@ -164,7 +159,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        {props.type === 'input' ? 'Form Input Purchase Order' : 'Form Approval Purchase Order' }
+                        {props.title === 'add' ? 'Input PO Customer' : 'Edit PO Customer'}
                     </Typography>
                 </Grid>
             </Grid>
@@ -186,37 +181,20 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PO Number'
+                                label='PO Number Customer'
                             /> 
-                        </Grid> 
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth 
-                                label='Supplier'
-                                select
-                            >
-                                <MenuItem value='1'>Supplier 1</MenuItem>
-                                <MenuItem value='2'>Supplier 2</MenuItem>
-                            </TextField> 
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                type='date'
-                                name='po_date'
-                                label="PO Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
                         </Grid>
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth 
                                 label='Customer Name'
-                            /> 
+                                select
+                            >
+                                <MenuItem value='1'>Customer 1</MenuItem>
+                                <MenuItem value='2'>Customer 2</MenuItem>
+                            </TextField> 
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={4}>
                             <TextField
                                 type='date'
                                 name='shipment_date'
@@ -227,7 +205,7 @@ const Form = (props) => {
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth 
                                 label='User Maker'
@@ -239,6 +217,7 @@ const Form = (props) => {
                                 label='Notes'
                             /> 
                         </Grid>
+                        
                         <Grid item xs={12} md={6}>
                             {form.document.file_url === '' ?
                                 <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
@@ -272,26 +251,25 @@ const Form = (props) => {
                                 />
                             }
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <TextField
+                                label='Item'
+                                value={form.item}
+                                onChange={onChangeItem}
                                 fullWidth 
-                                label='Terms and Conditions'
-                                multiline
-                                rows={3}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Term of Payment'
-                                multiline
-                                rows={3}
-                            /> 
+                                select
+                            >
+                                {itemData.map((v, i) => {
+                                    return (
+                                        <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
+                                    )
+                                })}
+                            </TextField> 
                         </Grid>
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer sx={{ maxWidth: 2000 }}>
-                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
+                                <TableContainer>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -300,11 +278,6 @@ const Form = (props) => {
                                                     bgcolor: '#d6e9ff'
                                                 }}
                                             >
-
-                                                {props.type === 'approval' ? 
-                                                <TableCell></TableCell>
-                                                : null
-                                                }
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Brand</TableCell>
@@ -313,27 +286,17 @@ const Form = (props) => {
                                                 <TableCell>Quantity</TableCell>
                                                 <TableCell>Current Stock</TableCell>
                                                 <TableCell>Tax</TableCell>
-                                                <TableCell>Shipment Charge</TableCell>
+                                                <TableCell>Total</TableCell>
                                                 <TableCell>Total Price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {item.map((v, i) => {
-                                                const temp = parseInt(v.shipment_charge)
-                                                const total = (v.harga * v.quantity) 
-                                                const grand_total = total + (total * 11 / 100) + temp
+                                                const total = v.harga * v.quantity
+                                                const grand_total = total + (total * 11 / 100)
                                                 return (
                                                     <TableRow key={i}>
-                                                        {/* {props.type === 'approval' ? 
-                                                            <TableCell>
-                                                                <Checkbox
-                                                                    checked={v.status}
-                                                                    onChange={(e) => onChangeCheckTable(e, v.code)}
-                                                                />
-                                                            </TableCell>
-                                                            : null
-                                                        } */}
                                                         <TableCell>{i + 1}</TableCell>
                                                         <TableCell>{v.name}</TableCell>
                                                         <TableCell>{v.brand}</TableCell>
@@ -357,18 +320,9 @@ const Form = (props) => {
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
-                                                        <TableCell>20</TableCell>
+                                                        <TableCell>10</TableCell>
                                                         <TableCell>{v.tax}%</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                    fullWidth 
-                                                                    label='Shipment Charge'
-                                                                    type='number'
-                                                                    name='shipment_charge'
-                                                                    value={v.shipment_charge}
-                                                                    onChange={(e) => onChangeItemTable(e, v.code)}
-                                                                /> 
-                                                            </TableCell>
+                                                        <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
                                                         <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
                                                         <TableCell align='center'>
                                                             <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
@@ -376,6 +330,7 @@ const Form = (props) => {
                                                     </TableRow>
                                                 )
                                             })}
+                                            
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -384,7 +339,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={item} />
+                           <CustomGrandTotalComponent item={item} /> 
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
@@ -397,7 +352,7 @@ const Form = (props) => {
                                     </LoadingButton>
                                 : null
                                 }
-                            </Stack>
+                            </Stack>    
                         </Grid>
                     </Grid>
                 </Card>

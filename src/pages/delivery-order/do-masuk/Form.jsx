@@ -1,11 +1,11 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import Iconify from '../../components/Iconify'
+import Iconify from '../../../components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../utils/Format'
-import CustomGrandTotalComponent from '../../components/CustomGrandTotalComponent'
+import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
+import { NumberFormat } from '../../../utils/Format'
+import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -105,6 +105,12 @@ const Form = (props) => {
     const onChangeItemTable = (e, id) => {
         const newItem = item.map((v, i) => {
             if(v.code === id){
+                if(e.target.name === 'shipment_charge'){
+                    return {
+                        ...v,
+                        shipment_charge: e.target.value.replaceAll('Rp', '').replaceAll('.', '')
+                    }
+                }
                 return {
                     ...v,
                     [e.target.name]: e.target.value,
@@ -337,38 +343,20 @@ const Form = (props) => {
                                                         <TableCell>{i + 1}</TableCell>
                                                         <TableCell>{v.name}</TableCell>
                                                         <TableCell>{v.brand}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                label='Description'
-                                                                name='description'
-                                                                value={v.description}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
+                                                        <TableCell>{v.description}</TableCell>
                                                         <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                label='Quantity'
-                                                                type='number'
-                                                                name='quantity'
-                                                                value={v.quantity}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
+                                                        <TableCell>{v.quantity}</TableCell>
                                                         <TableCell>20</TableCell>
                                                         <TableCell>{v.tax}%</TableCell>
                                                         <TableCell>
                                                             <TextField
-                                                                    fullWidth 
-                                                                    label='Shipment Charge'
-                                                                    type='number'
-                                                                    name='shipment_charge'
-                                                                    value={v.shipment_charge}
-                                                                    onChange={(e) => onChangeItemTable(e, v.code)}
-                                                                /> 
-                                                            </TableCell>
+                                                                fullWidth 
+                                                                label='Shipment Charge'
+                                                                name='shipment_charge'
+                                                                value={NumberFormat(v.shipment_charge, 'Rp')}
+                                                                onChange={(e) => onChangeItemTable(e, v.code)}
+                                                            /> 
+                                                        </TableCell>
                                                         <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
                                                         <TableCell align='center'>
                                                             <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />

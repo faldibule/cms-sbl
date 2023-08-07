@@ -32,6 +32,10 @@ import ApprovalPurchaseRequest from './pages/purchase-request/approval-purchase-
 import EditApprovalPurchaseRequest from './pages/purchase-request/approval-purchase-request/Edit'
 
 // Purchase Order
+import ReceivePurchaseOrder from './pages/purchase-order/terima-po'
+import AddReceivePurchaseOrder from './pages/purchase-order/terima-po/Add'
+import EditReceivePurchaseOrder from './pages/purchase-order/terima-po/Edit'
+
 import InputPurchaseOrder from './pages/purchase-order/input-purchase-order'
 import AddInputPurchaseOrder from './pages/purchase-order/input-purchase-order/Add'
 import EditInputPurchaseOrder from './pages/purchase-order/input-purchase-order/Edit'
@@ -40,9 +44,20 @@ import ApprovalPurchaseOrder from './pages/purchase-order/approval-purchase-orde
 import EditApprovalPurchaseOrder from './pages/purchase-order/approval-purchase-order/Edit'
 
 // Delivery Order
+// DO Masuk
+import DeliveryOrderMasuk from './pages/delivery-order/do-masuk'
+import AddDeliveryOrderMasuk from './pages/delivery-order/do-masuk/Add'
+import EditDeliveryOrderMasuk from './pages/delivery-order/do-masuk/Edit'
+
+// DO Keluar
 import DeliveryOrderKeluar from './pages/delivery-order/do-keluar'
 import AddDeliveryOrderKeluar from './pages/delivery-order/do-keluar/Add'
 import EditDeliveryOrderKeluar from './pages/delivery-order/do-keluar/Edit'
+
+// Sheet Detail
+import SheetDetail from './pages/meal-sheet/sheet-detail'
+import MealSheetDaily from './pages/meal-sheet/sheet-detail/meal-sheet-daily'
+import AddMealSheetDaily from './pages/meal-sheet/sheet-detail/meal-sheet-daily/Add'
 
 export default function Router() {
   return useRoutes([
@@ -102,6 +117,11 @@ export default function Router() {
       path: '/purchase-order',
       element: <DashboardLayout />,
       children: [
+        // Terima PO
+        { path: 'receive-purchase-order', element: <ReceivePurchaseOrder /> },
+        { path: 'receive-purchase-order/add', element: <AddReceivePurchaseOrder /> },
+        { path: 'receive-purchase-order/edit/:id', element: <EditReceivePurchaseOrder /> },
+
         // input PR
         { path: 'input-purchase-order', element: <InputPurchaseOrder /> },
         { path: 'input-purchase-order/add', element: <AddInputPurchaseOrder /> },
@@ -117,7 +137,9 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         // DO Masuk
-        { path: 'do-masuk', element: <DeliveryOrderKeluar /> },
+        { path: 'do-masuk', element: <DeliveryOrderMasuk /> },
+        { path: 'do-masuk/add', element: <AddDeliveryOrderMasuk /> },
+        { path: 'do-masuk/edit/:id', element: <EditDeliveryOrderMasuk /> },
         
         // DO Keluar
         { path: 'do-keluar', element: <DeliveryOrderKeluar /> },
@@ -126,6 +148,15 @@ export default function Router() {
 
         // Do Approval
         { path: 'do-approval', element: <DeliveryOrderKeluar /> },
+      ],
+    },
+    {
+      path: '/meal-sheet',
+      element: <DashboardLayout />,
+      children: [
+        { path: 'sheet-detail', element: <SheetDetail /> },
+        { path: 'sheet-detail/:id/meal-sheet-daily', element: <MealSheetDaily /> },
+        { path: 'sheet-detail/:id/meal-sheet-daily/add', element: <AddMealSheetDaily /> },
       ],
     },
     {

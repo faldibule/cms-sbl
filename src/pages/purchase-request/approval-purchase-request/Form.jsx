@@ -292,9 +292,10 @@ const Form = (props) => {
                                                 <TableCell>Description</TableCell>
                                                 <TableCell>Harga</TableCell>
                                                 <TableCell>Quantity</TableCell>
+                                                <TableCell>Current Stock</TableCell>
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Total</TableCell>
-                                                <TableCell>Grand Total</TableCell>
+                                                <TableCell>Total Price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -333,6 +334,7 @@ const Form = (props) => {
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
+                                                        <TableCell>10</TableCell>
                                                         <TableCell>{v.tax}%</TableCell>
                                                         <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
                                                         <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>

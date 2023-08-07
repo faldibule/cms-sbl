@@ -11,6 +11,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -18,6 +19,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -25,6 +27,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -32,6 +35,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -39,6 +43,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -46,6 +51,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -53,6 +59,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -60,6 +67,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -67,6 +75,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -74,6 +83,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -81,6 +91,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -88,6 +99,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -95,6 +107,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -102,6 +115,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -109,6 +123,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -116,6 +131,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -123,6 +139,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -130,6 +147,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -137,6 +155,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -144,6 +163,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -151,6 +171,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -158,6 +179,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -165,6 +187,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -172,6 +195,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -179,6 +203,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -186,6 +211,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -193,6 +219,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -200,6 +227,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -207,6 +235,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -214,6 +243,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -221,6 +251,7 @@ const dummy = [
     {
         pr_number: '123',
         customer_name: 'Customer 1',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 1',
         status: 'pending',
@@ -228,6 +259,7 @@ const dummy = [
     {
         pr_number: '124',
         customer_name: 'Customer 2',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 2',
         status: 'approved',
@@ -235,6 +267,7 @@ const dummy = [
     {
         pr_number: '321',
         customer_name: 'Customer 3',
+        supplier_name: 'Supplier 1',
         shipment_date: new Date(),
         user: 'user 3',
         status: 'rejected',
@@ -266,15 +299,15 @@ const index = () => {
     }
 
     return (
-        <Page title='DO Keluar'>
+        <Page title='DO Masuk'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                DO Keluar
+                                DO Masuk
                             </Typography>
-                            <Button onClick={() => navigate('/delivery-order/do-keluar/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate('/delivery-order/do-masuk/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>
@@ -318,8 +351,9 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/delivery-order/do-keluar/edit/1')}>{v.pr_number}</TableCell>
+                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/delivery-order/do-masuk/edit/1')}>{v.pr_number}</TableCell>
                                                         <TableCell>{v.customer_name}</TableCell>
+                                                        <TableCell>{v.supplier_name}</TableCell>
                                                         <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>
                                                         <TableCell>{v.user}</TableCell>
                                                         <TableCell>

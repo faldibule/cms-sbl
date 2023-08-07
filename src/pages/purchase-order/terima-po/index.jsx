@@ -266,15 +266,15 @@ const index = () => {
     }
 
     return (
-        <Page title='DO Keluar'>
+        <Page title='Input Purchase Request'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                DO Keluar
+                                Terima Purchase Order Customer
                             </Typography>
-                            <Button onClick={() => navigate('/delivery-order/do-keluar/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate('/purchase-order/receive-purchase-order/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>
@@ -318,7 +318,7 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/delivery-order/do-keluar/edit/1')}>{v.pr_number}</TableCell>
+                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/purchase-order/receive-purchase-order/edit/1')}>{v.pr_number}</TableCell>
                                                         <TableCell>{v.customer_name}</TableCell>
                                                         <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>
                                                         <TableCell>{v.user}</TableCell>

@@ -8,12 +8,13 @@ import CustomSearchComponent from '../../../components/CustomSearchComponent';
 import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
 import CustomMenuComponent from '../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
-import { NumberFormat } from '../../../utils/Format';
 
 let dummy = []
 for(let i = 0; i < 15; i++){
     dummy[i] = {
-        discount: i % 2 === 0 ? 20 : 0,
+        code: i + 1,
+        location: `Location ${i + 1}` ,
+        date: new Date(),
     }
 }
 
@@ -53,13 +54,13 @@ const index = () => {
     };
 
     return (
-        <Page title='Discount'>
+        <Page title='Sheet Detail'>
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                Discount
+                                Sheet Detail
                             </Typography>
                         </Stack>
                     </Grid>
@@ -81,7 +82,8 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>Discount</TableCell>
+                                                <TableCell>Date</TableCell>
+                                                <TableCell>Location</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -90,7 +92,8 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell>{v.discount === 0 ? `${v.discount}%` : 'none'}</TableCell>
+                                                        <TableCell onClick={() => navigate('/meal-sheet/sheet-detail/1/meal-sheet-daily')} sx={{ color: 'blue', cursor: 'pointer' }}>{moment(v.date).format('LL')}</TableCell>
+                                                        <TableCell>{v.location}</TableCell>
                                                         <TableCell>
                                                             <IconButton onClick={(e) => handleClick(e, v)}>
                                                                 <Iconify icon='mingcute:more-2-fill' />
@@ -99,6 +102,7 @@ const index = () => {
                                                     </TableRow>
                                                 )
                                             })}
+                                            
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -114,6 +118,33 @@ const index = () => {
                                     showLastButton
                                 />
                             </CardContent>
+                        </Card>
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <Card sx={{ p: 2 }}>
+                            <Typography mb={3} variant='h6'>Form sheet Meal</Typography>
+                            <Stack rowGap={2}>
+                                <TextField
+                                    type='date'
+                                    name='date'
+                                    label="Date"
+                                    fullWidth
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                    }}
+                                />
+                                <TextField
+                                    fullWidth 
+                                    label='Location'
+                                    select
+                                >
+                                    <MenuItem value='1'>Location 1</MenuItem>
+                                    <MenuItem value='2'>Location 2</MenuItem>
+                                </TextField> 
+                                <LoadingButton variant='contained' type='submit'>
+                                    submit
+                                </LoadingButton>
+                            </Stack>
                         </Card>
                     </Grid>
                     <Grid item xs={12} md={12}>
