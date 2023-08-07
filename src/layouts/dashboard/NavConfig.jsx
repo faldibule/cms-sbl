@@ -33,14 +33,14 @@ const navConfig = [
     children: [
       {
         title: 'Item Category',
-        path: 'category'
+        path: 'item-category'
       },
       {
         title: 'Site Location',
         path: 'site-location'
       },
       {
-        title: 'Const Center',
+        title: 'Cost Center',
         path: 'cost-center'
       },
       {
@@ -61,7 +61,7 @@ const navConfig = [
       },
       {
         title: 'Discount',
-        path: 'discound'
+        path: 'discount'
       },
     ]
   },

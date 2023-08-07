@@ -12,6 +12,17 @@ import Register from './pages/Register';
 import DashboardApp from './pages/DashboardApp';
 import ActivityLog from './pages/activity-log'
 
+// Master Data
+// Item Category
+import ItemCategory from './pages/master-data/item-category'
+import SiteLocation from './pages/master-data/site-location'
+import CostCenter from './pages/master-data/cost-center'
+import Department from './pages/master-data/department'
+import Supplier from './pages/master-data/supplier'
+import Pricelist from './pages/master-data/pricelist'
+import Discount from './pages/master-data/discount'
+import Customer from './pages/master-data/customer'
+
 // Purchase Request
 import InputPurchaseRequest from './pages/purchase-request/input-purchase-request'
 import AddInputPurchaseRequest from './pages/purchase-request/input-purchase-request/Add'
@@ -63,8 +74,14 @@ export default function Router() {
       path: '/master-data',
       element: <DashboardLayout />,
       children: [
-        { path: 'category', element: <DashboardApp /> },
-        { path: 'site-location', element: <DashboardApp /> },
+        { path: 'item-category', element: <ItemCategory /> },
+        { path: 'site-location', element: <SiteLocation /> },
+        { path: 'cost-center', element: <CostCenter /> },
+        { path: 'department', element: <Department /> },
+        { path: 'supplier', element: <Supplier /> },
+        { path: 'pricelist', element: <Pricelist /> },
+        { path: 'discount', element: <Discount /> },
+        { path: 'customer', element: <Customer /> },
       ],
     },
     {
