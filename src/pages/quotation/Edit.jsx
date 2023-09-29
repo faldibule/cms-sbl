@@ -1,13 +1,13 @@
 import React from 'react'
-import Page from '../../../components/Page'
+import Page from '@components/Page'
 import { Container } from '@mui/material'
 import Form from './Form'
 
 const Add = () => {
   return (
-    <Page title='Terima Purchase Order Customer'>
+    <Page title='Form Input Purchase Request'>
         <Container>
-            <Form title='add' type='input' />
+            <Form title='edit' data={{data: ''}} />
         </Container>
     </Page>
   )

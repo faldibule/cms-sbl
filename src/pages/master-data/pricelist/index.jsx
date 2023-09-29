@@ -129,6 +129,16 @@ const index = () => {
                         <Card sx={{ p: 2 }}>
                             <Typography mb={3} variant='h6'>Form Pricelist</Typography>
                             <Grid container spacing={2}>
+                                <Grid item xs={12} md={12}>
+                                    <TextField
+                                        fullWidth 
+                                        label='Site Location'
+                                        select
+                                    >
+                                        <MenuItem value='1'>Location 1</MenuItem>
+                                        <MenuItem value='2'>Location 2</MenuItem>
+                                    </TextField> 
+                                </Grid>
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth 
@@ -170,7 +180,7 @@ const index = () => {
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth 
-                                        label='PPN'
+                                        label='VAT'
                                     /> 
                                 </Grid>
                                 <Grid item xs={12} md={12}>

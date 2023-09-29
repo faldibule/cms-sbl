@@ -1,20 +1,21 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '../../../components/Page';
 import Iconify from '../../../components/Iconify';
 import moment from 'moment/moment';
 import CustomSearchComponent from '../../../components/CustomSearchComponent';
 import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
-import CustomMenuComponent from '../../../components/CustomMenuComponent';
-import { LoadingButton } from '@mui/lab';
-import { NumberFormat } from '../../../utils/Format';
+import CustomActionTableComponent from '@components/CustomActionTableComponent';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 
-let dummy = []
-for(let i = 0; i < 15; i++){
-    dummy[i] = {
-        discount: i % 2 === 0 ? 20 : 0,
-    }
+let dummy = [];
+for(let i = 0; i<5; i++){
+    dummy.push({
+        name: `User ${i}`,
+        email: `user${i}@gmail.com`,
+        role: 'BOD'
+    })
 }
 
 const index = () => {
@@ -41,29 +42,19 @@ const index = () => {
         })
     }
 
-    const [staging, setStaging] = useState();
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event, value) => {
-        setAnchorEl(event.currentTarget);
-        setStaging(value);
-    };
-    const handleMenu = () => {
-        setAnchorEl(null);
-    };
-
     return (
-        <Page title='Discount'>
+        <Page title='User List'>
             <Container>
-                <Grid container spacing={1}>
+                <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                Discount
+                                User List
                             </Typography>
+                            <Button component={Link} to='/user/user-list/add' variant='contained' startIcon={<Iconify icon='material-symbols:add' />}>Add User</Button>
                         </Stack>
                     </Grid>
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12} md={12}>
                         <Card>
                             <CardContent>
                                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
@@ -72,7 +63,7 @@ const index = () => {
                                     </Grid>
                                 </Grid>
                                 <TableContainer>
-                                    <Table aria-label="simple table">
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -81,7 +72,9 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>Discount</TableCell>
+                                                <TableCell>Name</TableCell>
+                                                <TableCell>Email</TableCell>
+                                                <TableCell>Role</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -90,15 +83,18 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell>{v.discount === 0 ? `${v.discount}%` : 'none'}</TableCell>
                                                         <TableCell>
-                                                            <IconButton onClick={(e) => handleClick(e, v)}>
-                                                                <Iconify icon='mingcute:more-2-fill' />
-                                                            </IconButton>
+                                                            <CustomLinkComponent label={v.name} url={`/user/user-list/edit/${1}`} />
+                                                        </TableCell>
+                                                        <TableCell>{v.email}</TableCell>
+                                                        <TableCell>{v.role}</TableCell>
+                                                        <TableCell>
+                                                            <CustomActionTableComponent />
                                                         </TableCell>
                                                     </TableRow>
                                                 )
                                             })}
+                                            
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -116,33 +112,7 @@ const index = () => {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={5}>
-                        <Card sx={{ p: 2 }}>
-                            <Typography mb={3} variant='h6'>Form Discount</Typography>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} md={12}>
-                                    <TextField
-                                        fullWidth 
-                                        label='Discount'
-                                    /> 
-                                </Grid>
-                                <Grid item xs={12} md={12}>
-                                    <LoadingButton fullWidth variant='contained' type='submit'>
-                                        Submit
-                                    </LoadingButton>
-                                </Grid>
-                            </Grid>
-                        </Card>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <CustomMenuComponent 
-                            anchorEl={anchorEl}
-                            open={open}
-                            handleMenu={handleMenu}
-                        />
-                    </Grid>
                 </Grid>
-
             </Container>
         </Page>
     );

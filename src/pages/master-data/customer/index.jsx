@@ -130,7 +130,7 @@ const index = () => {
                                 <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth 
-                                        label='Customer Type'
+                                        label='Customer Code'
                                     /> 
                                 </Grid>
                                 <Grid item xs={12} md={6}>
@@ -145,8 +145,10 @@ const index = () => {
                                         label='Company Contact Person'
                                     /> 
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={12}>
                                     <TextField
+                                        multiline
+                                        rows={2}
                                         fullWidth 
                                         label='Customer Address'
                                     /> 
@@ -157,7 +159,7 @@ const index = () => {
                                         label='Customer Email'
                                     /> 
                                 </Grid>
-                                <Grid item xs={12} md={12}>
+                                <Grid item xs={12} md={6}>
                                     <TextField
                                         fullWidth 
                                         label='Customer Phone'
@@ -165,7 +167,7 @@ const index = () => {
                                 </Grid>
                                 <Grid item xs={12} md={12}>
                                     <LoadingButton fullWidth variant='contained' type='submit'>
-                                        submit
+                                        Submit
                                     </LoadingButton>
                                 </Grid>
                             </Grid>

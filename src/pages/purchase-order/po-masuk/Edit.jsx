@@ -5,9 +5,9 @@ import Form from './Form'
 
 const Add = () => {
   return (
-    <Page title='Form Input DO Masuk'>
+    <Page title='Form Edit PO Masuk'>
         <Container>
-            <Form title='add' type='input' />
+            <Form type='input' title='edit' data={{data: ''}} />
         </Container>
     </Page>
   )

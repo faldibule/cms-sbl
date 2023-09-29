@@ -141,18 +141,10 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        if(props.type === 'input'){
-            navigate('/purchase-order/input-purchase-order', {
-                variant: 'success'
-            })
-        }
-        if(props.type ==='approval'){
-            navigate('/purchase-order/approval-purchase-order', {
-                variant: 'success'
-            })
-        }
+        navigate('/delivery-order/do-masuk', {
+            variant: 'success'
+        })
     }
-
     useEffect(() => {
         let mounted = true
         if(mounted){
@@ -170,7 +162,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        {props.type === 'input' ? 'Form Input Purchase Order' : 'Form Approval Purchase Order' }
+                        Form Delivery Order
                     </Typography>
                 </Grid>
             </Grid>
@@ -181,35 +173,24 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PR Number'
+                                label='DO From Supplier'
                                 select
-                                onChange={() => setItem([...itemDataEdit])}
                             >
-                                <MenuItem value='1'>PR Number 1</MenuItem>
-                                <MenuItem value='2'>PR Number 2</MenuItem>
+                                <MenuItem value='1'>DO From Supplier 1</MenuItem>
+                                <MenuItem value='2'>DO From Supplier 2</MenuItem>
                             </TextField> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PO Number'
+                                label='DO Number'
                             /> 
                         </Grid> 
                         <Grid item xs={12} md={4}>
                             <TextField
-                                fullWidth 
-                                label='Supplier'
-                                select
-                            >
-                                <MenuItem value='1'>Supplier 1</MenuItem>
-                                <MenuItem value='2'>Supplier 2</MenuItem>
-                            </TextField> 
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <TextField
                                 type='date'
-                                name='po_date'
-                                label="PO Date"
+                                name='tanggal_pengiriman'
+                                label="Tanggal Pengiriman"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
@@ -219,33 +200,10 @@ const Form = (props) => {
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth 
-                                label='Customer Name'
+                                label='Total'
                             /> 
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                type='date'
-                                name='shipment_date'
-                                label="Shipment Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='User Maker'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Notes'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={4}>
                             {form.document.file_url === '' ?
                                 <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
                                     Add Supporting Document *
@@ -278,18 +236,10 @@ const Form = (props) => {
                                 />
                             }
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <TextField
                                 fullWidth 
-                                label='Terms and Conditions'
-                                multiline
-                                rows={3}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Term of Payment'
+                                label='Keterangan DO'
                                 multiline
                                 rows={3}
                             /> 
@@ -372,7 +322,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={item} />
+                            {/* <CustomGrandTotalComponent item={item} /> */}
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>

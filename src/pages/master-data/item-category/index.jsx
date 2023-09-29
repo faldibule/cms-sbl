@@ -8,6 +8,7 @@ import CustomSearchComponent from '../../../components/CustomSearchComponent';
 import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
 import CustomMenuComponent from '../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
+import Loading from '@components/Loading';
 
 let dummy = []
 for(let i = 0; i < 15; i++){
@@ -21,6 +22,10 @@ for(let i = 0; i < 15; i++){
 }
 
 const index = () => {
+    const [data, setData] = useState({
+        code: ''
+    })
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
     const [rows, setRows] = useState(dummy);
     const [params, setParams] = useState({
@@ -54,6 +59,32 @@ const index = () => {
     const handleMenu = () => {
         setAnchorEl(null);
     };
+    const getData = () => new Promise(resolve => setTimeout(() => {
+        resolve('done')
+        setData({
+            code: '12321',
+            email: 'test@gmail.com',
+            status: '1',
+        })
+    }, 500))
+    const handleEdit = async () => {
+        console.log(staging)
+        handleMenu()
+        setLoading(true)
+        setTimeout(() => {
+            setData({
+                code: 'udin',
+            })
+            setLoading(false)
+        }, 500);
+        // try {
+        //     const res = await getData()
+        // } catch (err) {
+        //     console.log(err)
+        // } finally {
+        //     setLoading(false)
+        // }
+    }
 
     return (
         <Page title='Item Category'>
@@ -134,43 +165,71 @@ const index = () => {
                     <Grid item xs={12} md={4}>
                         <Card sx={{ p: 2 }}>
                             <Typography mb={3} variant='h6'>Form Item Category</Typography>
-                            <Stack rowGap={2}>
-                                <TextField
-                                    fullWidth 
-                                    label='Code'
-                                /> 
-                                <TextField
-                                    fullWidth 
-                                    label='Name'
-                                /> 
-                                <TextField
-                                    fullWidth 
-                                    label='Brand'
-                                    select
-                                >
-                                    <MenuItem value='1'>Brand 1</MenuItem>
-                                    <MenuItem value='2'>Brand 2</MenuItem>
-                                </TextField> 
-                                <TextField
-                                    fullWidth 
-                                    label='Size'
-                                /> 
-                                <TextField
-                                    fullWidth 
-                                    label='Tax'
-                                    select
-                                >
-                                    <MenuItem value='1'>Yes</MenuItem>
-                                    <MenuItem value='2'>No</MenuItem>
-                                </TextField> 
-                                <LoadingButton variant='contained' type='submit'>
-                                    submit
-                                </LoadingButton>
-                            </Stack>
+                            {!loading ? 
+                                <Stack rowGap={2}>
+                                    <TextField
+                                        fullWidth 
+                                        label='Code'
+                                        defaultValue={data.code}
+                                    /> 
+                                    <TextField
+                                        fullWidth 
+                                        label='Name'
+                                    /> 
+                                    <TextField
+                                        fullWidth 
+                                        label='Brand'
+                                        select
+                                    >
+                                        <MenuItem value='1'>Brand 1</MenuItem>
+                                        <MenuItem value='2'>Brand 2</MenuItem>
+                                    </TextField> 
+                                    <TextField
+                                        fullWidth 
+                                        label='Size'
+                                    /> 
+                                    <TextField
+                                        fullWidth 
+                                        label='Unit'
+                                        select
+                                    >
+                                        <MenuItem value=''>None</MenuItem>
+                                        <MenuItem value='kg'>KG</MenuItem>
+                                        <MenuItem value='grm'>GRM</MenuItem>
+                                        <MenuItem value='tin'>TIN</MenuItem>
+                                        <MenuItem value='btl'>BTL</MenuItem>
+                                        <MenuItem value='btl'>LTR</MenuItem>
+                                        <MenuItem value='btl'>TUB</MenuItem>
+                                        <MenuItem value='btl'>BAG</MenuItem>
+                                        <MenuItem value='btl'>EA</MenuItem>
+                                        <MenuItem value='btl'>BOX</MenuItem>
+                                        <MenuItem value='btl'>CTN</MenuItem>
+                                        <MenuItem value='btl'>GLN</MenuItem>
+                                        <MenuItem value='btl'>ROLL</MenuItem>
+                                        <MenuItem value='btl'>SLOP</MenuItem>
+                                        <MenuItem value='btl'>PPN</MenuItem>
+                                        <MenuItem value='btl'>SISIR</MenuItem>
+                                        <MenuItem value='btl'>LOT</MenuItem>
+                                    </TextField> 
+                                    <TextField
+                                        fullWidth 
+                                        label='Tax'
+                                        select
+                                    >
+                                        <MenuItem value='1'>Yes</MenuItem>
+                                        <MenuItem value='2'>No</MenuItem>
+                                    </TextField> 
+                                    <LoadingButton variant='contained' type='submit'>
+                                        submit
+                                    </LoadingButton>
+                                </Stack>
+                            : <Loading />
+                            }
                         </Card>
                     </Grid>
                     <Grid item xs={12} md={12}>
                         <CustomMenuComponent 
+                            handleEdit={handleEdit}
                             anchorEl={anchorEl}
                             open={open}
                             handleMenu={handleMenu}

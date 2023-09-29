@@ -68,17 +68,12 @@ const navConfig = [
   {
     title: 'Purchase Request',
     icon: getIcon('bxs:purchase-tag'),
-    path: '/purchase-request',
-    children: [
-      {
-        title: 'Input PR',
-        path: 'input-purchase-request'
-      },
-      // {
-      //   title: 'Approval PR',
-      //   path: 'approval-purchase-request'
-      // },
-    ]
+    path: '/purchase-request/input-purchase-request',
+  },
+  {
+    title: 'Quotation',
+    icon: getIcon('ph:note'),
+    path: '/quotation',
   },
   {
     title: 'Purchase Order',
@@ -86,12 +81,16 @@ const navConfig = [
     path: '/purchase-order',
     children: [
       {
-        title: 'Terima PO Customer',
-        path: 'receive-purchase-order'
+        title: 'PO Masuk',
+        path: 'po-masuk'
       },
       {
-        title: 'Input PO',
-        path: 'input-purchase-order'
+        title: 'PO Catering',
+        path: 'po-catering'
+      },
+      {
+        title: 'PO Keluar Quotation',
+        path: 'po-quotation'
       },
       // {
       //   title: 'Approval PO',
@@ -109,8 +108,12 @@ const navConfig = [
         path: 'do-masuk'
       },
       {
-        title: 'DO Keluar',
-        path: 'do-keluar'
+        title: 'DO Catering',
+        path: 'do-catering'
+      },
+      {
+        title: 'DO Keluar Quotation',
+        path: 'do-quotation'
       },
       // {
       //   title: 'Approval DO',
@@ -133,49 +136,39 @@ const navConfig = [
     title: 'Stock Management',
     icon: getIcon('iconamoon:box-fill'),
     path: '/stock-management',
-    children: [
-      {
-        title: 'Stock List',
-        path: 'stock-list'
-      },
-      {
-        title: 'Stock Opname',
-        path: 'stock-opname'
-      },
-    ]
   },
   {
     title: 'Activity Log',
     path: '/activity-log',
     icon: getIcon('material-symbols:browse-activity-sharp'),
   },
-  {
-    title: 'Report',
-    icon: getIcon('icon-park-solid:table-report'),
-    path: '/report',
-    children: [
-      {
-        title: 'PR Report',
-        path: 'pR-report'
-      },
-      {
-        title: 'PO Report',
-        path: 'po-report'
-      },
-      {
-        title: 'DO Report',
-        path: 'Do-report'
-      },
-      {
-        title: 'Meal Sheet Summary',
-        path: 'meal-report'
-      },
-      {
-        title: 'Stock Report',
-        path: 'stock-report'
-      },
-    ]
-  },
+  // {
+  //   title: 'Report',
+  //   icon: getIcon('icon-park-solid:table-report'),
+  //   path: '/report',
+  //   children: [
+  //     {
+  //       title: 'PR Report',
+  //       path: 'pR-report'
+  //     },
+  //     {
+  //       title: 'PO Report',
+  //       path: 'po-report'
+  //     },
+  //     {
+  //       title: 'DO Report',
+  //       path: 'Do-report'
+  //     },
+  //     {
+  //       title: 'Meal Sheet Summary',
+  //       path: 'meal-report'
+  //     },
+  //     {
+  //       title: 'Stock Report',
+  //       path: 'stock-report'
+  //     },
+  //   ]
+  // },
 
 ];
 

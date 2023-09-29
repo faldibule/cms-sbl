@@ -3,14 +3,14 @@ import Page from '../../../components/Page'
 import { Container } from '@mui/material'
 import Form from './Form'
 
-const Edit = () => {
+const Add = () => {
   return (
-    <Page title='Terima Purchase Order Customer'>
+    <Page title='From Input PO Keluar Quotation'>
         <Container>
-            <Form title='edit' type='input' data={{ a: '' }} />
+            <Form title='add' type='input' />
         </Container>
     </Page>
   )
 }
 
-export default Edit
+export default Add

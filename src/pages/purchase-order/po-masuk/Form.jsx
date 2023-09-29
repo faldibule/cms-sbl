@@ -1,11 +1,11 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import Iconify from '../../components/Iconify'
+import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../utils/Format'
-import CustomGrandTotalComponent from '../../components/CustomGrandTotalComponent'
+import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
+import { NumberFormat } from '../../../utils/Format'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -135,16 +135,9 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        if(props.type === 'input'){
-            navigate('/purchase-order/input-purchase-order', {
-                variant: 'success'
-            })
-        }
-        if(props.type ==='approval'){
-            navigate('/purchase-order/approval-purchase-order', {
-                variant: 'success'
-            })
-        }
+        navigate('/purchase-order/po-masuk', {
+            variant: 'success'
+        })
     }
 
     useEffect(() => {
@@ -164,7 +157,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        {props.type === 'input' ? 'Form Input Purchase Order' : 'Form Approval Purchase Order' }
+                        {props.type === 'input' ? 'Form Input PO Masuk' : 'Form Edit PO Masuk' }
                     </Typography>
                 </Grid>
             </Grid>
@@ -175,6 +168,16 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
+                                label='PO From Customer'
+                                select
+                            >
+                                <MenuItem value='1'>PO Customer 1</MenuItem>
+                                <MenuItem value='2'>PO Customer 2</MenuItem>
+                            </TextField> 
+                        </Grid>
+                        {/* <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
                                 label='PR Number'
                                 select
                                 onChange={() => setItem([...itemDataEdit])}
@@ -182,61 +185,34 @@ const Form = (props) => {
                                 <MenuItem value='1'>PR Number 1</MenuItem>
                                 <MenuItem value='2'>PR Number 2</MenuItem>
                             </TextField> 
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='PO Number'
                             /> 
                         </Grid> 
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth 
-                                label='Supplier'
-                                select
-                            >
-                                <MenuItem value='1'>Supplier 1</MenuItem>
-                                <MenuItem value='2'>Supplier 2</MenuItem>
-                            </TextField> 
-                        </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                 type='date'
                                 name='po_date'
-                                label="PO Date"
+                                label="Tanggal PO Diterima"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
                             />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Grand Total'
+                            /> 
+                        </Grid>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Customer Name'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                type='date'
-                                name='shipment_date'
-                                label="Shipment Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='User Maker'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Notes'
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -272,22 +248,15 @@ const Form = (props) => {
                                 />
                             }
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <TextField
                                 fullWidth 
-                                label='Terms and Conditions'
+                                label='Keterangan PO'
                                 multiline
                                 rows={3}
                             /> 
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Term of Payment'
-                                multiline
-                                rows={3}
-                            /> 
-                        </Grid>
+                        
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
                                 <TableContainer sx={{ maxWidth: 2000 }}>
@@ -383,9 +352,7 @@ const Form = (props) => {
                             null
                             }
                         </Grid>
-                        <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={item} />
-                        </Grid>
+                        
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
                                 <LoadingButton variant='contained' type='submit'>

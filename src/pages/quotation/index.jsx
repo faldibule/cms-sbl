@@ -1,246 +1,23 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '../../../components/Page';
-import Iconify from '../../../components/Iconify';
+import Page from '@components/Page';
+import Iconify from '@components/Iconify';
 import moment from 'moment/moment';
-import CustomSearchComponent from '../../../components/CustomSearchComponent';
-import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
+import CustomSearchComponent from '@components/CustomSearchComponent';
+import CustomStatusLabelComponent from '@components/CustomStatusLabelComponent';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 
-const dummy = [
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
+let dummy = []
+for(let i = 1; i <= 10; i++){
+    dummy.push({
+        quotation_number: '123' + i,
+        customer_name: `Customer ${i}`,
         shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-]
-
+        user: `user ${i}`,
+        status: i % 2 === 0 ? 'pending' : 'approved',
+    })
+}
 const index = () => {
     const navigate = useNavigate()
     const [rows, setRows] = useState(dummy);
@@ -266,15 +43,15 @@ const index = () => {
     }
 
     return (
-        <Page title='Purchase Request'>
+        <Page title='Quotation'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                Purchase Request
+                                Quotation
                             </Typography>
-                            <Button onClick={() => navigate('/purchase-request/input-purchase-request/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate('/quotation/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>
@@ -300,7 +77,7 @@ const index = () => {
                                                 <TableCell>PR Number</TableCell>
                                                 <TableCell>Customer Name</TableCell>
                                                 <TableCell>Shipment Date</TableCell>
-                                                <TableCell>User Maker</TableCell>
+                                                <TableCell>Prepared By</TableCell>
                                                 <TableCell>Status</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -318,7 +95,9 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/purchase-request/input-purchase-request/edit/1')}>{v.pr_number}</TableCell>
+                                                        <TableCell>
+                                                            <CustomLinkComponent label={v.quotation_number} url='/quotation/edit/1' />
+                                                        </TableCell>
                                                         <TableCell>{v.customer_name}</TableCell>
                                                         <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>
                                                         <TableCell>{v.user}</TableCell>

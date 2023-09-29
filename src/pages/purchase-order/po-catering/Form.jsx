@@ -1,11 +1,11 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useEffect, useMemo, useState } from 'react'
-import Iconify from '../../../components/Iconify'
+import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
 import { NumberFormat } from '../../../utils/Format'
-import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -18,7 +18,7 @@ const itemData = [
         tax: 11,
         total: 1000000,
         grand_total: 1000000,
-        vat: 0,
+        status: false,
     },
     {
         code: '2',
@@ -30,7 +30,7 @@ const itemData = [
         tax: 11,
         total: 2000000,
         grand_total: 2000000,
-        vat: 0,
+        status: true,
     },
     {
         code: '3',
@@ -42,48 +42,27 @@ const itemData = [
         tax: 11,
         total: 3000000,
         grand_total: 3000000,
-        vat: 0,
+        status: false,
     }
 ]
 
-const itemDataEdit = [
-    {
-        code: '1',
-        name: 'item 1',
-        brand: 'brand 1',
-        description: 'Test 1',
-        harga: 1000000,
-        quantity: 5,
+let itemDataEdit = []
+for(let i = 0; i < 4; i++){
+    const index = i + 1
+    itemDataEdit[i] = {
+        code: i + index,
+        name: 'item '+ index,
+        brand: 'brand '+ index,
+        description: 'Test '+ index,
+        harga: index * 1000000,
+        quantity: 5 + index,
         tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
-        vat: 0,
-    },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: 'test 2',
-        harga: 2000000,
-        quantity: 3,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        vat: 0,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: 'test 3',
-        harga: 3000000,
-        quantity: 1,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        vat: 0,
+        total: 0,
+        shipment_charge: 0,
+        grand_total: 0,
+        status: true,
     }
-]
+}
 
 const Form = (props) => {
     const sb = useCustomSnackbar()
@@ -91,7 +70,6 @@ const Form = (props) => {
     const [item, setItem] = useState([])
     const [form, setForm] = useState({
         item: '',
-        vat: 0,
         document: {
             file: '',
             file_name: '',
@@ -116,8 +94,6 @@ const Form = (props) => {
          }
     }
 
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-
     const onChangeItem = (e) => {
         setForm({
             ...form,
@@ -129,12 +105,6 @@ const Form = (props) => {
     const onChangeItemTable = (e, id) => {
         const newItem = item.map((v, i) => {
             if(v.code === id){
-                if(e.target.name === 'vat'){
-                    return {
-                        ...v,
-                        vat: e.target.value.replaceAll('Rp', '').replaceAll('.', '')
-                    }
-                }
                 return {
                     ...v,
                     [e.target.name]: e.target.value,
@@ -149,10 +119,23 @@ const Form = (props) => {
         setItem([...item.filter(v => v.code !== id)])
     }
 
+    const onChangeCheckTable = (e, id) => {
+        const newItem = item.map((v, i) => {
+            if(v.code === id){
+                return {
+                    ...v,
+                    status: e.target.checked
+                }
+            }
+            return v
+        })
+        setItem([...newItem])
+    }
+
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        navigate('/purchase-request/input-purchase-request', {
+        navigate('/purchase-order/po-catering', {
             variant: 'success'
         })
     }
@@ -174,7 +157,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        Form Purchase Request
+                        {props.title === 'input' ? 'Form Input PO Catering' : 'Form Edit PO Catering' }
                     </Typography>
                 </Grid>
             </Grid>
@@ -185,72 +168,53 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
+                                label='PO From Customer'
+                                select
+                            >
+                                <MenuItem value='1'>PO Customer 1</MenuItem>
+                                <MenuItem value='2'>PO Customer 2</MenuItem>
+                            </TextField> 
+                        </Grid>
+                        {/* <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
                                 label='PR Number'
+                                select
+                                onChange={() => setItem([...itemDataEdit])}
+                            >
+                                <MenuItem value='1'>PR Number 1</MenuItem>
+                                <MenuItem value='2'>PR Number 2</MenuItem>
+                            </TextField> 
+                        </Grid> */}
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='PO Number'
+                            /> 
+                        </Grid> 
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                type='date'
+                                name='po_date'
+                                label="Tanggal PO Diterima"
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Grand Total'
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Location'
-                                select
-                            >
-                                <MenuItem value='1'>Location 1</MenuItem>
-                                <MenuItem value='2'>Location 2</MenuItem>
-                            </TextField> 
+                                label='Customer Name'
+                            /> 
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                type='date'
-                                name='pr_date'
-                                label="PR Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                type='date'
-                                name='shipment_date'
-                                label="Shipment Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Prepared By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Acknowledge By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Approved By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
-                        </Grid>
-                        
                         <Grid item xs={12} md={6}>
                             {form.document.file_url === '' ?
                                 <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
@@ -286,23 +250,17 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
-                                label='Item'
-                                value={form.item}
-                                onChange={onChangeItem}
                                 fullWidth 
-                                select
-                            >
-                                {itemData.map((v, i) => {
-                                    return (
-                                        <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
-                                    )
-                                })}
-                            </TextField> 
+                                label='Keterangan PO'
+                                multiline
+                                rows={3}
+                            /> 
                         </Grid>
+                        
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer>
-                                    <Table aria-label="simple table">
+                                <TableContainer sx={{ maxWidth: 2000 }}>
+                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -311,45 +269,56 @@ const Form = (props) => {
                                                     bgcolor: '#d6e9ff'
                                                 }}
                                             >
+
+                                                {props.type === 'approval' ? 
+                                                <TableCell></TableCell>
+                                                : null
+                                                }
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Brand</TableCell>
                                                 <TableCell>Description</TableCell>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>Price</TableCell>
+                                                <TableCell>Harga</TableCell>
                                                 <TableCell>Quantity</TableCell>
-                                                <TableCell>Amount</TableCell>
-                                                <TableCell>VAT</TableCell>
+                                                <TableCell>Current Stock</TableCell>
+                                                <TableCell>Tax</TableCell>
+                                                <TableCell>Shipment Charge</TableCell>
                                                 <TableCell>Total Price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             {item.map((v, i) => {
-                                                const total = v.harga * v.quantity
-                                                const grand_total = total + parseInt(v.vat)
-                                                console.log(v.vat)
+                                                const temp = parseInt(v.shipment_charge)
+                                                const total = (v.harga * v.quantity) 
+                                                const grand_total = total + (total * 11 / 100) + temp
                                                 return (
                                                     <TableRow key={i}>
+                                                        {/* {props.type === 'approval' ? 
+                                                            <TableCell>
+                                                                <Checkbox
+                                                                    checked={v.status}
+                                                                    onChange={(e) => onChangeCheckTable(e, v.code)}
+                                                                />
+                                                            </TableCell>
+                                                            : null
+                                                        } */}
                                                         <TableCell>{i + 1}</TableCell>
                                                         <TableCell>{v.name}</TableCell>
                                                         <TableCell>{v.brand}</TableCell>
                                                         <TableCell>
                                                             <TextField
                                                                 fullWidth 
-                                                                sx={{ width: 300 }}
                                                                 label='Description'
                                                                 name='description'
                                                                 value={v.description}
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
-                                                        <TableCell>KG</TableCell>
                                                         <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
                                                         <TableCell>
                                                             <TextField
                                                                 fullWidth 
-                                                                sx={{ width: 300 }}
                                                                 label='Quantity'
                                                                 type='number'
                                                                 name='quantity'
@@ -357,17 +326,18 @@ const Form = (props) => {
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
-                                                        <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
+                                                        <TableCell>20</TableCell>
+                                                        <TableCell>{v.tax}%</TableCell>
                                                         <TableCell>
                                                             <TextField
-                                                                fullWidth 
-                                                                sx={{ width: 300 }}
-                                                                name='vat'
-                                                                label='VAT'
-                                                                value={NumberFormat(v.vat, 'Rp')}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
+                                                                    fullWidth 
+                                                                    label='Shipment Charge'
+                                                                    type='number'
+                                                                    name='shipment_charge'
+                                                                    value={v.shipment_charge}
+                                                                    onChange={(e) => onChangeItemTable(e, v.code)}
+                                                                /> 
+                                                            </TableCell>
                                                         <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
                                                         <TableCell align='center'>
                                                             <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
@@ -375,7 +345,6 @@ const Form = (props) => {
                                                     </TableRow>
                                                 )
                                             })}
-                                            
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -383,9 +352,7 @@ const Form = (props) => {
                             null
                             }
                         </Grid>
-                        <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent tax={false} item={item} />
-                        </Grid>
+                        
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
                                 <LoadingButton variant='contained' type='submit'>

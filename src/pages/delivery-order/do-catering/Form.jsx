@@ -135,7 +135,7 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        navigate('/delivery-order/do-keluar', {
+        navigate('/delivery-order/do-catering', {
             variant: 'success'
         })
     }
@@ -157,7 +157,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        {props.type === 'input' ? 'Form Input Delivery Order' : 'Form Input Delivery Order' }
+                        {props.type === 'input' ? 'Form Input DO Catering' : 'Form Edit DO Catering' }
                     </Typography>
                 </Grid>
             </Grid>
@@ -168,29 +168,47 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='DO Number'
+                                label='PR Number'
+                                select
+                                value={form.item}
+                                onChange={onChangeItem}
+                            >
+                                <MenuItem value='1'>PR Number 1</MenuItem>
+                                <MenuItem value='2'>PR Number 2</MenuItem>
+                            </TextField> 
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='PO Number'
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PO Number Customer'
+                                label='Supplier'
                                 select
-                                onChange={() => setItem([...itemDataEdit])}
                             >
-                                <MenuItem value='1'>PO Number Customer 1</MenuItem>
-                                <MenuItem value='2'>PO Number Customer 2</MenuItem>
+                                <MenuItem value='1'>Supplier 1</MenuItem>
+                                <MenuItem value='2'>Supplier 2</MenuItem>
                             </TextField> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Customer'
-                                select
-                            >
-                                <MenuItem value='1'>Customer 1</MenuItem>
-                                <MenuItem value='2'>Customer 2</MenuItem>
-                            </TextField> 
+                                label='Attn Name'
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                type='date'
+                                name='request_date'
+                                label="Request Date"
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                }}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
@@ -206,53 +224,70 @@ const Form = (props) => {
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth 
-                                label='Ship to'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth 
-                                label='Input No'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth 
-                                label='Item Category'
+                                label='Supplier'
                                 select
                             >
-                                <MenuItem value='1'>Item Category 1</MenuItem>
-                                <MenuItem value='2'>Item Category 2</MenuItem>
+                                <MenuItem value='1'>Supplier 1</MenuItem>
+                                <MenuItem value='2'>Supplier 2</MenuItem>
                             </TextField> 
                         </Grid>
                         <Grid item xs={12} md={4}>
                             <TextField
                                 fullWidth 
-                                label='Brand'
-                            /> 
+                                label='Discount'
+                                select
+                            >
+                                <MenuItem value='1'>Discount 1</MenuItem>
+                                <MenuItem value='2'>Discount 2</MenuItem>
+                            </TextField> 
                         </Grid>
                         <Grid item xs={12} md={4}>
-                            <TextField
-                                fullWidth 
-                                label='Size'
-                            /> 
+                            {form.document.file_url === '' ?
+                                <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
+                                    Add Supporting Document *
+                                    <input name="document" type="file" onChange={handleFile} hidden />
+                                </Button>
+                            :
+                                <TextField
+                                    variant="outlined"
+                                    label="Supporting Document *"
+                                    sx={{ mb: 2 }}
+                                    value={form.document.file_name}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Iconify icon='fluent:hard-drive-20-filled' />
+                                            </InputAdornment>
+                                        ),
+                                        endAdornment: (
+                                        <InputAdornment position="end">
+                                            <Tooltip title="Delete">
+                                                <IconButton onClick={() => setForm({...form, document: { file_url: '', file: '', file_name: '' }})}>
+                                                    <Iconify icon='zondicons:close-solid' />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </InputAdornment>
+                                        ),
+                                    }}
+                                    fullWidth
+                                    disabled
+                                />
+                            }
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Unit Quantity'
+                                label='Terms And Condition'
+                                multiline
+                                rows={3}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Prepared By'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Approved By'
+                                label='Terms of Payment'
+                                multiline
+                                rows={3}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -292,15 +327,6 @@ const Form = (props) => {
                                                 const grand_total = total + (total * 11 / 100) + temp
                                                 return (
                                                     <TableRow key={i}>
-                                                        {/* {props.type === 'approval' ? 
-                                                            <TableCell>
-                                                                <Checkbox
-                                                                    checked={v.status}
-                                                                    onChange={(e) => onChangeCheckTable(e, v.code)}
-                                                                />
-                                                            </TableCell>
-                                                            : null
-                                                        } */}
                                                         <TableCell>{i + 1}</TableCell>
                                                         <TableCell>{v.name}</TableCell>
                                                         <TableCell>{v.brand}</TableCell>
@@ -333,7 +359,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={itemDataEdit} />
+                            <CustomGrandTotalComponent item={item} />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>

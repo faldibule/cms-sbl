@@ -1,11 +1,11 @@
 import React from 'react'
-import Page from '../../../components/Page'
+import Page from '@components/Page'
 import { Container } from '@mui/material'
 import Form from './Form'
 
 const Add = () => {
   return (
-    <Page title='Form DO Keluar'>
+    <Page title='Form Input Quotation'>
         <Container>
             <Form title='add' />
         </Container>

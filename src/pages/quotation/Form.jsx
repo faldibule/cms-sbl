@@ -1,10 +1,11 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import Iconify from '../../../components/Iconify'
+import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import React, { useEffect, useMemo, useState } from 'react'
+import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../../utils/Format'
+import useCustomSnackbar from '../../hooks/useCustomSnackbar'
+import { NumberFormat } from '../../utils/Format'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 
 const itemData = [
     {
@@ -17,7 +18,7 @@ const itemData = [
         tax: 11,
         total: 1000000,
         grand_total: 1000000,
-        status: false,
+        vat: 0,
     },
     {
         code: '2',
@@ -29,7 +30,7 @@ const itemData = [
         tax: 11,
         total: 2000000,
         grand_total: 2000000,
-        status: true,
+        vat: 0,
     },
     {
         code: '3',
@@ -41,7 +42,7 @@ const itemData = [
         tax: 11,
         total: 3000000,
         grand_total: 3000000,
-        status: false,
+        vat: 0,
     }
 ]
 
@@ -56,7 +57,7 @@ const itemDataEdit = [
         tax: 11,
         total: 1000000,
         grand_total: 1000000,
-        status: false,
+        vat: 0,
     },
     {
         code: '2',
@@ -68,7 +69,7 @@ const itemDataEdit = [
         tax: 11,
         total: 2000000,
         grand_total: 2000000,
-        status: false,
+        vat: 0,
     },
     {
         code: '3',
@@ -80,7 +81,7 @@ const itemDataEdit = [
         tax: 11,
         total: 3000000,
         grand_total: 3000000,
-        status: false,
+        vat: 0,
     }
 ]
 
@@ -90,6 +91,7 @@ const Form = (props) => {
     const [item, setItem] = useState([])
     const [form, setForm] = useState({
         item: '',
+        vat: 0,
         document: {
             file: '',
             file_name: '',
@@ -114,6 +116,8 @@ const Form = (props) => {
          }
     }
 
+    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
+
     const onChangeItem = (e) => {
         setForm({
             ...form,
@@ -125,6 +129,12 @@ const Form = (props) => {
     const onChangeItemTable = (e, id) => {
         const newItem = item.map((v, i) => {
             if(v.code === id){
+                if(e.target.name === 'vat'){
+                    return {
+                        ...v,
+                        vat: e.target.value.replaceAll('Rp', '').replaceAll('.', '')
+                    }
+                }
                 return {
                     ...v,
                     [e.target.name]: e.target.value,
@@ -139,23 +149,10 @@ const Form = (props) => {
         setItem([...item.filter(v => v.code !== id)])
     }
 
-    const onChangeCheckTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                return {
-                    ...v,
-                    status: e.target.checked
-                }
-            }
-            return v
-        })
-        setItem([...newItem])
-    }
-
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        navigate('/purchase-request/input-purchase-request', {
+        navigate('/quotation', {
             variant: 'success'
         })
     }
@@ -177,7 +174,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        Form Approval Purchase Request
+                        Form Quotation
                     </Typography>
                 </Grid>
             </Grid>
@@ -188,18 +185,47 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PR Number'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Customer Name'
+                                label='Customer'
                                 select
                             >
                                 <MenuItem value='1'>Customer 1</MenuItem>
                                 <MenuItem value='2'>Customer 2</MenuItem>
                             </TextField> 
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Attention'
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Address'
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                type='date'
+                                name='delivery_date'
+                                label="Delivery Date"
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Vessel'
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Shipping Address'
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
@@ -215,48 +241,40 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='User Maker'
-                            /> 
+                                label='Prepared By'
+                                select
+                            >
+                                <MenuItem value='1'>User 1</MenuItem>
+                                <MenuItem value='2'>User 2</MenuItem>
+                            </TextField> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Notes'
-                            /> 
+                                label='Checked By'
+                                select
+                            >
+                                <MenuItem value='1'>User 1</MenuItem>
+                                <MenuItem value='2'>User 2</MenuItem>
+                            </TextField> 
                         </Grid>
-                        
                         <Grid item xs={12} md={6}>
-                            {form.document.file_url === '' ?
-                                <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
-                                    Add Supporting Document *
-                                    <input name="document" type="file" onChange={handleFile} hidden />
-                                </Button>
-                            :
-                                <TextField
-                                    variant="outlined"
-                                    label="Supporting Document *"
-                                    sx={{ mb: 2 }}
-                                    value={form.document.file_name}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Iconify icon='fluent:hard-drive-20-filled' />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                        <InputAdornment position="end">
-                                            <Tooltip title="Delete">
-                                                <IconButton onClick={() => setForm({...form, document: { file_url: '', file: '', file_name: '' }})}>
-                                                    <Iconify icon='zondicons:close-solid' />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </InputAdornment>
-                                        ),
-                                    }}
-                                    fullWidth
-                                    disabled
-                                />
-                            }
+                            <TextField
+                                fullWidth 
+                                label='Approved By'
+                                select
+                            >
+                                <MenuItem value='1'>User 1</MenuItem>
+                                <MenuItem value='2'>User 2</MenuItem>
+                            </TextField> 
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <TextField
+                                fullWidth 
+                                label='Term & Condition'
+                                multiline
+                                rows={3}
+                            />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
@@ -276,7 +294,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
                                 <TableContainer>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                    <Table aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -285,16 +303,15 @@ const Form = (props) => {
                                                     bgcolor: '#d6e9ff'
                                                 }}
                                             >
-                                                <TableCell></TableCell>
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Item Name</TableCell>
                                                 <TableCell>Item Brand</TableCell>
                                                 <TableCell>Description</TableCell>
-                                                <TableCell>Harga</TableCell>
+                                                <TableCell>Unit</TableCell>
+                                                <TableCell>Price</TableCell>
                                                 <TableCell>Quantity</TableCell>
-                                                <TableCell>Current Stock</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Total</TableCell>
+                                                <TableCell>Amount</TableCell>
+                                                <TableCell>VAT</TableCell>
                                                 <TableCell>Total Price</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
@@ -302,31 +319,29 @@ const Form = (props) => {
                                         <TableBody>
                                             {item.map((v, i) => {
                                                 const total = v.harga * v.quantity
-                                                const grand_total = total + (total * 11 / 100)
+                                                const grand_total = total + parseInt(v.vat)
+                                                console.log(v.vat)
                                                 return (
                                                     <TableRow key={i}>
-                                                        <TableCell>
-                                                            <Checkbox
-                                                                checked={v.status}
-                                                                onChange={(e) => onChangeCheckTable(e, v.code)}
-                                                            />
-                                                        </TableCell>
                                                         <TableCell>{i + 1}</TableCell>
                                                         <TableCell>{v.name}</TableCell>
                                                         <TableCell>{v.brand}</TableCell>
                                                         <TableCell>
                                                             <TextField
                                                                 fullWidth 
+                                                                sx={{ width: 300 }}
                                                                 label='Description'
                                                                 name='description'
                                                                 value={v.description}
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
+                                                        <TableCell>KG</TableCell>
                                                         <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
                                                         <TableCell>
                                                             <TextField
                                                                 fullWidth 
+                                                                sx={{ width: 300 }}
                                                                 label='Quantity'
                                                                 type='number'
                                                                 name='quantity'
@@ -334,9 +349,17 @@ const Form = (props) => {
                                                                 onChange={(e) => onChangeItemTable(e, v.code)}
                                                             /> 
                                                         </TableCell>
-                                                        <TableCell>10</TableCell>
-                                                        <TableCell>{v.tax}%</TableCell>
                                                         <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
+                                                        <TableCell>
+                                                            <TextField
+                                                                fullWidth 
+                                                                sx={{ width: 300 }}
+                                                                name='vat'
+                                                                label='VAT'
+                                                                value={NumberFormat(v.vat, 'Rp')}
+                                                                onChange={(e) => onChangeItemTable(e, v.code)}
+                                                            /> 
+                                                        </TableCell>
                                                         <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
                                                         <TableCell align='center'>
                                                             <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
@@ -353,9 +376,20 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <LoadingButton variant='contained' type='submit' sx={{ ml: 'auto' }}>
-                                submit
-                            </LoadingButton>
+                            <CustomGrandTotalComponent tax={false} item={item} />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <Stack direction='row' spacing={2}>
+                                <LoadingButton variant='contained' type='submit'>
+                                    submit
+                                </LoadingButton>
+                                {props.title == 'edit' ?
+                                    <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
+                                        Print
+                                    </LoadingButton>
+                                : null
+                                }
+                            </Stack>
                         </Grid>
                     </Grid>
                 </Card>

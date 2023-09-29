@@ -6,6 +6,7 @@ import Iconify from '../../../components/Iconify';
 import moment from 'moment/moment';
 import CustomSearchComponent from '../../../components/CustomSearchComponent';
 import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 
 const dummy = [
     {
@@ -266,14 +267,17 @@ const index = () => {
     }
 
     return (
-        <Page title='Input Purchase Request'>
+        <Page title='DO Keluar Quotation'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                Approval Purchase Order
+                                DO Keluar Quotation
                             </Typography>
+                            <Button onClick={() => navigate('/delivery-order/do-quotation/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                                Input
+                            </Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={12}>
@@ -315,7 +319,9 @@ const index = () => {
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }} onClick={() => navigate('/purchase-order/approval-purchase-order/edit/1')}>{v.pr_number}</TableCell>
+                                                        <TableCell>
+                                                            <CustomLinkComponent label={v.pr_number} url='/delivery-order/do-quotation/edit/1' />
+                                                        </TableCell>
                                                         <TableCell>{v.customer_name}</TableCell>
                                                         <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>
                                                         <TableCell>{v.user}</TableCell>
