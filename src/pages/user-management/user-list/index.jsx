@@ -1,114 +1,313 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '../../../components/Page';
-import Iconify from '../../../components/Iconify';
-import moment from 'moment/moment';
-import CustomSearchComponent from '../../../components/CustomSearchComponent';
-import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import CustomLinkComponent from '@components/CustomLinkComponent';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+    Avatar,
+    Button,
+    Card,
+    CardContent,
+    Container,
+    Grid,
+    IconButton,
+    InputAdornment,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TablePagination,
+    TableRow,
+    TextField,
+    Typography,
+} from "@mui/material";
+import Page from "../../../components/Page";
+import Iconify from "../../../components/Iconify";
+import moment from "moment/moment";
+import CustomSearchComponent from "../../../components/CustomSearchComponent";
+import CustomStatusLabelComponent from "../../../components/CustomStatusLabelComponent";
+import CustomActionTableComponent from "@components/CustomActionTableComponent";
+import CustomLinkComponent from "@components/CustomLinkComponent";
+import http from "@variable/Api";
+import { useQuery } from "react-query";
+import Loading from "@components/Loading";
 
 let dummy = [];
-for(let i = 0; i<5; i++){
+for (let i = 0; i < 5; i++) {
     dummy.push({
         name: `User ${i}`,
         email: `user${i}@gmail.com`,
-        role: 'BOD'
-    })
+        role: "BOD",
+    });
 }
 
 const index = () => {
-    const navigate = useNavigate()
-    const [rows, setRows] = useState(dummy);
+    const navigate = useNavigate();
     const [params, setParams] = useState({
-        page: 0,
+        page: 1,
         limit: 5,
-        search: ''
-    })
+        search: "",
+        role: "",
+        status: [],
+        department_id: [],
+        location_id: [],
+    });
+    const getUser = async (signal) => {
+        try {
+            const res = await http.get("user", {
+                signal,
+                params: {
+                    ...params
+                }
+            });
+            return res.data.data;
+        } catch (err) {
+            // console.log(err.response);
+        }
+    };
+    const {
+        data: rows,
+        error,
+        isLoading,
+        refetch,
+        isFetched,
+    } = useQuery(["users", params], ({ signal }) => getUser(signal));
 
     const handleChangePage = (event, newPage) => {
-        setParams({
-            ...params,
-            page: newPage
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: newPage + 1,
+            };
         });
-    }
+    };
 
     const handleChangeRowsPerPage = (event) => {
-        setParams({
-            ...params,
-            page: 0,
-            limit: parseInt(event.target.value, 10)
-        })
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: 1,
+                limit: +event.target.value,
+            };
+        });
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            const res = await http.post()
+            
+        } catch (err) {
+            console.log(err.response)
+            
+        }
     }
 
     return (
-        <Page title='User List'>
+        <Page title="User List">
             <Container>
                 <Grid container>
-                    <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>
+                    <Grid
+                        item
+                        xs={12}
+                        md={12}
+                    >
+                        <Stack
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                        >
+                            <Typography
+                                variant="h4"
+                                mb={3}
+                            >
                                 User List
                             </Typography>
-                            <Button component={Link} to='/user/user-list/add' variant='contained' startIcon={<Iconify icon='material-symbols:add' />}>Add User</Button>
+                            <Button
+                                component={Link}
+                                to="/user/user-list/add"
+                                variant="contained"
+                                startIcon={
+                                    <Iconify icon="material-symbols:add" />
+                                }
+                            >
+                                Add User
+                            </Button>
                         </Stack>
                     </Grid>
-                    <Grid item xs={12} md={12}>
+                    <Grid
+                        item
+                        xs={12}
+                        md={12}
+                    >
                         <Card>
                             <CardContent>
-                                <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
-                                    <Grid item xs={12} md={12}>
-                                        <CustomSearchComponent />
+                                <Grid
+                                    container
+                                    spacing={2}
+                                    sx={{ mb: 2 }}
+                                    alignItems="center"
+                                >
+                                    <Grid
+                                        item
+                                        xs={12}
+                                        md={12}
+                                    >
+                                        <CustomSearchComponent search={params.search} setParams={setParams} params={params} />
                                     </Grid>
                                 </Grid>
                                 <TableContainer>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                    <Table
+                                        sx={{ minWidth: 650 }}
+                                        aria-label="simple table"
+                                    >
                                         <TableHead>
                                             <TableRow
                                                 sx={{
-                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
-                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                    "& th:first-of-type": {
+                                                        borderRadius:
+                                                            "0.5em 0 0 0.5em",
+                                                    },
+                                                    "& th:last-of-type": {
+                                                        borderRadius:
+                                                            "0 0.5em 0.5em 0",
+                                                    },
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Name</TableCell>
                                                 <TableCell>Email</TableCell>
                                                 <TableCell>Role</TableCell>
+                                                <TableCell>Department</TableCell>
+                                                <TableCell>Location</TableCell>
+                                                <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {rows.slice(params.page * params.limit, params.page * params.limit + params.limit).map((v, i) => {
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell>
-                                                            <CustomLinkComponent label={v.name} url={`/user/user-list/edit/${1}`} />
-                                                        </TableCell>
-                                                        <TableCell>{v.email}</TableCell>
-                                                        <TableCell>{v.role}</TableCell>
-                                                        <TableCell>
-                                                            <CustomActionTableComponent />
+                                            {rows !== undefined ? (
+                                                rows.data.length > 0 ? (
+                                                    rows.data.map(
+                                                        (value, key) => (
+                                                            <TableRow key={key}>
+                                                                <TableCell
+                                                                    component="th"
+                                                                    scope="row"
+                                                                    align="center"
+                                                                >
+                                                                    {rows.meta
+                                                                        .from +
+                                                                        key}
+                                                                    .
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <CustomLinkComponent 
+                                                                        label={value.name}
+                                                                        url={`/user/user-list/edit/${value.id}`}
+                                                                    />
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {value.email}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {value.role}
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        value
+                                                                            .department
+                                                                            .department
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {
+                                                                        value
+                                                                            .location
+                                                                            .location
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    {value.status === 'active' ? 
+                                                                        <Iconify icon='material-symbols:check-circle' sx={{ color: 'green', fontSize: 20 }} />
+                                                                    :
+                                                                        <Iconify icon='carbon:close-filled' sx={{ color: 'red', fontSize: 20 }} />
+                                                                    }
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <CustomActionTableComponent 
+                                                                        handleDelete={() => handleDelete(value.id)}
+                                                                    />
+                                                                </TableCell>                                                             
+                                                            </TableRow>
+                                                        )
+                                                    )
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            component="th"
+                                                            scope="row"
+                                                            sx={{
+                                                                textAlign:
+                                                                    "center",
+                                                                py: 10,
+                                                            }}
+                                                            colSpan={10}
+                                                        >
+                                                            No result found
+                                                            {params.search !==
+                                                                "" && (
+                                                                <div
+                                                                    style={{
+                                                                        display:
+                                                                            "inline-block",
+                                                                    }}
+                                                                >
+                                                                    &nbsp;for "
+                                                                    <b>
+                                                                        {
+                                                                            params.search
+                                                                        }
+                                                                    </b>
+                                                                    "
+                                                                </div>
+                                                            )}
+                                                            .
                                                         </TableCell>
                                                     </TableRow>
                                                 )
-                                            })}
-                                            
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        component="th"
+                                                        scope="row"
+                                                        sx={{
+                                                            textAlign: "center",
+                                                            py: 5,
+                                                        }}
+                                                        colSpan={10}
+                                                    >
+                                                        <Loading />
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <TablePagination
-                                    component="div"
-                                    count={rows.length}
-                                    page={params.page}
-                                    rowsPerPage={params.limit}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    rowsPerPageOptions={[1, 5, 25, 50]}
-                                    showFirstButton
-                                    showLastButton
-                                />
+                                {rows !== undefined && rows.data.length > 0 && (
+                                    <TablePagination
+                                        component="div"
+                                        count={rows.meta.total}
+                                        page={params.page - 1}
+                                        rowsPerPage={params.limit}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={
+                                            handleChangeRowsPerPage
+                                        }
+                                        rowsPerPageOptions={[
+                                            1, 5, 10, 25, 50, 100,
+                                        ]}
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>

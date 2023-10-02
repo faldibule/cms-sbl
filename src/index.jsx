@@ -11,7 +11,9 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { SnackbarProvider, closeSnackbar } from 'notistack';
 import { Button } from '@mui/material';
-
+import { RecoilRoot } from 'recoil';
+import { QueryClient, QueryClientProvider } from 'react-query';
+const queryClient = new QueryClient()
 // ----------------------------------------------------------------------
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -19,17 +21,23 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
    <HelmetProvider>
     <BrowserRouter>
-      <SnackbarProvider 
-          action={(snackbarId) => (
-            <Button sx={{ color: 'white' }} onClick={() => closeSnackbar(snackbarId)}>
-              Dismiss
-            </Button>
-          )} 
-          maxSnack={3} 
-          autoHideDuration={3000}
-        >
-        <App />
-      </SnackbarProvider>
+      <QueryClientProvider client={queryClient}>
+        <RecoilRoot>
+          <Suspense fallback>
+            <SnackbarProvider 
+                action={(snackbarId) => (
+                  <Button sx={{ color: 'white' }} onClick={() => closeSnackbar(snackbarId)}>
+                    X
+                  </Button>
+                )} 
+                maxSnack={3} 
+                autoHideDuration={3000}
+              >
+              <App />
+            </SnackbarProvider>
+          </Suspense>
+        </RecoilRoot>
+      </QueryClientProvider>
     </BrowserRouter>
   </HelmetProvider>
   

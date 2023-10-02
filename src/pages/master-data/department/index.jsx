@@ -8,6 +8,12 @@ import CustomSearchComponent from '../../../components/CustomSearchComponent';
 import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
 import CustomMenuComponent from '../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
+import http from '@variable/Api';
+import { useQuery, useQueryClient } from 'react-query';
+import CustomActionTableComponent from '@components/CustomActionTableComponent';
+import Loading from '@components/Loading';
+import useCustomSnackbar from '@hooks/useCustomSnackbar';
+import DeleteDialog from '@components/DeleteDialog';
 
 let dummy = []
 for(let i = 0; i < 15; i++){
@@ -18,40 +24,117 @@ for(let i = 0; i < 15; i++){
 }
 
 const index = () => {
-    const navigate = useNavigate()
-    const [rows, setRows] = useState(dummy);
+    const { success, failed } = useCustomSnackbar()
     const [params, setParams] = useState({
-        page: 0,
+        page: 1,
         limit: 5,
-        search: ''
+        search: '',
     })
-
+    const getDepartment = async (signal) => {
+        try {
+            const res = await http.get('department', {
+                signal,
+                params
+            })
+            return res.data.data
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    const { data: rows, isLoading, refetch } = useQuery(["departments", params], ({signal}) => getDepartment(signal) )
     const handleChangePage = (event, newPage) => {
-        setParams({
-            ...params,
-            page: newPage
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: newPage + 1,
+            };
         });
-    }
-
+    };
     const handleChangeRowsPerPage = (event) => {
-        setParams({
-            ...params,
-            page: 0,
-            limit: parseInt(event.target.value, 10)
-        })
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: 1,
+                limit: +event.target.value,
+            };
+        });
+    };
+    
+    const [loadingButton, setLoadingButton] = useState(false)
+    const [loadingDelete, setLoadingDelete] = useState(false)
+    const [loading, setLoading] = useState(false)
+
+    const [staging, setStaging] = useState({})
+    const handleReset = (data) => {
+        setLoading(true)
+        setTimeout(() => {
+            setStaging({})
+            setErrors({})
+            setLoading(false)
+        }, 300);
+    }
+    const handleEdit = (data) => {
+        setLoading(true)
+        setTimeout(() => {
+            setStaging(data)
+            setErrors({})
+            setLoading(false)
+        }, 300);
+    }
+    
+    const [open, setOpen] = useState(false)
+    const handleClose = (id = null) => {
+        setOpen(!open)
+        if(!!!id) return;
+        setStaging({ id })
+    }
+    const handleDelete = async () => {
+        setLoadingDelete(true)
+        try {
+            const res = await http.delete(`department/${staging?.id}`)
+            success('Success Delete Department!')
+        } catch (err) {
+            console.log(err.response)
+        } finally {
+            setParams({ ...params, page: 1 })
+            setLoadingDelete(false)
+            setStaging({})
+            handleClose()
+        }
     }
 
-    const [staging, setStaging] = useState();
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event, value) => {
-        setAnchorEl(event.currentTarget);
-        setStaging(value);
-    };
-    const handleMenu = () => {
-        setAnchorEl(null);
-    };
-
+    const [errors, setErrors] = useState({})
+    const handleSave = async (formData) => {
+        try {
+            if(!!staging.id){
+                const res = await http.patch(`department/${staging.id}`, {}, {
+                    params: {
+                        ...Object.fromEntries(formData)
+                    }
+                })
+                success('Success Edit Department')
+            }else{
+                const res = await http.post('department', formData)
+                success('Success Add Department')
+            }
+            refetch()
+            handleReset()
+        } catch (err) {
+            if(!!err.response){
+                console.log(err.response.data.errors)
+                setErrors(err.response.data.errors)
+            } 
+        } finally {
+            setLoadingButton(false)
+        }
+    }
+    const onSubmit = (e) => {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        setErrors({})
+        setLoadingButton(true)
+        handleSave(formData)
+    }
     return (
         <Page title='Department'>
             <Container>
@@ -80,72 +163,151 @@ const index = () => {
                                                     "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
                                                 }}
                                             >
-                                                <TableCell>No.</TableCell>
+                                                <TableCell align='center'>No.</TableCell>
                                                 <TableCell>Code</TableCell>
                                                 <TableCell>Name</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {rows.slice(params.page * params.limit, params.page * params.limit + params.limit).map((v, i) => {
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }}>{v.code}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        <TableCell>
-                                                            <IconButton onClick={(e) => handleClick(e, v)}>
-                                                                <Iconify icon='mingcute:more-2-fill' />
-                                                            </IconButton>
+                                            {rows !== undefined ? (
+                                                rows.data.length > 0 ? (
+                                                    rows.data.map((value, key) => (
+                                                        <TableRow key={key}>
+                                                            <TableCell
+                                                                component="th"
+                                                                scope="row"
+                                                                align="center"
+                                                            >
+                                                                {rows.meta
+                                                                    .from +
+                                                                    key}
+                                                                .
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {value.department_code}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {value.department}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <CustomActionTableComponent 
+                                                                    edit={true}
+                                                                    handleEdit={() => handleEdit(value)}
+                                                                    handleDelete={() => handleClose(value.id)}
+                                                                />
+                                                            </TableCell>                                                             
+                                                        </TableRow>
+                                                    ))
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell
+                                                            component="th"
+                                                            scope="row"
+                                                            sx={{
+                                                                textAlign:
+                                                                    "center",
+                                                                py: 10,
+                                                            }}
+                                                            colSpan={10}
+                                                        >
+                                                            No result found
+                                                            {params.search !==
+                                                                "" && (
+                                                                <div
+                                                                    style={{
+                                                                        display:
+                                                                            "inline-block",
+                                                                    }}
+                                                                >
+                                                                    &nbsp;for "<b>{params.search}</b>"
+                                                                </div>
+                                                            )}
+                                                            .
                                                         </TableCell>
                                                     </TableRow>
                                                 )
-                                            })}
-                                            
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        component="th"
+                                                        scope="row"
+                                                        sx={{
+                                                            textAlign: "center",
+                                                            py: 5,
+                                                        }}
+                                                        colSpan={10}
+                                                    >
+                                                        <Loading />
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <TablePagination
-                                    component="div"
-                                    count={rows.length}
-                                    page={params.page}
-                                    rowsPerPage={params.limit}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    rowsPerPageOptions={[1, 5, 25, 50]}
-                                    showFirstButton
-                                    showLastButton
-                                />
+                                {rows !== undefined && rows.data.length > 0 && (
+                                    <TablePagination
+                                        component="div"
+                                        count={rows.meta.total}
+                                        page={params.page - 1}
+                                        rowsPerPage={params.limit}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={
+                                            handleChangeRowsPerPage
+                                        }
+                                        rowsPerPageOptions={[
+                                            1, 5, 10, 25, 50, 100,
+                                        ]}
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>
                     <Grid item xs={12} md={4}>
                         <Card sx={{ p: 2 }}>
-                            <Typography mb={3} variant='h6'>Form Department</Typography>
-                            <Stack rowGap={2}>
-                                <TextField
-                                    fullWidth 
-                                    label='Code'
-                                /> 
-                                <TextField
-                                    fullWidth 
-                                    label='Department Name'
-                                /> 
-                                <LoadingButton variant='contained' type='submit'>
-                                    submit
-                                </LoadingButton>
-                            </Stack>
+                            <Typography mb={3} variant='h6'>
+                                {!!staging.id ? 'Form Edit Department' : 'Form Add Department'}
+                            </Typography>
+                            {!loading ?
+                                <Stack rowGap={2} component='form' onSubmit={onSubmit}>
+                                    <TextField
+                                        fullWidth 
+                                        label='Code'
+                                        name='department_code'
+                                        defaultValue={staging?.department_code}
+                                        required
+                                        helperText={!!errors?.department_code && errors?.department_code[0]}
+                                        error={!!errors?.department_code}
+                                    /> 
+                                    <TextField
+                                        fullWidth 
+                                        label='Department Name'
+                                        name='department'
+                                        defaultValue={staging?.department}
+                                        required
+                                        helperText={!!errors?.department && errors?.department[0]}
+                                        error={!!errors?.department}
+                                    /> 
+                                    <Stack direction='row' spacing={2}>
+                                        <LoadingButton loading={loadingButton} fullWidth variant='contained' type='submit'>
+                                            Submit
+                                        </LoadingButton>
+                                        <Button variant='outlined' onClick={handleReset} fullWidth>Reset</Button>
+                                    </Stack>
+                                </Stack>
+                            : <Loading />
+                            }
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={12}>
-                        <CustomMenuComponent 
-                            anchorEl={anchorEl}
-                            open={open}
-                            handleMenu={handleMenu}
-                        />
-                    </Grid>
                 </Grid>
-
+                <DeleteDialog 
+                    handleClose={handleClose}
+                    handleDelete={handleDelete}
+                    open={open}
+                    loading={loadingDelete}
+                />
             </Container>
         </Page>
     );

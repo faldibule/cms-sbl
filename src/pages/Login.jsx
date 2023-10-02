@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Card, Link, Container, Typography } from '@mui/material';
+import { Card, Link, Container, Typography, Stack, Box } from '@mui/material';
 // hooks
 import useResponsive from '../hooks/useResponsive';
 // components
@@ -14,9 +14,14 @@ import AuthSocial from '../sections/auth/AuthSocial';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
-  [theme.breakpoints.up('md')]: {
-    display: 'flex',
-  },
+  margin: 0,
+  padding: 0,
+  backgroundImage: "url('/loginbackground2.jpg')",
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center center',
+  backgroundAttachment: 'fixed',
+  height: 'calc(100vh - 0px)'
 }));
 
 const HeaderStyle = styled('header')(({ theme }) => ({
@@ -31,7 +36,7 @@ const HeaderStyle = styled('header')(({ theme }) => ({
   justifyContent: 'space-between',
   [theme.breakpoints.up('md')]: {
     alignItems: 'flex-start',
-    padding: theme.spacing(7, 5, 0, 7),
+    // padding: theme.spacing(7, 5, 0, 7),
   },
 }));
 
@@ -45,13 +50,14 @@ const SectionStyle = styled(Card)(({ theme }) => ({
 }));
 
 const ContentStyle = styled('div')(({ theme }) => ({
-  maxWidth: 480,
+  filter: 'brightness(1)',
   margin: 'auto',
   minHeight: '100vh',
   display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
   justifyContent: 'center',
-  flexDirection: 'column',
-  padding: theme.spacing(12, 0),
+  // padding: theme.spacing(12, 0),
 }));
 
 // ----------------------------------------------------------------------
@@ -61,20 +67,19 @@ export default function Login() {
   return (
     <Page title="Login">
       <RootStyle>
-        <Container maxWidth="sm">
+        <Container>
           <ContentStyle>
-            <Card sx={{ p: 2 }}>
-              <Typography variant="h4" gutterBottom>
-                Sign in 
-              </Typography>
-              <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
-              <LoginForm />
-              <Typography variant="body2" align="center" sx={{ mt: 3 }}>
-                Don’t have an account?{' '}
-                <Link variant="subtitle2" component={RouterLink} to="/register">
-                  Get started
-                </Link>
-              </Typography>
+            {/* <Box sx={{ width: 500, filter: 'brightness(0.5)', height: 400, objectFit: 'contain', objectFit: 'cover' }} component='img' src='/loginbackground.jpg' /> */}
+            <Card sx={{ p: 2, width: 500, height: 400 }}>
+              <Stack direction='row'>
+                <Stack flexGrow={1}>
+                  <Typography variant="h4" gutterBottom>
+                    Sign in 
+                  </Typography>
+                  <Typography sx={{ color: 'text.secondary', mb: 2 }}>Enter your details below.</Typography>
+                  <LoginForm />
+                </Stack>
+              </Stack>
             </Card>
           </ContentStyle>
         </Container>

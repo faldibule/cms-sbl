@@ -9,7 +9,7 @@ const CustomSearchComponent = ({ search = "", setParams = () => {}, params = {} 
             variant="outlined"
             label="Search"
             autoComplete="off"
-            onChange={() => {}}
+            onChange={(e) => setParams({ ...params, search: e.target.value }) }
             value={search}
             fullWidth
             InputProps={{

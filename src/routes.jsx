@@ -1,10 +1,13 @@
 import { Navigate, useRoutes } from 'react-router-dom';
+import Middleware from './middleware'
+
 // layouts
 import DashboardLayout from './layouts/dashboard';
 import LogoOnlyLayout from './layouts/LogoOnlyLayout';
 
 // Not Auth
 import Login from './pages/Login';
+import Logout from './pages/Logout';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
 
@@ -77,22 +80,31 @@ export default function Router() {
   return useRoutes([
     {
       path: 'login',
-      element: <Login />,
+      element:
+      <Middleware.Before>
+        <Login />,
+      </Middleware.Before> 
     },
-    {
-      path: 'register',
-      element: <Register />,
-    },
+    // {
+    //   path: 'register',
+    //   element: <Register />,
+    // },
     {
       path: '/dashboard',
-      element: <DashboardLayout />,
+      element: 
+        <Middleware.After>
+          <DashboardLayout />
+        </Middleware.After>,
       children: [
         { path: '', element: <DashboardApp /> },
       ],
     },
     {
       path: '/user',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         { path: 'user-role', element: <UserRole /> },
         { path: 'user-list', element: <UserList /> },
@@ -102,7 +114,10 @@ export default function Router() {
     },
     {
       path: '/master-data',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>, 
       children: [
         { path: 'item-category', element: <ItemCategory /> },
         { path: 'site-location', element: <SiteLocation /> },
@@ -116,7 +131,10 @@ export default function Router() {
     },
     {
       path: '/purchase-request',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         // input PR
         { path: 'input-purchase-request', element: <InputPurchaseRequest /> },
@@ -126,7 +144,10 @@ export default function Router() {
     },
     {
       path: '/quotation',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         // input PR
         { path: '', element: <Quotation /> },
@@ -136,7 +157,10 @@ export default function Router() {
     },
     {
       path: '/purchase-order',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         // PO-Masuk
         { path: 'po-masuk', element: <POMasuk /> },
@@ -157,7 +181,10 @@ export default function Router() {
     },
     {
       path: '/delivery-order',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         // DO Masuk
         { path: 'do-masuk', element: <DeliveryOrderMasuk /> },
@@ -177,7 +204,10 @@ export default function Router() {
     },
     {
       path: '/meal-sheet',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         { path: 'sheet-detail', element: <SheetDetail /> },
         { path: 'sheet-detail/:id/meal-sheet-daily', element: <MealSheetDaily /> },
@@ -186,10 +216,20 @@ export default function Router() {
     },
     {
       path: '/activity-log',
-      element: <DashboardLayout />,
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
       children: [
         { path: '', element: <ActivityLog /> },
       ],
+    },
+    {
+      path: '/logout',
+      element: 
+      <Middleware.After>
+        <Logout />
+      </Middleware.After>,
     },
     {
       path: '/',

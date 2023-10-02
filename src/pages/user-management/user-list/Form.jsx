@@ -1,98 +1,48 @@
-import { Avatar, Box, Card, CardContent, Container, Grid, Stack, Typography } from '@mui/material'
+import { Avatar, Box, Card, CardContent, Container, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, MenuItem, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { dataRoleDummy } from '../user-role'
 import FormByType from '@components/FormByType'
 import { LoadingButton } from '@mui/lab'
+import http from '@variable/Api'
+import { useQuery } from 'react-query'
+import Loading from '@components/Loading'
+import { useNavigate } from 'react-router-dom'
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
 
 const Form = (props) => {
-    const { data: defaultValue } = props
+    const { success, failed } = useCustomSnackbar()
+    const navigate = useNavigate()
 
-    const [dataDepartment, setDataDepartment] = useState([ { id: '1', label: 'Department 1' }, { id: '2', label: 'Department 2' } ])
-    const [dataRole, setDataRole] = useState(dataRoleDummy)
-    const [dataLocation, setDataLocation] = useState([  { id: '1', label: 'Location 1' }, { id: '2', label: 'Location 2' }  ])
-    
-    const [form, setForm] = useState([
-        {
-            name: 'employee_code',
-            label: 'Employee Code',
-            type: 'text-uncontrolled',
-            typeInput: 'text',
-            defaultValue: defaultValue?.employee_code
-        },
-        {
-            name: 'full_name',
-            label: 'Full Name',
-            type: 'text-uncontrolled',
-            typeInput: 'text',
-            defaultValue: defaultValue?.full_name
-        },
-        {
-            name: 'email',
-            label: 'Email Address',
-            type: 'text-uncontrolled',
-            typeInput: 'email',
-            defaultValue: defaultValue?.email
-        },
-        {
-            name: 'phone_number',
-            label: 'Phone Number',
-            type: 'text-uncontrolled',
-            typeInput: 'number',
-            defaultValue: defaultValue?.phone_number
-        },
-        {
-            name: 'department',
-            label: 'Department',
-            type: 'select-uncontrolled',
-            typeInput: 'text',
-            defaultValue: defaultValue?.department,
-            data: dataDepartment,
-        },
-        {
-            name: 'role',
-            label: 'Role',
-            type: 'select-uncontrolled',
-            typeInput: 'text',
-            defaultValue: defaultValue?.role,
-            data: dataRole,
-        },
-        {
-            name: 'location',
-            label: 'Location',
-            type: 'select-uncontrolled',
-            typeInput: 'text',
-            defaultValue: defaultValue?.location,
-            data: dataLocation,
-        },
-        {
-            name: 'address',
-            label: 'Address',
-            type: 'textarea-uncontrolled',
-            typeInput: 'text',
-            defaultValue: defaultValue?.address,
-        },
-        {
-            name: 'password',
-            label: 'Password',
-            type: 'text-uncontrolled',
-            typeInput: 'password',
-            defaultValue: '',
-        },
-        {
-            name: 're-password',
-            label: 'Repeat Password',
-            type: 'text-uncontrolled',
-            typeInput: 'password',
-            defaultValue: '',
-        },
-        {
-            name: 'status',
-            label: 'Status User',
-            type: 'radio-uncontrolled',
-            typeInput: 'radio',
-            defaultValue: defaultValue?.status,
-        },
-    ])
+    const { data: dataDepartment, isLoading: loadingDepartment } = useQuery(["department"], () => getDepartment())
+    const { data: dataRole, isLoading: loadingRole } = useQuery(["role"], () => getRole())
+    const { data: dataLocation, isLoading: loadingLocation } = useQuery(["location"], () => getLocation())
+
+    const [defaultValue, setDefaultValue] = useState({})
+
+    const getDepartment = async () => {
+        try {
+            const res = await http.get('department')
+            return res.data
+        } catch (err) {
+            console.log(err.response)
+        }
+    }
+    const getRole = async () => {
+        try {
+            const res = await http.get('user/role')
+            return res.data
+        } catch (err) {
+            console.log(err.response)
+        }
+    }
+    const getLocation = async () => {
+        try {
+            const res = await http.get('location')
+            return res.data
+        } catch (err) {
+            console.log(err.response)
+        }
+    }
     
     const [image, setImage] = useState({
         image_preview: '',
@@ -105,12 +55,59 @@ const Form = (props) => {
            image_preview,
            image_file,
         });
-     };
-
+    };
+    
+    const [loading, setLoading] = useState(false)
+    const [errors, setErrors] = useState({})
+    const handleSave = async (formData) => {
+        try {
+            if(props.title === 'add') {
+                const res = await http.post('user', formData) 
+                success('Success Create User')
+                navigate('/user/user-list')
+            }
+            if(props.title === 'edit'){
+                const res = await http.post(`user/${props.id}`, formData)
+                success('Success Edit User')
+                navigate('/user/user-list')
+            }
+        } catch (err) {
+            if(!!err.response){
+                console.log(err.response.data.errors)
+                setErrors(err.response.data.errors)
+            }
+        } finally {
+            setLoading(false)
+        }
+    }
+    
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        console.log(Object.fromEntries(formData))
+        setLoading(true)
+        setErrors({})
+        handleSave(formData)
+    }
+
+    useEffect(() => {
+        let mounted = true
+        if(!!props.data){
+            const { data } = props
+            if(mounted){
+                if(!!data.photo){
+                    setImage({
+                        image_file: '',
+                        image_preview: data.photo
+                    })
+                }
+                setDefaultValue(data)
+            }
+        }
+        return () => mounted = false
+    }, [props])
+
+    if(loadingDepartment || loadingLocation || loadingRole){
+        return <Loading />
     }
 
     return (
@@ -147,17 +144,170 @@ const Form = (props) => {
                 <Grid item xs={12} md={8}>
                     <Card sx={{ p: 2 }}>
                         <Grid container spacing={3}>
-                            {form.map((v, i) => {
-                                const md = v.name === 'location' || v.name === 'address' ? 12 : 6
-                                
-                                return (
-                                    <Grid item xs={12} md={md} key={v.name}>
-                                        <FormByType v={v} />
-                                    </Grid>
-                                )
-                            })}
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Employee Code'
+                                    name="code"
+                                    defaultValue={defaultValue?.code}
+                                    required
+                                    helperText={!!errors?.code && errors?.code[0]}
+                                    error={!!errors?.code}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Full Name'
+                                    name="name"
+                                    defaultValue={defaultValue?.name}
+                                    required
+                                    helperText={!!errors?.name && errors?.name[0]}
+                                    error={!!errors?.name}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Username'
+                                    name="username"
+                                    defaultValue={defaultValue?.username}
+                                    required
+                                    helperText={!!errors?.username && errors?.username[0]}
+                                    error={!!errors?.username}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Email Address'
+                                    name="email"
+                                    defaultValue={defaultValue?.email}
+                                    required
+                                    helperText={!!errors?.username && errors?.username[0]}
+                                    error={!!errors?.username}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Phone Number'
+                                    type='number'
+                                    name="phone_number"
+                                    defaultValue={defaultValue?.phone_number}
+                                    required
+                                    helperText={!!errors?.phone_number && errors?.phone_number[0]}
+                                    error={!!errors?.phone_number}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Department'
+                                    name="department_id"
+                                    defaultValue={defaultValue?.department?.id}
+                                    select
+                                    required
+                                    helperText={!!errors?.department && errors?.department[0]}
+                                    error={!!errors?.department}
+                                >
+                                    {dataDepartment.data.data.map((v, i) => {
+                                        return (
+                                            <MenuItem key={v.id} value={v.id}>{v.department_code} - {v.department}</MenuItem>
+                                        )
+                                    })}
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Role'
+                                    name="role"
+                                    defaultValue={defaultValue?.role[0]}
+                                    select
+                                    required
+                                    helperText={!!errors?.role && errors?.role[0]}
+                                    error={!!errors?.role}
+                                >
+                                    {dataRole.data.map((v, i) => {
+                                        return (
+                                            <MenuItem key={v.name} value={v.name}>{v.name}</MenuItem>
+                                        )
+                                    })}
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth 
+                                    label='Location'
+                                    name="location_id"
+                                    defaultValue={defaultValue?.location?.id}
+                                    select
+                                    required
+                                    helperText={!!errors?.location && errors?.location[0]}
+                                    error={!!errors?.location}
+                                >
+                                    {dataLocation.data.data.map((v, i) => {
+                                        return (
+                                            <MenuItem key={v.id} value={v.id}>{v.location_code} - {v.location}</MenuItem>
+                                        )
+                                    })}
+                                </TextField>
+                            </Grid>
                             <Grid item xs={12} md={12}>
-                                <LoadingButton fullWidth variant='contained' type='submit'>
+                                <TextField
+                                    fullWidth 
+                                    label='Address'
+                                    name="address"
+                                    defaultValue={defaultValue?.address}
+                                    required
+                                    multiline
+                                    rows={3}
+                                    helperText={!!errors?.address && errors?.address[0]}
+                                    error={!!errors?.address}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={12}>
+                                <FormControl required>
+                                    <FormLabel id="demo-row-radio-buttons-group-label">Status</FormLabel>
+                                    <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name='status' defaultValue={defaultValue?.status}>
+                                        <FormControlLabel value="active" control={<Radio />} label="Active" />
+                                        <FormControlLabel value="not_active" control={<Radio />} label="Not Active" />
+                                    </RadioGroup>
+                                    <FormHelperText error={!!errors?.status}>{!!errors?.status && errors?.status[0]}</FormHelperText>
+                                </FormControl>
+                            </Grid>
+                            {props.title === 'add' ? 
+                            <>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth 
+                                        label='Password'
+                                        name="password"
+                                        type='password'
+                                        defaultValue={defaultValue?.password}
+                                        required
+                                        helperText={!!errors?.password && errors?.password[0]}
+                                        error={!!errors?.password}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <TextField
+                                        fullWidth 
+                                        label='Password Confirmation'
+                                        name="password_confirmation"
+                                        type='password'
+                                        defaultValue={defaultValue?.password_confirmation}
+                                        required
+                                        helperText={!!errors?.password && errors?.password[0]}
+                                        error={!!errors?.password}
+                                    />
+                                </Grid>
+                            </>
+                            : null
+                            }
+                            <Grid item xs={12} md={12}>
+                                <LoadingButton loading={loading} fullWidth variant='contained' type='submit'>
                                     Save
                                 </LoadingButton>
                             </Grid>

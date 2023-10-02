@@ -5,26 +5,30 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
-import { Link, Stack, IconButton, InputAdornment } from '@mui/material';
+import { Link, Stack, IconButton, InputAdornment, Typography, Alert } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
-import Iconify from '../../../components/Iconify';
-import { FormProvider, RHFTextField, RHFCheckbox } from '../../../components/hook-form';
+import Iconify from '@components/Iconify';
+import { FormProvider, RHFTextField, RHFCheckbox } from '@components/hook-form';
+import http from '@variable/Api';
+import { useSetRecoilState } from 'recoil';
+import { authentication } from '@recoil/Authentication';
 
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const setAuth = useSetRecoilState(authentication)
 
   const [showPassword, setShowPassword] = useState(false);
 
   const LoginSchema = Yup.object().shape({
-    email: Yup.string().email('Email must be a valid email address').required('Email is required'),
+    username: Yup.string().required('Username is required'),
     password: Yup.string().required('Password is required'),
   });
 
   const defaultValues = {
-    email: '',
+    username: '',
     password: '',
     remember: true,
   };
@@ -39,15 +43,47 @@ export default function LoginForm() {
     formState: { isSubmitting },
   } = methods;
 
-  const onSubmit = async () => {
-    navigate('/dashboard', { replace: true });
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const handleLogin = async (formData) => {
+    try {
+      const res = await http.post('user/auth/login', formData)
+      localStorage.setItem('token', res.data.data.access_token);
+      setAuth({
+        auth: true,
+        user: res.data.data.user,
+      })
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      if(err?.code === "ERR_NETWORK"){
+        setError('Network Error')
+      }
+      if(err?.response?.status === 422){
+        setError('Username or Password is Invalid!')
+      }
+    } finally { 
+      setLoading(false)
+    }
+  }
+
+  const onSubmit = async (data) => {
+    const formData = new FormData()
+    formData.append('username', data.username)
+    formData.append('password', data.password)
+    setError('')
+    setLoading(true)
+    handleLogin(formData)
   };
 
   return (
     <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
       <Stack spacing={3}>
-        <RHFTextField name="email" label="Email address" />
-
+        <Stack direction="row">
+          {error !== '' ? 
+            <Alert sx={{ width: '100%' }} variant='standard' color='error' severity='error'>{error}</Alert>
+          : null}
+        </Stack>
+        <RHFTextField name="username" label="Username" />
         <RHFTextField
           name="password"
           label="Password"
@@ -65,13 +101,12 @@ export default function LoginForm() {
       </Stack>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ my: 2 }}>
-        <RHFCheckbox name="remember" label="Remember me" />
         <Link variant="subtitle2" underline="hover">
           Forgot password?
         </Link>
       </Stack>
-
-      <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={isSubmitting}>
+      
+      <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={loading}>
         Login
       </LoadingButton>
     </FormProvider>

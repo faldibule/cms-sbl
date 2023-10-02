@@ -328,7 +328,6 @@ const Form = (props) => {
                                             {item.map((v, i) => {
                                                 const total = v.harga * v.quantity
                                                 const grand_total = total + parseInt(v.vat)
-                                                console.log(v.vat)
                                                 return (
                                                     <TableRow key={i}>
                                                         <TableCell>{i + 1}</TableCell>
@@ -337,6 +336,7 @@ const Form = (props) => {
                                                         <TableCell>
                                                             <TextField
                                                                 fullWidth 
+                                                                size='small'
                                                                 sx={{ width: 300 }}
                                                                 label='Description'
                                                                 name='description'
@@ -349,6 +349,7 @@ const Form = (props) => {
                                                         <TableCell>
                                                             <TextField
                                                                 fullWidth 
+                                                                size='small'
                                                                 sx={{ width: 300 }}
                                                                 label='Quantity'
                                                                 type='number'
@@ -360,6 +361,7 @@ const Form = (props) => {
                                                         <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
                                                         <TableCell>
                                                             <TextField
+                                                                size='small'
                                                                 fullWidth 
                                                                 sx={{ width: 300 }}
                                                                 name='vat'
