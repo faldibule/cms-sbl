@@ -38,10 +38,10 @@ const index = () => {
             })
             return res.data.data
         } catch (err) {
-            console.log(err)
+            // console.log(err)
         }
     }
-    const { data: rows, isLoading, refetch } = useQuery(["departments", params], ({signal}) => getDepartment(signal) )
+    const { data: rows, isLoading, refetch, isFetchedAfterMount } = useQuery(["departments", params], ({signal}) => getDepartment(signal))
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -71,7 +71,7 @@ const index = () => {
             setStaging({})
             setErrors({})
             setLoading(false)
-        }, 300);
+        }, 0);
     }
     const handleEdit = (data) => {
         setLoading(true)
@@ -79,11 +79,14 @@ const index = () => {
             setStaging(data)
             setErrors({})
             setLoading(false)
-        }, 300);
+        }, 500);
     }
     
     const [open, setOpen] = useState(false)
     const handleClose = (id = null) => {
+        if(open){
+            handleReset()
+        }
         setOpen(!open)
         if(!!!id) return;
         setStaging({ id })
@@ -94,9 +97,9 @@ const index = () => {
             const res = await http.delete(`department/${staging?.id}`)
             success('Success Delete Department!')
         } catch (err) {
-            console.log(err.response)
+            // console.log(err.response)
         } finally {
-            setParams({ ...params, page: 1 })
+            refetch()
             setLoadingDelete(false)
             setStaging({})
             handleClose()
@@ -121,7 +124,7 @@ const index = () => {
             handleReset()
         } catch (err) {
             if(!!err.response){
-                console.log(err.response.data.errors)
+                // console.log(err.response.data.errors)
                 setErrors(err.response.data.errors)
             } 
         } finally {
@@ -135,6 +138,11 @@ const index = () => {
         setLoadingButton(true)
         handleSave(formData)
     }
+
+    if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
+        setParams({ ...params, page: rows.meta.last_page })
+    }
+
     return (
         <Page title='Department'>
             <Container>
@@ -151,7 +159,11 @@ const index = () => {
                             <CardContent>
                                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
                                     <Grid item xs={12} md={12}>
-                                        <CustomSearchComponent />
+                                        <CustomSearchComponent 
+                                            params={params}
+                                            search={params.search}
+                                            setParams={setParams}
+                                        />
                                     </Grid>
                                 </Grid>
                                 <TableContainer>
