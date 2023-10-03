@@ -2,7 +2,7 @@ import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import http from '@variable/Api'
 import { useMutation } from 'react-query'
 
-const useSaveCategory = ({ onSuccess }) => {
+const useSaveItemCategory = ({ onSuccess }) => {
     const { success } = useCustomSnackbar()
     return useMutation({
         mutationFn: async ({ formData, id }) => {
@@ -12,14 +12,14 @@ const useSaveCategory = ({ onSuccess }) => {
                         ...Object.fromEntries(formData)
                     }
                 })
-                success('Success Edit Category')
+                success('Success Edit Item Category')
             }else{
                 const res = await http.post('item-category', formData)
-                success('Success Add Category')
+                success('Success Add Item Category')
             }
         },
         onSuccess,
     })
 }
 
-export default useSaveCategory
+export default useSaveItemCategory

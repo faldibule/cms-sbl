@@ -1,8 +1,8 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchCategory = (params) => {
-    return useQuery(['categories', params], async ({ signal }) => {
+const useFetchItemCategory = (params) => {
+    return useQuery(['item-categories', params], async ({ signal }) => {
         try {
             const res = await http.get('item-category', {
                 signal,
@@ -15,4 +15,4 @@ const useFetchCategory = (params) => {
     })
 }
 
-export default useFetchCategory
+export default useFetchItemCategory

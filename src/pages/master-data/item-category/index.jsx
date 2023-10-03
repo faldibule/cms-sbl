@@ -9,31 +9,21 @@ import CustomStatusLabelComponent from '../../../components/CustomStatusLabelCom
 import CustomMenuComponent from '../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
 import Loading from '@components/Loading';
-import useFetchItem from '@hooks/item/useFetchItem';
-import useDeleteItem from '@hooks/item/useDeleteItem';
-import useSaveItem from '@hooks/item/useSaveItem';
 import DeleteDialog from '@components/DeleteDialog';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-
-let dummy = []
-for(let i = 0; i < 15; i++){
-    dummy[i] = {
-        code: i + 1,
-        name: `Item Category ${i + 1}`,
-        brand:  `Brand 1`,
-        size: 'Size 1',
-        tax: i % 2 === 0 ? true : false
-    }
-}
+import useFetchItemCategory from '@hooks/item-category/useFetchItemCategory';
+import useDeleteItemCategory from '@hooks/item-category/useDeleteItemCategory';
+import useSaveItemCategory from '@hooks/item-category/useSaveItemCategory';
 
 const index = () => {
     const [params, setParams] = useState({
-        page: 0,
+        page: 1,
         limit: 5,
         search: '',
         paginate: 1,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchItem(params)
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchItemCategory(params)
+    const { data: parentCategories, refetch: refetchParentCategories, isLoading: loadingParent  } = useFetchItemCategory({ paginate: 0 })
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -79,10 +69,11 @@ const index = () => {
         setStaging({ id })
     }
 
-    const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteItem({
+    const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteItemCategory({
         onSuccess: () => {
             handleReset()
             refetch()
+            refetchParentCategories()
             handleClose()
         }
     })
@@ -90,10 +81,11 @@ const index = () => {
         deleteDepartment(staging?.id)
     }
 
-    const { mutate: save, isLoading: loadingSave, error } = useSaveItem({
+    const { mutate: save, isLoading: loadingSave, error } = useSaveItemCategory({
         onSuccess: () => {
             handleReset()
             refetch()
+            refetchParentCategories()
         }
     })
     const errors = error?.response?.data?.errors
@@ -171,6 +163,9 @@ const index = () => {
                     {value.category}
                 </TableCell>
                 <TableCell>
+                    {!!value.parent_category_id ? value.parent_category_id : '-'}
+                </TableCell>
+                <TableCell>
                     <CustomActionTableComponent 
                         edit={true}
                         handleEdit={() => handleEdit(value)}
@@ -179,6 +174,26 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
+    }
+
+    const renderParentCategory = () => {
+        if(loadingParent) return;
+        const filteredData = parentCategories.data.filter(v => {
+            if(!!staging.id){
+                return !v.parent_category_id && v.id !== staging.id
+            }
+            return !v.parent_category_id
+        })
+        if(filteredData.length === 0 ){
+            return (
+                <MenuItem value='' disabled>Kosong</MenuItem>
+            )
+        }
+        return filteredData.map((v) => {
+            return (
+                <MenuItem key={v.id} value={v.id}>{v.category_code} - {v.category}</MenuItem>
+            )
+        })
     }
 
     return (
@@ -216,7 +231,7 @@ const index = () => {
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Code</TableCell>
                                                 <TableCell>Name</TableCell>
-                                                <TableCell>Tax</TableCell>
+                                                <TableCell>Parent</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -272,46 +287,16 @@ const index = () => {
                                     /> 
                                     <TextField
                                         fullWidth 
-                                        label='Brand'
+                                        label='Parent'
                                         select
-                                    >
-                                        <MenuItem value='1'>Brand 1</MenuItem>
-                                        <MenuItem value='2'>Brand 2</MenuItem>
-                                    </TextField> 
-                                    <TextField
-                                        fullWidth 
-                                        label='Size'
-                                    /> 
-                                    <TextField
-                                        fullWidth 
-                                        label='Unit'
-                                        select
+                                        name='parent_category_id'
+                                        defaultValue={staging?.parent_category_id}
+                                        helperText={!!errors?.parent_category_id && errors?.parent_category_id[0]}
+                                        error={!!errors?.parent_category_id}
+                                        disabled={loadingParent}
                                     >
                                         <MenuItem value=''>None</MenuItem>
-                                        <MenuItem value='kg'>KG</MenuItem>
-                                        <MenuItem value='grm'>GRM</MenuItem>
-                                        <MenuItem value='tin'>TIN</MenuItem>
-                                        <MenuItem value='btl'>BTL</MenuItem>
-                                        <MenuItem value='btl'>LTR</MenuItem>
-                                        <MenuItem value='btl'>TUB</MenuItem>
-                                        <MenuItem value='btl'>BAG</MenuItem>
-                                        <MenuItem value='btl'>EA</MenuItem>
-                                        <MenuItem value='btl'>BOX</MenuItem>
-                                        <MenuItem value='btl'>CTN</MenuItem>
-                                        <MenuItem value='btl'>GLN</MenuItem>
-                                        <MenuItem value='btl'>ROLL</MenuItem>
-                                        <MenuItem value='btl'>SLOP</MenuItem>
-                                        <MenuItem value='btl'>PPN</MenuItem>
-                                        <MenuItem value='btl'>SISIR</MenuItem>
-                                        <MenuItem value='btl'>LOT</MenuItem>
-                                    </TextField> 
-                                    <TextField
-                                        fullWidth 
-                                        label='Tax'
-                                        select
-                                    >
-                                        <MenuItem value='1'>Yes</MenuItem>
-                                        <MenuItem value='2'>No</MenuItem>
+                                        {renderParentCategory()}
                                     </TextField> 
                                     <Stack direction='row' spacing={2}>
                                         <LoadingButton loading={loadingSave} fullWidth variant='contained' type='submit'>

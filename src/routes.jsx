@@ -23,8 +23,8 @@ import EditUserList from './pages/user-management/user-list/Edit'
 
 // Master Data
 // Item Category
+import ItemProduct from './pages/master-data/item-product'
 import ItemCategory from './pages/master-data/item-category'
-import Category from './pages/master-data/category'
 import SiteLocation from './pages/master-data/site-location'
 import CostCenter from './pages/master-data/cost-center'
 import Department from './pages/master-data/department'
@@ -120,8 +120,8 @@ export default function Router() {
         <DashboardLayout />,
       </Middleware.After>, 
       children: [
-        { path: 'category', element: <Category /> },
         { path: 'item-category', element: <ItemCategory /> },
+        { path: 'item-product', element: <ItemProduct /> },
         { path: 'site-location', element: <SiteLocation /> },
         { path: 'cost-center', element: <CostCenter /> },
         { path: 'department', element: <Department /> },

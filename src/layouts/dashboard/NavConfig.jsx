@@ -32,12 +32,12 @@ const navConfig = [
     path: '/master-data',
     children: [
       {
-        title: 'Category',
-        path: 'category'
-      },
-      {
         title: 'Item Category',
         path: 'item-category'
+      },
+      {
+        title: 'Item Product',
+        path: 'item-product'
       },
       {
         title: 'Site Location',
