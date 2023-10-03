@@ -9,6 +9,11 @@ import CustomStatusLabelComponent from '../../../components/CustomStatusLabelCom
 import CustomMenuComponent from '../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
 import Loading from '@components/Loading';
+import useFetchItem from '@hooks/item/useFetchItem';
+import useDeleteItem from '@hooks/item/useDeleteItem';
+import useSaveItem from '@hooks/item/useSaveItem';
+import DeleteDialog from '@components/DeleteDialog';
+import CustomActionTableComponent from '@components/CustomActionTableComponent';
 
 let dummy = []
 for(let i = 0; i < 15; i++){
@@ -22,68 +27,158 @@ for(let i = 0; i < 15; i++){
 }
 
 const index = () => {
-    const [data, setData] = useState({
-        code: ''
-    })
-    const [loading, setLoading] = useState(false)
-    const navigate = useNavigate()
-    const [rows, setRows] = useState(dummy);
     const [params, setParams] = useState({
         page: 0,
         limit: 5,
-        search: ''
+        search: '',
+        paginate: 1,
     })
-
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchItem(params)
     const handleChangePage = (event, newPage) => {
-        setParams({
-            ...params,
-            page: newPage
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: newPage + 1,
+            };
         });
-    }
-
+    };
     const handleChangeRowsPerPage = (event) => {
-        setParams({
-            ...params,
-            page: 0,
-            limit: parseInt(event.target.value, 10)
-        })
-    }
-
-    const [staging, setStaging] = useState();
-    const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
-    const handleClick = (event, value) => {
-        setAnchorEl(event.currentTarget);
-        setStaging(value);
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: 1,
+                limit: +event.target.value,
+            };
+        });
     };
-    const handleMenu = () => {
-        setAnchorEl(null);
-    };
-    const getData = () => new Promise(resolve => setTimeout(() => {
-        resolve('done')
-        setData({
-            code: '12321',
-            email: 'test@gmail.com',
-            status: '1',
-        })
-    }, 500))
-    const handleEdit = async () => {
-        console.log(staging)
-        handleMenu()
+    
+    const [loading, setLoading] = useState(false)
+    const [staging, setStaging] = useState({})
+    const handleReset = (data) => {
         setLoading(true)
         setTimeout(() => {
-            setData({
-                code: 'udin',
-            })
+            setStaging({})
+            setLoading(false)
+        }, 0);
+    }
+    const handleEdit = (data) => {
+        setLoading(true)
+        setTimeout(() => {
+            setStaging(data)
             setLoading(false)
         }, 500);
-        // try {
-        //     const res = await getData()
-        // } catch (err) {
-        //     console.log(err)
-        // } finally {
-        //     setLoading(false)
-        // }
+    }
+    
+    const [open, setOpen] = useState(false)
+    const handleClose = (id = null) => {
+        if(open){
+            handleReset()
+        }
+        setOpen(!open)
+        if(!!!id) return;
+        setStaging({ id })
+    }
+
+    const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteItem({
+        onSuccess: () => {
+            handleReset()
+            refetch()
+            handleClose()
+        }
+    })
+    const handleDelete = async () => {
+        deleteDepartment(staging?.id)
+    }
+
+    const { mutate: save, isLoading: loadingSave, error } = useSaveItem({
+        onSuccess: () => {
+            handleReset()
+            refetch()
+        }
+    })
+    const errors = error?.response?.data?.errors
+    const onSubmit = (e) => {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        save({ formData, id: staging?.id })
+    }
+
+    if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
+        setParams({ ...params, page: rows.meta.last_page })
+    }
+
+    const renderData = () => {
+        if(rows === undefined) {
+            return (
+                <TableRow>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                            textAlign: "center",
+                            py: 5,
+                        }}
+                        colSpan={10}
+                    >
+                        <Loading />
+                    </TableCell>
+                </TableRow>
+            )
+        } 
+        if(rows.data.length === 0){
+            return (
+                <TableRow>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                            textAlign:
+                                "center",
+                            py: 10,
+                        }}
+                        colSpan={10}
+                    >
+                        No result found
+                        {params.search !==
+                            "" && (
+                            <div
+                                style={{
+                                    display:
+                                        "inline-block",
+                                }}
+                            >
+                                &nbsp;for "<b>{params.search}</b>"
+                            </div>
+                        )}
+                        .
+                    </TableCell>
+                </TableRow>
+            )
+        }
+        return rows.data.map((value, key) => (
+            <TableRow key={key}>
+                <TableCell
+                    component="th"
+                    scope="row"
+                    align="center"
+                >
+                    {rows.meta.from+key}.
+                </TableCell>
+                <TableCell>
+                    {value.category_code}
+                </TableCell>
+                <TableCell>
+                    {value.category}
+                </TableCell>
+                <TableCell>
+                    <CustomActionTableComponent 
+                        edit={true}
+                        handleEdit={() => handleEdit(value)}
+                        handleDelete={() => handleClose(value.id)}
+                    />
+                </TableCell>                                                             
+            </TableRow>
+        ))
     }
 
     return (
@@ -102,7 +197,11 @@ const index = () => {
                             <CardContent>
                                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
                                     <Grid item xs={12} md={12}>
-                                        <CustomSearchComponent />
+                                        <CustomSearchComponent 
+                                            params={params}
+                                            search={params.search}
+                                            setParams={setParams}
+                                        />
                                     </Grid>
                                 </Grid>
                                 <TableContainer>
@@ -117,64 +216,59 @@ const index = () => {
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Code</TableCell>
                                                 <TableCell>Name</TableCell>
-                                                {/* <TableCell>Brand</TableCell> */}
-                                                {/* <TableCell>Size</TableCell> */}
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {rows.slice(params.page * params.limit, params.page * params.limit + params.limit).map((v, i) => {
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell sx={{ color: 'blue', cursor: 'pointer' }}>{v.code}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        {/* <TableCell>{v.brand}</TableCell> */}
-                                                        {/* <TableCell>{v.size}</TableCell> */}
-                                                        <TableCell>
-                                                            {v.tax ? 'Yes' : 'No'}
-                                                        </TableCell>
-                                                        <TableCell>
-                                                            <IconButton onClick={(e) => handleClick(e, v)}>
-                                                                <Iconify icon='mingcute:more-2-fill' />
-                                                            </IconButton>
-                                                        </TableCell>
-                                                        
-                                                    </TableRow>
-                                                )
-                                            })}
-                                            
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <TablePagination
-                                    component="div"
-                                    count={rows.length}
-                                    page={params.page}
-                                    rowsPerPage={params.limit}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    rowsPerPageOptions={[1, 5, 25, 50]}
-                                    showFirstButton
-                                    showLastButton
-                                />
+                                {rows !== undefined && rows.data.length > 0 && (
+                                    <TablePagination
+                                        component="div"
+                                        count={rows.meta.total}
+                                        page={params.page - 1}
+                                        rowsPerPage={params.limit}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={
+                                            handleChangeRowsPerPage
+                                        }
+                                        rowsPerPageOptions={[
+                                            1, 5, 10, 25, 50, 100,
+                                        ]}
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>
                     <Grid item xs={12} md={4}>
                         <Card sx={{ p: 2 }}>
-                            <Typography mb={3} variant='h6'>Form Item Category</Typography>
+                            <Typography mb={3} variant='h6'>
+                                {!!staging.id ? 'Form Edit Item Category' : 'Form Add Item Category'}
+                            </Typography>
                             {!loading ? 
-                                <Stack rowGap={2}>
+                                <Stack rowGap={2} component='form' onSubmit={onSubmit}>
                                     <TextField
                                         fullWidth 
                                         label='Code'
-                                        defaultValue={data.code}
+                                        name='category_code'
+                                        defaultValue={staging?.category_code}
+                                        required
+                                        helperText={!!errors?.category_code && errors?.category_code[0]}
+                                        error={!!errors?.category_code}
                                     /> 
                                     <TextField
                                         fullWidth 
                                         label='Name'
+                                        name='category'
+                                        defaultValue={staging?.category}
+                                        required
+                                        helperText={!!errors?.category && errors?.category[0]}
+                                        error={!!errors?.category}
                                     /> 
                                     <TextField
                                         fullWidth 
@@ -219,24 +313,26 @@ const index = () => {
                                         <MenuItem value='1'>Yes</MenuItem>
                                         <MenuItem value='2'>No</MenuItem>
                                     </TextField> 
-                                    <LoadingButton variant='contained' type='submit'>
-                                        submit
-                                    </LoadingButton>
+                                    <Stack direction='row' spacing={2}>
+                                        <LoadingButton loading={loadingSave} fullWidth variant='contained' type='submit'>
+                                            Submit
+                                        </LoadingButton>
+                                        <Button variant='outlined' onClick={handleReset} fullWidth>Reset</Button>
+                                    </Stack>
                                 </Stack>
                             : <Loading />
                             }
                         </Card>
                     </Grid>
                     <Grid item xs={12} md={12}>
-                        <CustomMenuComponent 
-                            handleEdit={handleEdit}
-                            anchorEl={anchorEl}
+                        <DeleteDialog 
+                            handleClose={handleClose}
+                            handleDelete={handleDelete}
                             open={open}
-                            handleMenu={handleMenu}
+                            loading={loadingDelete}
                         />
                     </Grid>
                 </Grid>
-
             </Container>
         </Page>
     );

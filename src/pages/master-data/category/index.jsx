@@ -1,14 +1,19 @@
-import { useMemo, useRef, useState } from 'react'
-import { Autocomplete, Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import CustomSearchComponent from '@components/CustomSearchComponent';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import Page from '../../../components/Page';
+import Iconify from '../../../components/Iconify';
+import moment from 'moment/moment';
+import CustomSearchComponent from '../../../components/CustomSearchComponent';
+import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
+import CustomMenuComponent from '../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
 import Loading from '@components/Loading';
 import DeleteDialog from '@components/DeleteDialog';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import useFetchLocation from '@hooks/location/useFetchLocation';
-import useDeleteLocation from '@hooks/location/useDeleteLocation';
-import useSaveLocation from '@hooks/location/useSaveLocation';
+import useFetchCategory from '@hooks/category/useFetchItem';
+import useDeleteCategory from '@hooks/category/useDeleteItem';
+import useSaveCategory from '@hooks/category/useSaveItem';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -17,11 +22,8 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    const [selectedValue, setSelectedValue] = useState(null);
-    const [inputValue, setInputValue] = useState('')
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchLocation(params)
-    const { data: parentLocation, refetch: refetchParentLocation, isLoading: loadingParent  } = useFetchLocation({ paginate: 1, search: inputValue, limit: 2 })
-
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchCategory(params)
+    const { data: parentCategories, refetch: refetchParentCategories, isLoading: loadingParent  } = useFetchCategory({ paginate: 0 })
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -47,18 +49,12 @@ const index = () => {
         setTimeout(() => {
             setStaging({})
             setLoading(false)
-            setSelectedValue(null)
         }, 0);
     }
     const handleEdit = (data) => {
         setLoading(true)
         setTimeout(() => {
             setStaging(data)
-            if(!!data.parent_location_id){
-                // setSelectedValue(parentLocation.data.find(v => v.id === data.parent_location_id))
-                setInputValue('test')
-                setSelectedValue()
-            }
             setLoading(false)
         }, 500);
     }
@@ -73,11 +69,11 @@ const index = () => {
         setStaging({ id })
     }
 
-    const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteLocation({
+    const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteCategory({
         onSuccess: () => {
             handleReset()
             refetch()
-            refetchParentLocation()
+            refetchParentCategories()
             handleClose()
         }
     })
@@ -85,26 +81,17 @@ const index = () => {
         deleteDepartment(staging?.id)
     }
 
-    const { mutate: save, isLoading: loadingSave, error } = useSaveLocation({
+    const { mutate: save, isLoading: loadingSave, error } = useSaveCategory({
         onSuccess: () => {
             handleReset()
             refetch()
-            refetchParentLocation()
+            refetchParentCategories()
         }
     })
     const errors = error?.response?.data?.errors
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        let parent_location_id = ''
-        if(!!selectedValue){
-            parent_location_id = selectedValue.id
-        }else{
-            if(!!staging.parent_location_id && inputValue !== ''){
-                parent_location_id = staging.parent_location_id
-            }
-        }
-        formData.append('parent_location_id', parent_location_id)
         save({ formData, id: staging?.id })
     }
 
@@ -167,19 +154,16 @@ const index = () => {
                     scope="row"
                     align="center"
                 >
-                    {rows.meta
-                        .from +
-                        key}
-                    .
+                    {rows.meta.from+key}.
                 </TableCell>
                 <TableCell>
-                    {value.location_code}
+                    {value.category_code}
                 </TableCell>
                 <TableCell>
-                    {value.location}
+                    {value.category}
                 </TableCell>
                 <TableCell>
-                    {!!value.parent_location_id ? value.parent_location_id : '-'}
+                    {!!value.parent_category_id ? value.parent_category_id : '-'}
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 
@@ -191,13 +175,14 @@ const index = () => {
             </TableRow>
         ))
     }
-    const renderParentLocation = () => {
+
+    const renderParentCategory = () => {
         if(loadingParent) return;
-        const filteredData = parentLocation.data.filter(v => {
+        const filteredData = parentCategories.data.filter(v => {
             if(!!staging.id){
-                return !v.parent_location_id && v.id !== staging.id
+                return !v.parent_category_id && v.id !== staging.id
             }
-            return !v.parent_location_id
+            return !v.parent_category_id
         })
         if(filteredData.length === 0 ){
             return (
@@ -206,28 +191,19 @@ const index = () => {
         }
         return filteredData.map((v) => {
             return (
-                <MenuItem key={v.id} value={v.id}>{v.location_code} - {v.location}</MenuItem>
+                <MenuItem key={v.id} value={v.id}>{v.category_code} - {v.category}</MenuItem>
             )
         })
     }
-    const filteredData = useMemo(() => {
-        const temp = parentLocation?.data.filter(v => {
-            if(!!staging.id){
-                return !v.parent_location_id && v.id !== staging.id
-            }
-            return !v.parent_location_id
-        })
-        return !!temp ? temp : []
-    }, [loadingParent, staging]) 
 
     return (
-        <Page title='Site Location'>
+        <Page title='Item Category'>
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                Site Location
+                                Item Category
                             </Typography>
                         </Stack>
                     </Grid>
@@ -287,64 +263,41 @@ const index = () => {
                     <Grid item xs={12} md={4}>
                         <Card sx={{ p: 2 }}>
                             <Typography mb={3} variant='h6'>
-                                {!!staging.id ? 'Form Edit Location' : 'Form Add Location'}
+                                {!!staging.id ? 'Form Edit Item Category' : 'Form Add Item Category'}
                             </Typography>
-                            {!loading ?
+                            {!loading ? 
                                 <Stack rowGap={2} component='form' onSubmit={onSubmit}>
                                     <TextField
                                         fullWidth 
                                         label='Code'
-                                        name='location_code'
-                                        defaultValue={staging?.location_code}
+                                        name='category_code'
+                                        defaultValue={staging?.category_code}
                                         required
-                                        helperText={!!errors?.location_code && errors?.location_code[0]}
-                                        error={!!errors?.location_code}
+                                        helperText={!!errors?.category_code && errors?.category_code[0]}
+                                        error={!!errors?.category_code}
                                     /> 
                                     <TextField
                                         fullWidth 
-                                        label='Location Name'
-                                        name='location'
-                                        defaultValue={staging?.location}
+                                        label='Name'
+                                        name='category'
+                                        defaultValue={staging?.category}
                                         required
-                                        helperText={!!errors?.location && errors?.location[0]}
-                                        error={!!errors?.location}
+                                        helperText={!!errors?.category && errors?.category[0]}
+                                        error={!!errors?.category}
                                     /> 
-                                    {/* <TextField
+                                    <TextField
                                         fullWidth 
-                                        label='Parent Location'
-                                        name='parent_location_id'
+                                        label='Parent'
                                         select
-                                        defaultValue={staging?.parent_location_id}
-                                        helperText={!!errors?.parent_location_id && errors?.parent_location_id[0]}
-                                        error={!!errors?.parent_location_id}
+                                        name='parent_category_id'
+                                        defaultValue={staging?.parent_category_id}
+                                        helperText={!!errors?.parent_category_id && errors?.parent_category_id[0]}
+                                        error={!!errors?.parent_category_id}
                                         disabled={loadingParent}
                                     >
                                         <MenuItem value=''>None</MenuItem>
-                                        {renderParentLocation()}
-                                    </TextField>  */}
-                                    <Autocomplete
-                                        // disabled={loadingParent}
-                                        freeSolo
-                                        options={filteredData || []}
-                                        getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
-                                        value={selectedValue || null} 
-                                        inputValue={inputValue}
-                                        onInputChange={(e, value, reason) => {
-                                            setInputValue(value)
-                                        }}
-                                        onChange={(event, newValue) => {
-                                            setSelectedValue(newValue);
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField 
-                                                {...params} 
-                                                fullWidth
-                                                label="Parent Location Autocomplete" 
-                                                error={!!errors?.parent_location_id}
-                                                helperText={!!errors?.parent_location_id && errors?.parent_location_id[0]}
-                                            />
-                                        )}
-                                    />
+                                        {renderParentCategory()}
+                                    </TextField> 
                                     <Stack direction='row' spacing={2}>
                                         <LoadingButton loading={loadingSave} fullWidth variant='contained' type='submit'>
                                             Submit

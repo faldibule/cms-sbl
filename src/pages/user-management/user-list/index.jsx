@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
     Avatar,
     Button,
@@ -7,8 +7,6 @@ import {
     CardContent,
     Container,
     Grid,
-    IconButton,
-    InputAdornment,
     Stack,
     Table,
     TableBody,
@@ -17,60 +15,31 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TextField,
     Typography,
 } from "@mui/material";
-import Page from "../../../components/Page";
-import Iconify from "../../../components/Iconify";
-import moment from "moment/moment";
-import CustomSearchComponent from "../../../components/CustomSearchComponent";
-import CustomStatusLabelComponent from "../../../components/CustomStatusLabelComponent";
+import Page from "@components/Page";
+import Iconify from "@components/Iconify";
+import CustomSearchComponent from "@components/CustomSearchComponent";
 import CustomActionTableComponent from "@components/CustomActionTableComponent";
 import CustomLinkComponent from "@components/CustomLinkComponent";
 import http from "@variable/Api";
-import { useQuery } from "react-query";
 import Loading from "@components/Loading";
-
-let dummy = [];
-for (let i = 0; i < 5; i++) {
-    dummy.push({
-        name: `User ${i}`,
-        email: `user${i}@gmail.com`,
-        role: "BOD",
-    });
-}
+import useFetchUser from "@hooks/user-list/useFetchUser";
 
 const index = () => {
-    const navigate = useNavigate();
     const [params, setParams] = useState({
         page: 1,
         limit: 5,
         search: "",
+        paginate: 1,
         role: "",
         status: [],
         department_id: [],
         location_id: [],
     });
-    const getUser = async (signal) => {
-        try {
-            const res = await http.get("user", {
-                signal,
-                params: {
-                    ...params
-                }
-            });
-            return res.data.data;
-        } catch (err) {
-            // console.log(err.response);
-        }
-    };
     const {
         data: rows,
-        error,
-        isLoading,
-        refetch,
-        isFetched,
-    } = useQuery(["users", params], ({ signal }) => getUser(signal));
+    } = useFetchUser(params)
 
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
@@ -93,10 +62,9 @@ const index = () => {
 
     const handleDelete = async (id) => {
         try {
-            const res = await http.post()
             
         } catch (err) {
-            console.log(err.response)
+            // console.log(err.response)
             
         }
     }

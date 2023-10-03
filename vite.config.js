@@ -9,6 +9,7 @@ export default defineConfig({
         '@variable': '/src/variable',
         '@recoil': '/src/recoil',
         '@hooks': '/src/hooks',
+        '@utils': '/src/utils',
       }
     }
 });

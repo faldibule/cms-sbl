@@ -6,26 +6,19 @@ import { useParams } from 'react-router-dom'
 import Loading from '@components/Loading'
 import { useQuery } from 'react-query'
 import http from '@variable/Api'
+import useFetchUserById from '@hooks/user-list/useFetchUserById'
 
 const Add = () => {
     const { id } = useParams()
-    const getUserById = async () => {
-        try {
-            const res = await http.get(`user/${id}`)   
-            return res.data.data
-        } catch (err) {
-            // console.log(err.response)
-        }
-    }
-    const { data, isLoading } = useQuery(['user', id], () => getUserById())
+    const { data, isLoading, refetch } = useFetchUserById(id)
 
     return (
         <Page title='Edit User List'>
             <Container>
                 <Typography variant='h4' mb={3}>Edit User List</Typography>
                 {!isLoading ?
-                    <Form title='edit' data={data} id={id} />
-                : <Loading />
+                    <Form title='edit' data={data} id={id} refetch={refetch} />
+                : null
                 }
             </Container>
         </Page>

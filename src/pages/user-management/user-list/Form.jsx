@@ -1,48 +1,26 @@
-import { Avatar, Box, Card, CardContent, Container, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, MenuItem, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
+import { Avatar, Box, Card, CardContent, Container, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { dataRoleDummy } from '../user-role'
 import FormByType from '@components/FormByType'
 import { LoadingButton } from '@mui/lab'
-import http from '@variable/Api'
+import http, { baseURL } from '@variable/Api'
 import { useQuery } from 'react-query'
 import Loading from '@components/Loading'
 import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '@hooks/useCustomSnackbar'
+import useFetchDepartment from '@hooks/department/useFetchDepartment'
+import useFetchLocation from '@hooks/location/useFetchLocation'
+import useFetchRole from '@hooks/role/useFetchRole'
+import useSaveUser from '@hooks/user-list/useSaveUser'
 
 const Form = (props) => {
-    const { success, failed } = useCustomSnackbar()
     const navigate = useNavigate()
 
-    const { data: dataDepartment, isLoading: loadingDepartment } = useQuery(["department"], () => getDepartment())
-    const { data: dataRole, isLoading: loadingRole } = useQuery(["role"], () => getRole())
-    const { data: dataLocation, isLoading: loadingLocation } = useQuery(["location"], () => getLocation())
+    const { data: dataDepartment, isLoading: loadingDepartment } = useFetchDepartment({})
+    const { data: dataRole, isLoading: loadingRole } = useFetchRole({})
+    const { data: dataLocation, isLoading: loadingLocation } = useFetchLocation({})
 
     const [defaultValue, setDefaultValue] = useState({})
-
-    const getDepartment = async () => {
-        try {
-            const res = await http.get('department')
-            return res.data
-        } catch (err) {
-            console.log(err.response)
-        }
-    }
-    const getRole = async () => {
-        try {
-            const res = await http.get('user/role')
-            return res.data
-        } catch (err) {
-            console.log(err.response)
-        }
-    }
-    const getLocation = async () => {
-        try {
-            const res = await http.get('location')
-            return res.data
-        } catch (err) {
-            console.log(err.response)
-        }
-    }
     
     const [image, setImage] = useState({
         image_preview: '',
@@ -57,59 +35,50 @@ const Form = (props) => {
         });
     };
     
-    const [loading, setLoading] = useState(false)
-    const [errors, setErrors] = useState({})
-    const handleSave = async (formData) => {
-        try {
-            if(props.title === 'add') {
-                const res = await http.post('user', formData) 
-                success('Success Create User')
-                navigate('/user/user-list')
-            }
+    const { mutate: save, isLoading: loading, error } = useSaveUser({
+        onSuccess: () => {
             if(props.title === 'edit'){
-                const res = await http.post(`user/${props.id}`, formData)
-                success('Success Edit User')
-                navigate('/user/user-list')
+                props.refetch()
             }
-        } catch (err) {
-            if(!!err.response){
-                console.log(err.response.data.errors)
-                setErrors(err.response.data.errors)
-            }
-        } finally {
-            setLoading(false)
+            navigate('/user/user-list')
         }
-    }
+    })
+    const errors = error?.response?.data?.errors
     
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        setLoading(true)
-        setErrors({})
-        handleSave(formData)
+        save({
+            formData,
+            id: props?.id,
+            title: props.title
+        })
     }
-
+    
+    const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
     useEffect(() => {
         let mounted = true
         if(!!props.data){
             const { data } = props
             if(mounted){
-                if(!!data.photo){
-                    setImage({
-                        image_file: '',
-                        image_preview: data.photo
-                    })
-                }
-                setDefaultValue(data)
+                setTimeout(() => {
+                    if(!!data.photo){
+                        setImage({
+                            image_file: '',
+                            image_preview: baseURL + data.photo
+                        })
+                    }
+                    setDefaultValue(data)
+                    setPageLoading(false)
+                }, 500);
             }
         }
         return () => mounted = false
-    }, [props])
+    }, [props.id])
 
-    if(loadingDepartment || loadingLocation || loadingRole){
+    if(loadingDepartment || loadingLocation || loadingRole || pageLoading ){
         return <Loading />
     }
-
     return (
         <Box component="form" onSubmit={onSubmit}>
             <Grid container spacing={2}>
@@ -120,7 +89,7 @@ const Form = (props) => {
                                 <input
                                     onChange={handleImage}
                                     type="file"
-                                    name="image"
+                                    name="photo"
                                     style={{ display: "none" }}
                                     id="image"
                                     accept="image/png, image/gif, image/jpeg, image/jpg"
@@ -130,7 +99,7 @@ const Form = (props) => {
                                     <Avatar
                                         sx={{ height: "20vh", width: "20vh", boxShadow: 1, mb: 2, cursor: "pointer" }}
                                         alt="Remy Sharp"
-                                        src={image.image_preview !== "" ? image.image_preview : "/assets/images.default.png"}
+                                        src={image.image_preview !== "" ? image.image_preview : ""}
                                     />
                                 </Box>
                                 <Typography color="primary" variant="caption">
@@ -192,12 +161,15 @@ const Form = (props) => {
                                 <TextField
                                     fullWidth 
                                     label='Phone Number'
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start">+62</InputAdornment>,
+                                    }}
                                     type='number'
-                                    name="phone_number"
-                                    defaultValue={defaultValue?.phone_number}
+                                    name="phone"
+                                    defaultValue={defaultValue?.phone}
                                     required
-                                    helperText={!!errors?.phone_number && errors?.phone_number[0]}
-                                    error={!!errors?.phone_number}
+                                    helperText={!!errors?.phone && errors?.phone[0]}
+                                    error={!!errors?.phone}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -211,7 +183,7 @@ const Form = (props) => {
                                     helperText={!!errors?.department && errors?.department[0]}
                                     error={!!errors?.department}
                                 >
-                                    {dataDepartment.data.data.map((v, i) => {
+                                    {dataDepartment.data.map((v, i) => {
                                         return (
                                             <MenuItem key={v.id} value={v.id}>{v.department_code} - {v.department}</MenuItem>
                                         )
@@ -223,13 +195,13 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Role'
                                     name="role"
-                                    defaultValue={defaultValue?.role[0]}
+                                    defaultValue={defaultValue?.role}
                                     select
                                     required
                                     helperText={!!errors?.role && errors?.role[0]}
                                     error={!!errors?.role}
                                 >
-                                    {dataRole.data.map((v, i) => {
+                                    {dataRole.map((v, i) => {
                                         return (
                                             <MenuItem key={v.name} value={v.name}>{v.name}</MenuItem>
                                         )
@@ -247,7 +219,7 @@ const Form = (props) => {
                                     helperText={!!errors?.location && errors?.location[0]}
                                     error={!!errors?.location}
                                 >
-                                    {dataLocation.data.data.map((v, i) => {
+                                    {dataLocation.data.map((v, i) => {
                                         return (
                                             <MenuItem key={v.id} value={v.id}>{v.location_code} - {v.location}</MenuItem>
                                         )

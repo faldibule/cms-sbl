@@ -1,7 +1,6 @@
 import axios from "axios";
 
-let baseURL = "http://localhost:8000/";
-// let baseURL = "http://api.siwira.id/api/";
+export let baseURL = "http://localhost:8000/";
 
 const http = axios
 http.defaults.baseURL = baseURL;
