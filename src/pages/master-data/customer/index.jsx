@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
@@ -14,7 +14,7 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent';
 
 const index = () => {
     const [params, setParams] = useState({
-        page: 0,
+        page: 1,
         limit: 5,
         search: '',
         paginate: 1,
@@ -93,7 +93,7 @@ const index = () => {
         setParams({ ...params, page: rows.meta.last_page })
     }
 
-    const renderData = () => {
+    const renderData = useCallback(() => {
         if(rows === undefined) {
             return (
                 <TableRow>
@@ -165,7 +165,7 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
-    }
+    }, [rows])
 
     return (
         <Page title='Customer'>

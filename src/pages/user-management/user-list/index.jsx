@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     Avatar,
@@ -68,6 +68,99 @@ const index = () => {
             
         }
     }
+
+    const renderData = useCallback(() => {
+        if(rows === undefined) {
+            return (
+                <TableRow>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                            textAlign: "center",
+                            py: 5,
+                        }}
+                        colSpan={10}
+                    >
+                        <Loading />
+                    </TableCell>
+                </TableRow>
+            )
+        } 
+        if(rows.data.length === 0){
+            return (
+                <TableRow>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                            textAlign:
+                                "center",
+                            py: 10,
+                        }}
+                        colSpan={10}
+                    >
+                        No result found
+                        {params.search !==
+                            "" && (
+                            <div
+                                style={{
+                                    display:
+                                        "inline-block",
+                                }}
+                            >
+                                &nbsp;for "<b>{params.search}</b>"
+                            </div>
+                        )}
+                        .
+                    </TableCell>
+                </TableRow>
+            )
+        }
+        return rows.data.map(
+            (value, key) => (
+                <TableRow key={key}>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        align="center"
+                    >
+                        {rows.meta.from+key}.
+                    </TableCell>
+                    <TableCell>
+                        <CustomLinkComponent 
+                            label={value.name}
+                            url={`/user/user-list/edit/${value.id}`}
+                        />
+                    </TableCell>
+                    <TableCell>
+                        {value.email}
+                    </TableCell>
+                    <TableCell>
+                        {value.role}
+                    </TableCell>
+                    <TableCell>
+                        {value.department.department}
+                    </TableCell>
+                    <TableCell>
+                        {value.location.location}
+                    </TableCell>
+                    <TableCell>
+                        {value.status === 'active' ? 
+                            <Iconify icon='material-symbols:check-circle' sx={{ color: 'green', fontSize: 20 }} />
+                        :
+                            <Iconify icon='carbon:close-filled' sx={{ color: 'red', fontSize: 20 }} />
+                        }
+                    </TableCell>
+                    <TableCell>
+                        <CustomActionTableComponent 
+                            handleDelete={() => handleDelete(value.id)}
+                        />
+                    </TableCell>                                                             
+                </TableRow>
+            )
+        )
+    }, [rows])
 
     return (
         <Page title="User List">
@@ -151,111 +244,7 @@ const index = () => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {rows !== undefined ? (
-                                                rows.data.length > 0 ? (
-                                                    rows.data.map(
-                                                        (value, key) => (
-                                                            <TableRow key={key}>
-                                                                <TableCell
-                                                                    component="th"
-                                                                    scope="row"
-                                                                    align="center"
-                                                                >
-                                                                    {rows.meta
-                                                                        .from +
-                                                                        key}
-                                                                    .
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <CustomLinkComponent 
-                                                                        label={value.name}
-                                                                        url={`/user/user-list/edit/${value.id}`}
-                                                                    />
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {value.email}
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {value.role}
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {
-                                                                        value
-                                                                            .department
-                                                                            .department
-                                                                    }
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {
-                                                                        value
-                                                                            .location
-                                                                            .location
-                                                                    }
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    {value.status === 'active' ? 
-                                                                        <Iconify icon='material-symbols:check-circle' sx={{ color: 'green', fontSize: 20 }} />
-                                                                    :
-                                                                        <Iconify icon='carbon:close-filled' sx={{ color: 'red', fontSize: 20 }} />
-                                                                    }
-                                                                </TableCell>
-                                                                <TableCell>
-                                                                    <CustomActionTableComponent 
-                                                                        handleDelete={() => handleDelete(value.id)}
-                                                                    />
-                                                                </TableCell>                                                             
-                                                            </TableRow>
-                                                        )
-                                                    )
-                                                ) : (
-                                                    <TableRow>
-                                                        <TableCell
-                                                            component="th"
-                                                            scope="row"
-                                                            sx={{
-                                                                textAlign:
-                                                                    "center",
-                                                                py: 10,
-                                                            }}
-                                                            colSpan={10}
-                                                        >
-                                                            No result found
-                                                            {params.search !==
-                                                                "" && (
-                                                                <div
-                                                                    style={{
-                                                                        display:
-                                                                            "inline-block",
-                                                                    }}
-                                                                >
-                                                                    &nbsp;for "
-                                                                    <b>
-                                                                        {
-                                                                            params.search
-                                                                        }
-                                                                    </b>
-                                                                    "
-                                                                </div>
-                                                            )}
-                                                            .
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            ) : (
-                                                <TableRow>
-                                                    <TableCell
-                                                        component="th"
-                                                        scope="row"
-                                                        sx={{
-                                                            textAlign: "center",
-                                                            py: 5,
-                                                        }}
-                                                        colSpan={10}
-                                                    >
-                                                        <Loading />
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

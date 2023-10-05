@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '../../../components/Page';
@@ -23,7 +23,7 @@ const index = () => {
         paginate: 1,
     })
     const { data: rows, refetch, isFetchedAfterMount } = useFetchItemCategory(params)
-    const { data: parentCategories, refetch: refetchParentCategories, isLoading: loadingParent  } = useFetchItemCategory({ paginate: 0 })
+    const { data: parentCategories, refetch: refetchParentCategories, isLoading: loadingParent  } = useFetchItemCategory({ paginate: 0, only_parent: 1 })
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -99,7 +99,7 @@ const index = () => {
         setParams({ ...params, page: rows.meta.last_page })
     }
 
-    const renderData = () => {
+    const renderData = useCallback(() => {
         if(rows === undefined) {
             return (
                 <TableRow>
@@ -174,15 +174,15 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
-    }
+    }, [rows])   
 
-    const renderParentCategory = () => {
-        if(loadingParent) return;
+    const renderParentCategory = useCallback(() => {
+        if(loadingParent) return null;
         const filteredData = parentCategories.data.filter(v => {
             if(!!staging.id){
-                return !v.parent_category_id && v.id !== staging.id
+                return v.id !== staging.id
             }
-            return !v.parent_category_id
+            return true
         })
         if(filteredData.length === 0 ){
             return (
@@ -194,16 +194,16 @@ const index = () => {
                 <MenuItem key={v.id} value={v.id}>{v.category_code} - {v.category}</MenuItem>
             )
         })
-    }
+    }, [loadingParent, parentCategories, staging])
 
     return (
-        <Page title='Item Category'>
+        <Page title='item category'>
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                        <Stack direction='row' justifycontent='space-between' alignitems='center'>
                             <Typography variant='h4' mb={3}>
-                                Item Category
+                                item category
                             </Typography>
                         </Stack>
                     </Grid>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Box, Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
 import CustomSearchComponent from '@components/CustomSearchComponent';
@@ -97,7 +97,7 @@ const index = () => {
         setParams({ ...params, page: rows.meta.last_page })
     }
 
-    const renderData = () => {
+    const renderData = useCallback(() => {
         if(rows === undefined) {
             return (
                 <TableRow>
@@ -169,7 +169,7 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
-    }
+    }, [rows])
 
     return (
         <Page title='Supplier'>

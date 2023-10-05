@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import {  useCallback, useMemo, useState } from 'react'
 import { Autocomplete, Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
 import CustomSearchComponent from '@components/CustomSearchComponent';
@@ -20,7 +20,7 @@ const index = () => {
     const [selectedValue, setSelectedValue] = useState(null);
     const [inputValue, setInputValue] = useState('')
     const { data: rows, refetch, isFetchedAfterMount } = useFetchLocation(params)
-    const { data: parentLocation, refetch: refetchParentLocation, isLoading: loadingParent  } = useFetchLocation({ paginate: 1, search: inputValue, limit: 2 })
+    const { data: parentLocation, refetch: refetchParentLocation, isLoading: loadingParent  } = useFetchLocation({ paginate: 1, search: inputValue, limit: 3, only_parent: 1 })
 
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
@@ -46,6 +46,7 @@ const index = () => {
         setLoading(true)
         setTimeout(() => {
             setStaging({})
+            setInputValue('')
             setLoading(false)
             setSelectedValue(null)
         }, 0);
@@ -56,7 +57,7 @@ const index = () => {
             setStaging(data)
             if(!!data.parent_location_id){
                 // setSelectedValue(parentLocation.data.find(v => v.id === data.parent_location_id))
-                setInputValue('test')
+                setInputValue('default parent')
                 setSelectedValue()
             }
             setLoading(false)
@@ -93,9 +94,7 @@ const index = () => {
         }
     })
     const errors = error?.response?.data?.errors
-    const onSubmit = (e) => {
-        e.preventDefault()
-        const formData = new FormData(e.target)
+    const handleParentLocationId = () => {
         let parent_location_id = ''
         if(!!selectedValue){
             parent_location_id = selectedValue.id
@@ -104,6 +103,12 @@ const index = () => {
                 parent_location_id = staging.parent_location_id
             }
         }
+        return parent_location_id
+    }
+    const onSubmit = (e) => {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        const parent_location_id = handleParentLocationId()
         formData.append('parent_location_id', parent_location_id)
         save({ formData, id: staging?.id })
     }
@@ -112,7 +117,7 @@ const index = () => {
         setParams({ ...params, page: rows.meta.last_page })
     }
 
-    const renderData = () => {
+    const renderData = useCallback(() => {
         if(rows === undefined) {
             return (
                 <TableRow>
@@ -190,35 +195,16 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
-    }
-    const renderParentLocation = () => {
-        if(loadingParent) return;
-        const filteredData = parentLocation.data.filter(v => {
-            if(!!staging.id){
-                return !v.parent_location_id && v.id !== staging.id
-            }
-            return !v.parent_location_id
-        })
-        if(filteredData.length === 0 ){
-            return (
-                <MenuItem value='' disabled>Kosong</MenuItem>
-            )
-        }
-        return filteredData.map((v) => {
-            return (
-                <MenuItem key={v.id} value={v.id}>{v.location_code} - {v.location}</MenuItem>
-            )
-        })
-    }
+    })
     const filteredData = useMemo(() => {
         const temp = parentLocation?.data.filter(v => {
             if(!!staging.id){
-                return !v.parent_location_id && v.id !== staging.id
+                return v.id !== staging.id
             }
-            return !v.parent_location_id
+            return true
         })
         return !!temp ? temp : []
-    }, [loadingParent, staging]) 
+    }, [parentLocation, staging]) 
 
     return (
         <Page title='Site Location'>
@@ -309,23 +295,9 @@ const index = () => {
                                         helperText={!!errors?.location && errors?.location[0]}
                                         error={!!errors?.location}
                                     /> 
-                                    {/* <TextField
-                                        fullWidth 
-                                        label='Parent Location'
-                                        name='parent_location_id'
-                                        select
-                                        defaultValue={staging?.parent_location_id}
-                                        helperText={!!errors?.parent_location_id && errors?.parent_location_id[0]}
-                                        error={!!errors?.parent_location_id}
-                                        disabled={loadingParent}
-                                    >
-                                        <MenuItem value=''>None</MenuItem>
-                                        {renderParentLocation()}
-                                    </TextField>  */}
                                     <Autocomplete
-                                        // disabled={loadingParent}
                                         freeSolo
-                                        options={filteredData || []}
+                                        options={filteredData}
                                         getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
                                         value={selectedValue || null} 
                                         inputValue={inputValue}
@@ -339,7 +311,7 @@ const index = () => {
                                             <TextField 
                                                 {...params} 
                                                 fullWidth
-                                                label="Parent Location Autocomplete" 
+                                                label="Parent Location" 
                                                 error={!!errors?.parent_location_id}
                                                 helperText={!!errors?.parent_location_id && errors?.parent_location_id[0]}
                                             />
