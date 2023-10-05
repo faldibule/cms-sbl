@@ -53,7 +53,7 @@ const index = () => {
         setLoading(true)
         setTimeout(() => {
             setStaging(data)
-            // handleNpwp('11111111')
+            handleNpwp(data.npwp)
             setLoading(false)
         }, 500);
     }
