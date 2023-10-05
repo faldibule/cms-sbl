@@ -197,7 +197,7 @@ const index = () => {
     }, [loadingParent, parentCategories, staging])
 
     return (
-        <Page title='item category'>
+        <Page title='item Category'>
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
