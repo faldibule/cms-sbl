@@ -228,7 +228,7 @@ const index = () => {
                             </Typography>
                         </Stack>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={7}>
                         <Card>
                             <CardContent>
                                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
@@ -281,14 +281,14 @@ const index = () => {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={5}>
                         <Card sx={{ p: 2 }}>
                             <Typography mb={3} variant='h6'>
-                                {!!staging.id ? 'Form Edit Item Category' : 'Form Add Item Category'}
+                                {!!staging.id ? 'Form Edit Item Product' : 'Form Add Item Product'}
                             </Typography>
                             {!loading ? 
                                 <Grid container spacing={2} component='form' onSubmit={onSubmit}>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={12} md={12}>
                                         <TextField
                                             fullWidth 
                                             label='Code'
@@ -309,17 +309,6 @@ const index = () => {
                                             helperText={!!errors?.category && errors?.category[0]}
                                             error={!!errors?.category}
                                         /> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Brand'
-                                            name='brand'
-                                            defaultValue={staging?.brand || ''}
-                                            required
-                                            helperText={!!errors?.brand && errors?.brand[0]}
-                                            error={!!errors?.brand}
-                                        />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                         <TextField
