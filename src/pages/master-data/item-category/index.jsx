@@ -1,12 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '../../../components/Page';
-import Iconify from '../../../components/Iconify';
-import moment from 'moment/moment';
-import CustomSearchComponent from '../../../components/CustomSearchComponent';
-import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
-import CustomMenuComponent from '../../../components/CustomMenuComponent';
+import Page from '@components/Page';
+import CustomSearchComponent from '@components/CustomSearchComponent';
 import { LoadingButton } from '@mui/lab';
 import Loading from '@components/Loading';
 import DeleteDialog from '@components/DeleteDialog';
@@ -163,7 +158,7 @@ const index = () => {
                     {value.category}
                 </TableCell>
                 <TableCell>
-                    {!!value.parent_category_id ? value.parent_category_id : '-'}
+                    {value?.parent_category?.category || '-'}
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 
@@ -290,7 +285,7 @@ const index = () => {
                                         label='Parent'
                                         select
                                         name='parent_category_id'
-                                        defaultValue={staging?.parent_category_id}
+                                        defaultValue={staging?.parent_category?.id}
                                         helperText={!!errors?.parent_category_id && errors?.parent_category_id[0]}
                                         error={!!errors?.parent_category_id}
                                         disabled={loadingParent}

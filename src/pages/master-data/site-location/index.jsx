@@ -55,9 +55,9 @@ const index = () => {
         setLoading(true)
         setTimeout(() => {
             setStaging(data)
-            if(!!data.parent_location_id){
-                // setSelectedValue(parentLocation.data.find(v => v.id === data.parent_location_id))
-                setInputValue('default parent')
+            if(!!data.parent_location){
+                const parentLocation = data.parent_location
+                setInputValue(`${parentLocation.location_code} - ${parentLocation.location}`)
                 setSelectedValue()
             }
             setLoading(false)
@@ -99,8 +99,8 @@ const index = () => {
         if(!!selectedValue){
             parent_location_id = selectedValue.id
         }else{
-            if(!!staging.parent_location_id && inputValue !== ''){
-                parent_location_id = staging.parent_location_id
+            if(!!staging.parent_location?.id && inputValue !== ''){
+                parent_location_id = staging.parent_location?.id
             }
         }
         return parent_location_id
@@ -184,7 +184,7 @@ const index = () => {
                     {value.location}
                 </TableCell>
                 <TableCell>
-                    {!!value.parent_location_id ? value.parent_location_id : '-'}
+                    {value?.parent_location?.location || '-'}
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 

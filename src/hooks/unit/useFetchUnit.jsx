@@ -1,10 +1,10 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchItemProduct = (params) => {
-    return useQuery(['item-products', params], async ({ signal }) => {
+const useFetchUnit = (params) => {
+    return useQuery(['units', params], async ({ signal }) => {
         try {
-            const res = await http.get('item-product', {
+            const res = await http.get('param/unit', {
                 signal,
                 params
             })
@@ -15,4 +15,4 @@ const useFetchItemProduct = (params) => {
     })
 }
 
-export default useFetchItemProduct
+export default useFetchUnit

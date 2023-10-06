@@ -204,9 +204,8 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>Supplier Type</TableCell>
+                                                <TableCell>Supplier Code</TableCell>
                                                 <TableCell>Company Name</TableCell>
-                                                {/* <TableCell>Category</TableCell> */}
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>

@@ -70,7 +70,7 @@ export default function Login() {
         <Container>
           <ContentStyle>
             {/* <Box sx={{ width: 500, filter: 'brightness(0.5)', height: 400, objectFit: 'contain', objectFit: 'cover' }} component='img' src='/loginbackground.jpg' /> */}
-            <Card sx={{ p: 2, width: 500, height: 400 }}>
+            <Card sx={{ p: 2, width: 500, minHeight: 400 }}>
               <Stack direction='row'>
                 <Stack flexGrow={1}>
                   <Typography variant="h4" gutterBottom>

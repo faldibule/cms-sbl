@@ -43,10 +43,10 @@ const navConfig = [
         title: 'Site Location',
         path: 'site-location'
       },
-      {
-        title: 'Cost Center',
-        path: 'cost-center'
-      },
+      // {
+      //   title: 'Cost Center',
+      //   path: 'cost-center'
+      // },
       {
         title: 'Department',
         path: 'department'
@@ -140,6 +140,16 @@ const navConfig = [
     title: 'Stock Management',
     icon: getIcon('iconamoon:box-fill'),
     path: '/stock-management',
+    children: [
+      {
+        title: 'Data Stock Masuk', // Tampilan mengikuti form excel stock management
+        path: 'data-stock-masuk'
+      },
+      {
+        title: 'Data Stock Kapal',
+        path: 'data-stock-kapal'
+      },
+    ]
   },
   {
     title: 'Activity Log',

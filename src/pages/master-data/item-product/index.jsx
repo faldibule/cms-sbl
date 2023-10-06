@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
 import CustomSearchComponent from '@components/CustomSearchComponent';
@@ -10,6 +10,7 @@ import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct';
 import useDeleteItemProduct from '@hooks/item-product/useDeleteItemProduct';
 import useSaveItemProduct from '@hooks/item-product/useSaveItemProduct';
 import useFetchItemCategory from '@hooks/item-category/useFetchItemCategory';
+import useFetchUnit from '@hooks/unit/useFetchUnit';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -20,20 +21,23 @@ const index = () => {
     })
     const { data: rows, refetch, isFetchedAfterMount } = useFetchItemProduct(params)
 
+    // Unit 
+    const { data: unitData, isLoading: loadingUnit } = useFetchUnit({ paginate: 0 })
+
     // Category & Sub Category
     const [category, setCategory] = useState('')
     const { data: itemCategory, isLoading: loadingCategory } = useFetchItemCategory({ paginate: 0 })
     const handleCategory = (e) => setCategory(e.target.value)
     const filteredDataParentCategory = useMemo(() => {
         const temp = itemCategory?.data.filter(v => {
-            return !!!v.parent_category_id
+            return !!!v.parent_category?.id
         })
         return !!temp ? temp : []
     }, [itemCategory]) 
     const filteredDataChildCategory = useMemo(() => {
         if(category === '') return []
         const temp = itemCategory?.data.filter(v => {
-            return !!v.parent_category_id && v.parent_category_id === category
+            return !!v.parent_category?.id && v.parent_category?.id === category
         })
         return !!temp ? temp : []
     }, [itemCategory, category]) 
@@ -96,6 +100,7 @@ const index = () => {
         setLoading(true)
         setTimeout(() => {
             setStaging(data)
+            setCategory(data.item_category.id)
             setLoading(false)
         }, 500);
     }
@@ -132,15 +137,14 @@ const index = () => {
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        console.log(Object.fromEntries(formData))
-        // save({ formData, id: staging?.id })
+        save({ formData, id: staging?.id })
     }
 
     // HandleTable
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
     }
-    const renderData = () => {
+    const renderData = useCallback(() => {
         if(rows === undefined) {
             return (
                 <TableRow>
@@ -198,13 +202,13 @@ const index = () => {
                     {rows.meta.from+key}.
                 </TableCell>
                 <TableCell>
-                    {value.category_code}
+                    {value.code}
                 </TableCell>
                 <TableCell>
-                    {value.category}
+                    {value.name}
                 </TableCell>
                 <TableCell>
-                    -
+                    {value.tax}
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 
@@ -215,7 +219,22 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
-    }
+    }, [rows])
+
+    const renderUnitMenuItem = useCallback(() => {
+        if(loadingUnit) return null
+        if(unitData.length === 0 ){
+            return (
+                <MenuItem value='' disabled>Kosong</MenuItem>
+            )
+        }
+        return unitData.map((v) => {
+            return (
+                <MenuItem key={v.id} value={v.id}>{v.param}</MenuItem>
+            )
+        })
+
+    }, [unitData])
 
     return (
         <Page title='Item Product'>
@@ -303,17 +322,22 @@ const index = () => {
                                         <TextField
                                             fullWidth 
                                             label='Name'
-                                            name='category'
-                                            defaultValue={staging?.category}
+                                            name='name'
+                                            defaultValue={staging?.name}
                                             required
-                                            helperText={!!errors?.category && errors?.category[0]}
-                                            error={!!errors?.category}
+                                            helperText={!!errors?.name && errors?.name[0]}
+                                            error={!!errors?.name}
                                         /> 
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth 
                                             label='Size'
+                                            name='size'
+                                            defaultValue={staging?.size}
+                                            required
+                                            helperText={!!errors?.size && errors?.size[0]}
+                                            error={!!errors?.size}
                                         /> 
                                     </Grid>
                                     <Grid item xs={12} md={6}>
@@ -322,12 +346,12 @@ const index = () => {
                                             fullWidth 
                                             label='Category'
                                             select
-                                            name='category'
+                                            name='item_category_id'
                                             value={category}
                                             onChange={handleCategory}
                                             required
-                                            helperText={!!errors?.category && errors?.category[0]}
-                                            error={!!errors?.category}
+                                            helperText={!!errors?.item_category_id && errors?.item_category_id[0]}
+                                            error={!!errors?.item_category_id}
                                         >
                                             {renderInputParentCategory()}
                                         </TextField> 
@@ -338,11 +362,11 @@ const index = () => {
                                             fullWidth 
                                             label='Sub Category'
                                             select
-                                            name='sub_category'
-                                            defaultValue={staging?.sub_category || ''}
+                                            name='sub_item_category_id'
+                                            defaultValue={staging?.sub_item_category?.id || ''}
                                             required
-                                            helperText={!!errors?.sub_category && errors?.sub_category[0]}
-                                            error={!!errors?.sub_category}
+                                            helperText={!!errors?.sub_item_category_id && errors?.sub_item_category_id[0]}
+                                            error={!!errors?.sub_item_category_id}
                                         >
                                             {renderInputChildCategory()}
                                         </TextField> 
@@ -352,29 +376,14 @@ const index = () => {
                                             fullWidth 
                                             label='Unit'
                                             select
-                                            name='unit'
-                                            defaultValue={staging?.unit || ''}
+                                            name='unit_id'
+                                            defaultValue={staging?.unit?.id || ''}
                                             required
-                                            helperText={!!errors?.unit && errors?.unit[0]}
-                                            error={!!errors?.unit}
+                                            helperText={!!errors?.unit_id && errors?.unit_id[0]}
+                                            error={!!errors?.unit_id}
+                                            disabled={loadingUnit}
                                         >
-                                            <MenuItem value=''>None</MenuItem>
-                                            <MenuItem value='kg'>KG</MenuItem>
-                                            <MenuItem value='grm'>GRM</MenuItem>
-                                            <MenuItem value='tin'>TIN</MenuItem>
-                                            <MenuItem value='btl'>BTL</MenuItem>
-                                            <MenuItem value='btl'>LTR</MenuItem>
-                                            <MenuItem value='btl'>TUB</MenuItem>
-                                            <MenuItem value='btl'>BAG</MenuItem>
-                                            <MenuItem value='btl'>EA</MenuItem>
-                                            <MenuItem value='btl'>BOX</MenuItem>
-                                            <MenuItem value='btl'>CTN</MenuItem>
-                                            <MenuItem value='btl'>GLN</MenuItem>
-                                            <MenuItem value='btl'>ROLL</MenuItem>
-                                            <MenuItem value='btl'>SLOP</MenuItem>
-                                            <MenuItem value='btl'>PPN</MenuItem>
-                                            <MenuItem value='btl'>SISIR</MenuItem>
-                                            <MenuItem value='btl'>LOT</MenuItem>
+                                            {renderUnitMenuItem()} 
                                         </TextField> 
                                     </Grid>
                                     <Grid item xs={12} md={6}>
@@ -383,13 +392,13 @@ const index = () => {
                                             label='Tax'
                                             select
                                             name='tax'
-                                            defaultValue={staging?.tax || ''}
+                                            defaultValue={staging?.tax}
                                             required
                                             helperText={!!errors?.tax && errors?.tax[0]}
                                             error={!!errors?.tax}
                                         >
-                                            <MenuItem value='1'>Yes</MenuItem>
-                                            <MenuItem value='2'>No</MenuItem>
+                                            <MenuItem value='yes'>Yes</MenuItem>
+                                            <MenuItem value='no'>No</MenuItem>
                                         </TextField> 
                                     </Grid>
                                     <Grid item xs={12} md={12}>

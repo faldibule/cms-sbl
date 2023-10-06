@@ -168,11 +168,11 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='PO From Customer'
+                                label='PR Number'
                                 select
                             >
-                                <MenuItem value='1'>PO Customer 1</MenuItem>
-                                <MenuItem value='2'>PO Customer 2</MenuItem>
+                                <MenuItem value='1'>PR Number 1</MenuItem>
+                                <MenuItem value='2'>PR Number 2</MenuItem>
                             </TextField> 
                         </Grid>
                         {/* <Grid item xs={12} md={6}>
