@@ -192,13 +192,13 @@ const index = () => {
     }, [loadingParent, parentCategories, staging])
 
     return (
-        <Page title='item Category'>
+        <Page title='Item Category'>
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifycontent='space-between' alignitems='center'>
                             <Typography variant='h4' mb={3}>
-                                item category
+                                Item Category
                             </Typography>
                         </Stack>
                     </Grid>
