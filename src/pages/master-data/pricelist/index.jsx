@@ -184,6 +184,12 @@ const index = () => {
                     {value.supplier.name}
                 </TableCell>
                 <TableCell>
+                    {value.item_product.code} - {value.item_product.name}
+                </TableCell>
+                <TableCell>
+                    {NumberFormat(value.price, 'Rp')}
+                </TableCell>
+                <TableCell>
                     <CustomActionTableComponent 
                         edit={true}
                         handleEdit={() => handleEdit(value)}
@@ -259,7 +265,7 @@ const index = () => {
                                     </Grid>
                                 </Grid>
                                 <TableContainer>
-                                    <Table aria-label="simple table">
+                                    <Table size='small' aria-label="simple table" sx={{ overflowX: 'auto', minWidth: 800 }}>
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -268,7 +274,9 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>ItemProduct Type</TableCell>
+                                                <TableCell>Location</TableCell>
+                                                <TableCell>Supplier Name</TableCell>
+                                                <TableCell>Product</TableCell>
                                                 <TableCell>Harga</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>

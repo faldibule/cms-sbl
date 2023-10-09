@@ -1,5 +1,5 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Box, Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useMemo, useState } from 'react'
 import Iconify from '../../../components/Iconify'
 import { useNavigate } from 'react-router-dom'
@@ -85,6 +85,111 @@ const itemDataEdit = [
     }
 ]
 
+const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
+    const onSubmit = (e) => {
+        e.preventDefault()
+        const formElem = document.querySelector('#test') 
+        const formData = new FormData(formElem)
+        const formObject = Object.fromEntries(formData)
+        onChangeByIndex(i, formObject)
+        handleClose()
+    }
+    return (
+        <Dialog
+            fullWidth
+            maxWidth="xs"
+            open={open}
+            onClose={() => {}}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+        >
+            <DialogTitle>Edit Form {v.name}</DialogTitle>
+            <DialogContent>
+                <Grid container id='test' component='form' spacing={2} p={1}>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            label='Quantity'
+                            type='number'
+                            name='quantity'
+                            defaultValue={v?.quantity}
+                        />  
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            name='vat'
+                            type='number'
+                            label='VAT'
+                            defaultValue={v?.vat}
+                        /> 
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            label='Description'
+                            name='description'
+                            defaultValue={v?.description}
+                            multiline
+                            rows={3}
+                        /> 
+                    </Grid>
+                </Grid>
+            </DialogContent>
+            <DialogActions>
+                <Stack direction='row' justifyContent='end'>
+                    <Button color='error' variant="text" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="text" onClick={onSubmit}>
+                        Save
+                    </Button>
+                </Stack>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
+    const [open, setOpen] = useState(false)
+    const handleClose = () => setOpen(!open)
+    const total = useMemo(() => (v.harga * parseInt(v.vat)) * v.quantity, [v.harga, v.quantity, v.vat])
+    const grand_total = useMemo(() => total, [total])
+    return (
+        <TableRow key={i}>
+            <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
+            <TableCell>{v.name}</TableCell>
+            <TableCell>{v.brand}</TableCell>
+            <TableCell>
+                {v.description}
+            </TableCell>
+            <TableCell>KG</TableCell>
+            <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
+            <TableCell>
+                {v.quantity}
+            </TableCell>
+            <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
+            <TableCell>
+                {v.vat}
+            </TableCell>
+            <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
+            <TableCell align='center'>
+                <Stack direction='row' spacing={2}>
+                    <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
+                    <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
+                </Stack>
+                <DialogInputRow 
+                    handleClose={handleClose} 
+                    open={open} 
+                    v={v} 
+                    onChangeByIndex={onChangeByIndex}
+                    i={i}
+                />
+            </TableCell>
+        </TableRow>
+    )
+}
+
 const Form = (props) => {
     const sb = useCustomSnackbar()
     const navigate = useNavigate()
@@ -123,7 +228,25 @@ const Form = (props) => {
             ...form,
             item: ''
         })
-        setItem([...item, itemData.find(v => v.code === e.target.value)])
+        const dummy = []
+        const dataById = itemData.find(v => v.code === e.target.value)
+        for(let i = 0; i < 50; i++){
+            dummy.push(dataById)
+        }
+        setItem([...item, ...dummy])
+    }
+    
+    const onChangeByIndex = (index, object) => {
+        const temp = item.map((v, i) => {
+            if(i === index){
+                return {
+                    ...v,
+                    ...object
+                }
+            }
+            return v
+        })
+        setItem([...temp])
     }
 
     const onChangeItemTable = (e, id) => {
@@ -145,16 +268,21 @@ const Form = (props) => {
         setItem([...newItem])
     }
 
-    const deleteItemTable = (e, id) => {
-        setItem([...item.filter(v => v.code !== id)])
+    const deleteItemTable = (e, index) => {
+        setItem([...item.filter((v, i) => i !== index)])
     }
 
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        navigate('/purchase-request/input-purchase-request', {
-            variant: 'success'
+        const formData = new FormData(e.target)
+        item.forEach((v, i) => {
+            formData.append(`description[${i}]`, v.description)
         })
+        console.log(Object.fromEntries(formData))
+        // navigate('/purchase-request/input-purchase-request', {
+        //     variant: 'success'
+        // })
     }
 
     useEffect(() => {
@@ -325,59 +453,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => {
-                                                const total = v.harga * v.quantity
-                                                const grand_total = total + parseInt(v.vat)
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{i + 1}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        <TableCell>{v.brand}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                size='small'
-                                                                sx={{ width: 300 }}
-                                                                label='Description'
-                                                                name='description'
-                                                                value={v.description}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>KG</TableCell>
-                                                        <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                size='small'
-                                                                sx={{ width: 300 }}
-                                                                label='Quantity'
-                                                                type='number'
-                                                                name='quantity'
-                                                                value={v.quantity}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                size='small'
-                                                                fullWidth 
-                                                                sx={{ width: 300 }}
-                                                                name='vat'
-                                                                label='VAT'
-                                                                value={NumberFormat(v.vat, 'Rp')}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-                                                        <TableCell align='center'>
-                                                            <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
-                                            
+                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
