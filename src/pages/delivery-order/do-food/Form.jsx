@@ -141,7 +141,7 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         sb.success('Success!')
-        navigate('/delivery-order/do-quotation', {
+        navigate('/delivery-order/do-food', {
             variant: 'success'
         })
     }
@@ -163,7 +163,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input DO Quotation' : 'Form Edit DO Quotation' }
+                        {props.title === 'add' ? 'Form Input DO Keluar Food Supply' : 'Form Edit DO Keluar Food Supply' }
                     </Typography>
                 </Grid>
             </Grid>

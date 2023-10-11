@@ -67,10 +67,10 @@ import DeliveryOrderCatering from './pages/delivery-order/do-catering'
 import AddDeliveryOrderCatering from './pages/delivery-order/do-catering/Add'
 import EditDeliveryOrderCatering from './pages/delivery-order/do-catering/Edit'
 
-// DO Quotation
-import DeliveryOrderQuotation from './pages/delivery-order/do-quotation'
-import AddDeliveryOrderQuotation from './pages/delivery-order/do-quotation/Add'
-import EditDeliveryOrderQuotation from './pages/delivery-order/do-quotation/Edit'
+// DO Keluar Food
+import DeliveryOrderFood from './pages/delivery-order/do-food'
+import AddDeliveryOrderFood from './pages/delivery-order/do-food/Add'
+import EditDeliveryOrderFood from './pages/delivery-order/do-food/Edit'
 
 // Sheet Detail
 import SheetDetail from './pages/meal-sheet/sheet-detail'
@@ -198,10 +198,10 @@ export default function Router() {
         { path: 'do-catering/add', element: <AddDeliveryOrderCatering /> },
         { path: 'do-catering/edit/:id', element: <EditDeliveryOrderCatering /> },
         
-        // DO Keluar
-        { path: 'do-quotation', element: <DeliveryOrderQuotation /> },
-        { path: 'do-quotation/add', element: <AddDeliveryOrderQuotation /> },
-        { path: 'do-quotation/edit/:id', element: <EditDeliveryOrderQuotation /> },
+        // DO Keluar Food Supply
+        { path: 'do-food', element: <DeliveryOrderFood /> },
+        { path: 'do-food/add', element: <AddDeliveryOrderFood /> },
+        { path: 'do-food/edit/:id', element: <EditDeliveryOrderFood /> },
       ],
     },
     {

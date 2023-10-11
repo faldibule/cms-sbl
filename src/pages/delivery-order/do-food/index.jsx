@@ -267,15 +267,15 @@ const index = () => {
     }
 
     return (
-        <Page title='DO Keluar Quotation'>
+        <Page title='DO Keluar Food Supply'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                DO Keluar Quotation
+                                DO Keluar Food Supply
                             </Typography>
-                            <Button onClick={() => navigate('/delivery-order/do-quotation/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate('/delivery-order/do-food/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>
@@ -320,7 +320,7 @@ const index = () => {
                                                     <TableRow key={i}>
                                                         <TableCell>{params.page * params.limit + i + 1}</TableCell>
                                                         <TableCell>
-                                                            <CustomLinkComponent label={v.pr_number} url='/delivery-order/do-quotation/edit/1' />
+                                                            <CustomLinkComponent label={v.pr_number} url='/delivery-order/do-food/edit/1' />
                                                         </TableCell>
                                                         <TableCell>{v.customer_name}</TableCell>
                                                         <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>

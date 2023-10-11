@@ -116,8 +116,8 @@ const navConfig = [
         path: 'do-catering'
       },
       {
-        title: 'DO Keluar Quotation',
-        path: 'do-quotation'
+        title: 'DO Keluar Food Supply',
+        path: 'do-food'
       },
       // {
       //   title: 'Approval DO',
