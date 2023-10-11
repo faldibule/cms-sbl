@@ -49,6 +49,16 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                             rows={3}
                         /> 
                     </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            label='Remarks'
+                            name='remarks'
+                            defaultValue={v?.remarks}
+                            multiline
+                            rows={3}
+                        /> 
+                    </Grid>
                 </Grid>
             </DialogContent>
             <DialogActions>

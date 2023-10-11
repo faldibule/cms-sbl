@@ -7,83 +7,35 @@ import useCustomSnackbar from '../../hooks/useCustomSnackbar'
 import { NumberFormat } from '../../utils/Format'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/quotation/TableInputRow'
+import { read, utils } from 'xlsx'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
 
 const itemData = [
     {
         code: '1',
         name: 'item 1',
-        brand: 'brand 1',
-        description: '',
+        weight: '1',
+        unit: 'kg',
         harga: 1000000,
         quantity: 0,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
         vat: 0,
+        tnt: '',
+        remarks: ''
     },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: '',
-        harga: 2000000,
-        quantity: 0,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        vat: 0,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: '',
-        harga: 3000000,
-        quantity: 0,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        vat: 0,
-    }
 ]
 
 const itemDataEdit = [
     {
         code: '1',
         name: 'item 1',
-        brand: 'brand 1',
-        description: 'Test 1',
+        weight: '1',
+        unit: 'kg',
         harga: 1000000,
-        quantity: 5,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
+        quantity: 0,
         vat: 0,
+        tnt: '',
+        remarks: ''
     },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: 'test 2',
-        harga: 2000000,
-        quantity: 3,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        vat: 0,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: 'test 3',
-        harga: 3000000,
-        quantity: 1,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        vat: 0,
-    }
 ]
 
 const Form = (props) => {
@@ -142,6 +94,28 @@ const Form = (props) => {
             return v
         })
         setItem([...temp])
+    }
+
+    const [importLoading, setImportLoading] = useState(false)
+    const handleFileImport = (e) => {
+        e.preventDefault()
+        setImportLoading(true)
+        if (e.target.files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = read(data, { type: "array" });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = utils.sheet_to_json(worksheet);
+                setItem([...json])
+            };
+            reader.onloadend = () => {
+                setImportLoading(false)
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+            e.target.value = null;
+        }
     }
 
     const onSubmit = (e) => {
@@ -272,24 +246,31 @@ const Form = (props) => {
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <TextField
-                                label='Item'
-                                value={form.item}
-                                onChange={onChangeItem}
-                                fullWidth 
-                                select
-                            >
-                                {itemData.map((v, i) => {
-                                    return (
-                                        <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
-                                    )
-                                })}
-                            </TextField> 
+                            <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
+                                <TextField
+                                    size='small'
+                                    label='Item'
+                                    value={form.item}
+                                    onChange={onChangeItem}
+                                    fullWidth 
+                                    select
+                                >
+                                    {itemData.map((v, i) => {
+                                        return (
+                                            <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
+                                        )
+                                    })}
+                                </TextField> 
+                                <LoadingButton loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                    <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
+                                    Import
+                                </LoadingButton>
+                            </Stack>
                         </Grid>
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer>
-                                    <Table aria-label="simple table">
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -298,18 +279,19 @@ const Form = (props) => {
                                                     bgcolor: '#d6e9ff'
                                                 }}
                                             >
-                                                <TableCell>No.</TableCell>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Brand</TableCell>
-                                                <TableCell>Description</TableCell>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>Price</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>VAT</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Total Price</TableCell>
-                                                <TableCell>Grand Total</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Weight</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor>T/NT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Remarks</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>

@@ -365,7 +365,7 @@ const Form = (props) => {
                                                 <TableCell>VAT</TableCell>
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Total Price</TableCell>
-                                                <TableCell>Shipment Charge</TableCell>
+                                                {/* <TableCell>Shipment Charge</TableCell> */}
                                                 <TableCell>Grand Total</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>

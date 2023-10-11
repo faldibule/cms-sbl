@@ -7,31 +7,29 @@ import { NumberFormat } from "@utils/Format"
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
+    const shipment_charge = parseInt(v.shipment_charge) || 0
     const total = useMemo(() => (v.harga * v.quantity), [v.harga, v.quantity])
     const tax = useMemo(() => total * parseInt(v.vat) / 100, [total, v.vat])
-    const grand_total = useMemo(() => total + tax, [total, tax])
+    const grand_total = useMemo(() => total + tax + shipment_charge, [total, tax, shipment_charge])
+
     return (
         <TableRow key={i}>
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell>{v.name}</TableCell>
-            <TableCell>{v.weight}</TableCell>
-            <TableCell>{v.unit}</TableCell>
+            <TableCell>{v.brand}</TableCell>
             <TableCell>
-                {v.quantity}
+                {v.description}
             </TableCell>
             <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
             <TableCell>
-                {v.vat}%
+                {v.quantity}
+            </TableCell>
+            <TableCell>
+                {v.vat || '0'}%
             </TableCell>
             <TableCell>{NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-            <TableCell>
-                {v?.tnt || ''}
-            </TableCell>
-            <TableCell>
-                {v?.remarks || '' }
-            </TableCell>
             <TableCell align='center'>
                 <Stack direction='row' spacing={2}>
                     <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />

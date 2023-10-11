@@ -24,11 +24,14 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
                 {v.quantity}
             </TableCell>
             <TableCell>
-                {v.vat}
+                {v.vat}%
             </TableCell>
             <TableCell>{NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 100 }} align="left">
+                {v?.remarks || ''}
+            </TableCell>
             <TableCell align='center'>
                 <Stack direction='row' spacing={2}>
                     <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />

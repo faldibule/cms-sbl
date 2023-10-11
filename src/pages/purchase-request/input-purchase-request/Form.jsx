@@ -291,6 +291,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <TextField
+                                    size='small'
                                     label='Item'
                                     value={form.item}
                                     onChange={onChangeItem}
@@ -303,7 +304,7 @@ const Form = (props) => {
                                         )
                                     })}
                                 </TextField> 
-                                <Button sx={{ width: 250 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>Import Data</Button>
+                                <Button sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>Import</Button>
                             </Stack>
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -329,6 +330,7 @@ const Form = (props) => {
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Total Price</TableCell>
                                                 <TableCell>Grand Total</TableCell>
+                                                <TableCell>Remarks</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>

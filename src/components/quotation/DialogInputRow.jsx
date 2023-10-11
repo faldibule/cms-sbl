@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Stack, TextField } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Stack, TextField } from "@mui/material"
 
 const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
     const onSubmit = (e) => {
@@ -42,9 +42,21 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
-                            label='Description'
-                            name='description'
-                            defaultValue={v?.description}
+                            label='T/NT'
+                            name='tnt'
+                            defaultValue={v?.tnt}
+                            select
+                        >
+                            <MenuItem value='T'>T</MenuItem>
+                            <MenuItem value='NT'>NT</MenuItem>
+                        </TextField> 
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            label='Remarks'
+                            name='remarks'
+                            defaultValue={v?.remarks}
                             multiline
                             rows={3}
                         /> 

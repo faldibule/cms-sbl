@@ -7,7 +7,7 @@ import { NumberFormat } from "@utils/Format"
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
-    const shipment_charge = parseInt(v.shipment_charge)
+    const shipment_charge = parseInt(v.shipment_charge) || 0
     const total = useMemo(() => (v.harga * v.quantity), [v.harga, v.quantity])
     const tax = useMemo(() => total * parseInt(v.vat) / 100, [total, v.vat])
     const grand_total = useMemo(() => total + tax + shipment_charge, [total, tax, shipment_charge])
@@ -30,7 +30,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
             </TableCell>
             <TableCell>{NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
-            <TableCell>{NumberFormat(v.shipment_charge, 'Rp')}</TableCell>
+            {/* <TableCell>{NumberFormat(v.shipment_charge, 'Rp')}</TableCell> */}
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
             <TableCell align='center'>
                 <Stack direction='row' spacing={2}>
