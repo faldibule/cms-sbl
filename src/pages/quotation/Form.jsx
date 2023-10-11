@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '../../hooks/useCustomSnackbar'
 import { NumberFormat } from '../../utils/Format'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
+import TableInputRow from '@components/quotation/TableInputRow'
 
 const itemData = [
     {
@@ -126,27 +127,21 @@ const Form = (props) => {
         setItem([...item, itemData.find(v => v.code === e.target.value)])
     }
 
-    const onChangeItemTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                if(e.target.name === 'vat'){
-                    return {
-                        ...v,
-                        vat: e.target.value.replaceAll('Rp', '').replaceAll('.', '')
-                    }
-                }
+    const deleteItemTable = (e, index) => {
+        setItem([...item.filter((v, i) => i !== index)])
+    }
+
+    const onChangeByIndex = (index, object) => {
+        const temp = item.map((v, i) => {
+            if(i === index){
                 return {
                     ...v,
-                    [e.target.name]: e.target.value,
+                    ...object
                 }
             }
             return v
         })
-        setItem([...newItem])
-    }
-
-    const deleteItemTable = (e, id) => {
-        setItem([...item.filter(v => v.code !== id)])
+        setItem([...temp])
     }
 
     const onSubmit = (e) => {
@@ -310,64 +305,15 @@ const Form = (props) => {
                                                 <TableCell>Unit</TableCell>
                                                 <TableCell>Price</TableCell>
                                                 <TableCell>Quantity</TableCell>
-                                                <TableCell>Amount</TableCell>
                                                 <TableCell>VAT</TableCell>
+                                                <TableCell>Tax</TableCell>
                                                 <TableCell>Total Price</TableCell>
+                                                <TableCell>Grand Total</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => {
-                                                const total = v.harga * v.quantity
-                                                const grand_total = total + parseInt(v.vat)
-                                                console.log(v.vat)
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{i + 1}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        <TableCell>{v.brand}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                sx={{ width: 300 }}
-                                                                label='Description'
-                                                                name='description'
-                                                                value={v.description}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>KG</TableCell>
-                                                        <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                sx={{ width: 300 }}
-                                                                label='Quantity'
-                                                                type='number'
-                                                                name='quantity'
-                                                                value={v.quantity}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                sx={{ width: 300 }}
-                                                                name='vat'
-                                                                label='VAT'
-                                                                value={NumberFormat(v.vat, 'Rp')}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-                                                        <TableCell align='center'>
-                                                            <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
-                                            
+                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
