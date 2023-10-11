@@ -8,6 +8,9 @@ import MenuPopover from '../../components/MenuPopover';
 // mocks_
 import account from '../../_mock/account';
 import { grey } from '@mui/material/colors';
+import { useRecoilValue } from 'recoil';
+import { authentication } from '@recoil/Authentication';
+import ResetPasswordDialog from '@components/ResetPasswordDialog';
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +39,10 @@ export default function AccountPopover() {
   const anchorRef = useRef(null);
 
   const [open, setOpen] = useState(null);
+  const { user } = useRecoilValue(authentication)
+
+  const [dialog, setDialog] = useState(false)
+  const handleDialog = () => setDialog(!dialog)
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -90,10 +97,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {user?.name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {user?.email}
           </Typography>
         </Box>
 
@@ -101,7 +108,7 @@ export default function AccountPopover() {
 
         <Stack sx={{ p: 1 }}>
           {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} to={option.linkTo} component={RouterLink} onClick={handleClose}>
+            <MenuItem key={option.label} to={option.linkTo} component={RouterLink} onClick={handleDialog}>
               {option.label}
             </MenuItem>
           ))}
@@ -109,10 +116,15 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <MenuItem onClick={handleLogout} sx={{ m: 1 }}>
+        <MenuItem onClick={handleLogout} sx={{ m: 1, color: 'red' }}>
           Logout
         </MenuItem>
       </MenuPopover>
+
+      <ResetPasswordDialog 
+        open={dialog}
+        handleClose={() => { handleDialog(); handleClose();}}
+      />
     </>
   );
 }

@@ -28,53 +28,54 @@ import MenuPopover from '../../components/MenuPopover';
 
 // ----------------------------------------------------------------------
 
-const NOTIFICATIONS = [
-  {
-    id: faker.datatype.uuid(),
-    title: 'Your order is placed',
-    description: 'waiting for shipping',
-    avatar: null,
-    type: 'order_placed',
-    createdAt: set(new Date(), { hours: 10, minutes: 30 }),
-    isUnRead: true,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: faker.name.findName(),
-    description: 'answered to your comment on the Minimal',
-    avatar: '/static/mock-images/avatars/avatar_2.jpg',
-    type: 'friend_interactive',
-    createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
-    isUnRead: true,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new message',
-    description: '5 unread messages',
-    avatar: null,
-    type: 'chat_message',
-    createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'You have new mail',
-    description: 'sent from Guido Padberg',
-    avatar: null,
-    type: 'mail',
-    createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-  {
-    id: faker.datatype.uuid(),
-    title: 'Delivery processing',
-    description: 'Your order is being shipped',
-    avatar: null,
-    type: 'order_shipped',
-    createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
-    isUnRead: false,
-  },
-];
+// const NOTIFICATIONS = [
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'Your order is placed',
+//     description: 'waiting for shipping',
+//     avatar: null,
+//     type: 'order_placed',
+//     createdAt: set(new Date(), { hours: 10, minutes: 30 }),
+//     isUnRead: true,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: faker.name.findName(),
+//     description: 'answered to your comment on the Minimal',
+//     avatar: '/static/mock-images/avatars/avatar_2.jpg',
+//     type: 'friend_interactive',
+//     createdAt: sub(new Date(), { hours: 3, minutes: 30 }),
+//     isUnRead: true,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'You have new message',
+//     description: '5 unread messages',
+//     avatar: null,
+//     type: 'chat_message',
+//     createdAt: sub(new Date(), { days: 1, hours: 3, minutes: 30 }),
+//     isUnRead: false,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'You have new mail',
+//     description: 'sent from Guido Padberg',
+//     avatar: null,
+//     type: 'mail',
+//     createdAt: sub(new Date(), { days: 2, hours: 3, minutes: 30 }),
+//     isUnRead: false,
+//   },
+//   {
+//     id: faker.datatype.uuid(),
+//     title: 'Delivery processing',
+//     description: 'Your order is being shipped',
+//     avatar: null,
+//     type: 'order_shipped',
+//     createdAt: sub(new Date(), { days: 3, hours: 3, minutes: 30 }),
+//     isUnRead: false,
+//   },
+// ];
+const NOTIFICATIONS = []
 
 export default function NotificationsPopover() {
   const anchorRef = useRef(null);
@@ -119,7 +120,7 @@ export default function NotificationsPopover() {
         open={Boolean(open)}
         anchorEl={open}
         onClose={handleClose}
-        sx={{ width: 360, p: 0, mt: 1.5, ml: 0.75 }}
+        sx={{ width: 360, maxHeight: 400, overflowY: 'auto', p: 0, mt: 1.5, ml: 0.75 }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', py: 2, px: 2.5 }}>
           <Box sx={{ flexGrow: 1 }}>
@@ -141,40 +142,40 @@ export default function NotificationsPopover() {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Scrollbar sx={{ height: { xs: 340, sm: 'auto' } }}>
-          <List
-            disablePadding
-            subheader={
-              <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
-                New
-              </ListSubheader>
-            }
-          >
-            {notifications.slice(0, 2).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
-          </List>
 
-          <List
-            disablePadding
-            subheader={
-              <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
-                Before that
-              </ListSubheader>
-            }
-          >
-            {notifications.slice(2, 5).map((notification) => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
-          </List>
+          {NOTIFICATIONS.length > 0 ?
+            <List
+              disablePadding
+              subheader={
+                <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
+                  New
+                </ListSubheader>
+              }
+            >
+              {notifications.slice(0, 2).map((notification) => (
+                <NotificationItem key={notification.id} notification={notification} />
+              ))}
+            </List>
+          : null
+          }
+
+          {NOTIFICATIONS.length > 0 ?
+            <List
+              disablePadding
+              subheader={
+                <ListSubheader disableSticky sx={{ py: 1, px: 2.5, typography: 'overline' }}>
+                  Before that
+                </ListSubheader>
+              }
+            >
+              {notifications.slice(2, 5).map((notification) => (
+                <NotificationItem key={notification.id} notification={notification} />
+              ))}
+            </List>
+          : null
+          }
+
         </Scrollbar>
-
-        <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <Box sx={{ p: 1 }}>
-          <Button fullWidth disableRipple>
-            View All
-          </Button>
-        </Box>
       </MenuPopover>
     </>
   );
