@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Stack, TextField } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Stack, TextField } from "@mui/material"
 import { IntegerFormat, NumberFormat } from "@utils/Format"
 import { useState } from "react"
 
@@ -44,24 +44,17 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                             defaultValue={v?.vat || 0}
                         /> 
                     </Grid>
-                    {/* <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
-                            name='shipment_charge'
-                            label='Shipment charge'
-                            value={shipmentCharge}
-                            onChange={(e) => handleShipmentCharge(e.target.value)}
-                        /> 
-                    </Grid> */}
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
-                            label='Description'
-                            name='description'
-                            defaultValue={v?.description}
-                            multiline
-                            rows={3}
-                        /> 
+                            name='tnt'
+                            label='T/NT'
+                            defaultValue={v?.tnt}
+                            select
+                        > 
+                            <MenuItem value='T'>T</MenuItem>
+                            <MenuItem value='NT'>NT</MenuItem>
+                        </TextField>
                     </Grid>
                 </Grid>
             </DialogContent>

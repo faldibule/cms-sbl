@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/input-purchase-request/TableInputRow'
+import { read, utils } from 'xlsx'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
 
 const itemData = [
     {
@@ -146,6 +148,28 @@ const Form = (props) => {
 
     const deleteItemTable = (e, index) => {
         setItem([...item.filter((v, i) => i !== index)])
+    }
+
+    const [importLoading, setImportLoading] = useState(false)
+    const handleFileImport = (e) => {
+        e.preventDefault()
+        setImportLoading(true)
+        if (e.target.files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = read(data, { type: "array" });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = utils.sheet_to_json(worksheet);
+                setItem([...json])
+            };
+            reader.onloadend = () => {
+                setImportLoading(false)
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+            e.target.value = null;
+        }
     }
 
     const onSubmit = (e) => {
@@ -304,13 +328,16 @@ const Form = (props) => {
                                         )
                                     })}
                                 </TextField> 
-                                <Button sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>Import</Button>
+                                <LoadingButton loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                    <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
+                                    Import
+                                </LoadingButton>
                             </Stack>
                         </Grid>
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer sx={{ height: 400, overflowY: 'auto' }}>
-                                    <Table aria-label="simple table">
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -319,19 +346,20 @@ const Form = (props) => {
                                                     bgcolor: '#d6e9ff'
                                                 }}
                                             >
-                                                <TableCell>No.</TableCell>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Brand</TableCell>
-                                                <TableCell>Description</TableCell>
-                                                <TableCell>Unit</TableCell>
-                                                <TableCell>Price</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>VAT</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Total Price</TableCell>
-                                                <TableCell>Grand Total</TableCell>
-                                                <TableCell>Remarks</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Brand</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Remarks</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -349,7 +377,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
                                 <LoadingButton variant='contained' type='submit'>
-                                    submit
+                                    Submit
                                 </LoadingButton>
                                 {props.title == 'edit' ?
                                     <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>

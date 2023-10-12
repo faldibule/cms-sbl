@@ -16,20 +16,20 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
         <TableRow key={i}>
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell>{v.name}</TableCell>
-            <TableCell>{v.brand}</TableCell>
-            <TableCell>
-                {v.description}
-            </TableCell>
-            <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
+            <TableCell>{v.weight}</TableCell>
+            <TableCell>{v.size}</TableCell>
+            <TableCell>{v.unit}</TableCell>
             <TableCell>
                 {v.quantity}
             </TableCell>
+            <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
+            <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>
                 {v.vat || '0'}%
             </TableCell>
             <TableCell>{NumberFormat(tax, 'Rp')}</TableCell>
-            <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
+            <TableCell>{v?.tnt}</TableCell>
             <TableCell align='center'>
                 <Stack direction='row' spacing={2}>
                     <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />

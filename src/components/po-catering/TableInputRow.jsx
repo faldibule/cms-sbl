@@ -15,13 +15,13 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
     return (
         <TableRow key={i}>
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
-            <TableCell>{v.name}</TableCell>
-            <TableCell>{v.brand}</TableCell>
-            <TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{v.name}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{v.brand}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>
                 {v.description}
             </TableCell>
+            <TableCell>{v?.size}</TableCell>
             <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-            <TableCell>Stock</TableCell>
             <TableCell>
                 {v.quantity}
             </TableCell>

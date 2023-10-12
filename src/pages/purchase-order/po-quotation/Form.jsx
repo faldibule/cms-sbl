@@ -3,65 +3,45 @@ import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem
 import React, { useEffect, useState } from 'react'
 import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../../utils/Format'
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/po-quotation/TableInputRow'
+import { read, utils } from 'xlsx'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
 
 const itemData = [
     {
         code: '1',
         name: 'item 1',
-        brand: 'brand 1',
-        description: '',
-        harga: 1000000,
+        weight: 'weight 1',
+        size: '100gr',
+        unit: 'KG',
         quantity: 0,
-        tax: 11,
+        harga: 1000000,
         total: 1000000,
+        vat: 0,
         grand_total: 1000000,
         status: false,
+        tnt: 'T'
     },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: '',
-        harga: 2000000,
-        quantity: 0,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        status: true,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: '',
-        harga: 3000000,
-        quantity: 0,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        status: false,
-    }
 ]
 
 let itemDataEdit = []
 for(let i = 0; i < 4; i++){
     const index = i + 1
     itemDataEdit[i] = {
-        code: i + index,
-        name: 'item '+ index,
-        brand: 'brand '+ index,
-        description: 'Test '+ index,
-        harga: index * 1000000,
-        quantity: 5 + index,
-        tax: 11,
-        total: 0,
-        shipment_charge: 0,
-        grand_total: 0,
-        status: true,
+        code: '1',
+        name: `item ${i + 1}`,
+        weight: `weight ${i+1}`,
+        size: '100gr',
+        unit: 'KG',
+        quantity: 0,
+        harga: 1000000,
+        total: 1000000,
+        vat: 0,
+        grand_total: 1000000,
+        status: false,
+        tnt: 'T'
     }
 }
 
@@ -103,21 +83,6 @@ const Form = (props) => {
         setItem([...item, itemData.find(v => v.code === e.target.value)])
     }
 
-    const onChangeItemTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                return {
-                    ...v,
-                    [e.target.name]: e.target.value,
-                }
-            }
-            return v
-        })
-        setItem([...newItem])
-    }
-
-
-
     const deleteItemTable = (e, index) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
@@ -135,17 +100,26 @@ const Form = (props) => {
         setItem([...temp])
     }
 
-    const onChangeCheckTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                return {
-                    ...v,
-                    status: e.target.checked
-                }
-            }
-            return v
-        })
-        setItem([...newItem])
+    const [importLoading, setImportLoading] = useState(false)
+    const handleFileImport = (e) => {
+        e.preventDefault()
+        setImportLoading(true)
+        if (e.target.files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = read(data, { type: "array" });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = utils.sheet_to_json(worksheet);
+                setItem([...json])
+            };
+            reader.onloadend = () => {
+                setImportLoading(false)
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+            e.target.value = null;
+        }
     }
 
     const onSubmit = (e) => {
@@ -333,13 +307,16 @@ const Form = (props) => {
                                         )
                                     })}
                                 </TextField> 
-                                <Button sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>Import</Button>
+                                <LoadingButton loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                    <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
+                                    Import
+                                </LoadingButton>
                             </Stack>
                         </Grid>
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer sx={{ maxWidth: 2000 }}>
-                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -353,17 +330,19 @@ const Form = (props) => {
                                                 <TableCell></TableCell>
                                                 : null
                                                 }
-                                                <TableCell>No.</TableCell>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Brand</TableCell>
-                                                <TableCell>Description</TableCell>
-                                                <TableCell>Harga</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>VAT</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Total Price</TableCell>
-                                                <TableCell>Grand Total</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Weight</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor>T/NT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -375,7 +354,9 @@ const Form = (props) => {
                             null
                             }
                         </Grid>
-                        
+                        <Grid item xs={12} md={12}>
+                            <CustomGrandTotalComponent item={item} />
+                        </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
                                 <LoadingButton variant='contained' type='submit'>

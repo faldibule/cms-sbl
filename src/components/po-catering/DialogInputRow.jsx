@@ -44,6 +44,14 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                             defaultValue={v?.vat || 0}
                         /> 
                     </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            name='size'
+                            label='Size'
+                            defaultValue={v?.size}
+                        /> 
+                    </Grid>
                     {/* <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
