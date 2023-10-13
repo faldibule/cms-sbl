@@ -6,63 +6,22 @@ import { useNavigate } from 'react-router-dom'
 import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
 import { IntegerFormat, NumberFormat } from '../../../utils/Format'
 import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
+import TableInputRow from '@components/do-food/TableInputRow'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import { read, utils } from 'xlsx'
 
 const itemData = [
     {
         code: '1',
         name: 'item 1',
+        description: 'Description 1',
         brand: 'brand 1',
-        description: '',
-        harga: 1000000,
+        size: '100gr',
+        unit: 'KG',
         quantity: 0,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
-        status: false,
     },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: '',
-        harga: 2000000,
-        quantity: 0,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        status: true,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: '',
-        harga: 3000000,
-        quantity: 0,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        status: false,
-    }
 ]
 
-let itemDataEdit = []
-for(let i = 0; i < 4; i++){
-    const index = i + 1
-    itemDataEdit[i] = {
-        code: i + index,
-        name: 'item '+ index,
-        brand: 'brand '+ index,
-        description: 'Test '+ index,
-        harga: index * 1000000,
-        quantity: 5 + index,
-        tax: 11,
-        total: 0,
-        shipment_charge: 0,
-        grand_total: 0,
-        status: true,
-    }
-}
 
 const Form = (props) => {
     const sb = useCustomSnackbar()
@@ -121,21 +80,44 @@ const Form = (props) => {
         setItem([...newItem])
     }
 
-    const deleteItemTable = (e, id) => {
-        setItem([...item.filter(v => v.code !== id)])
+
+    const deleteItemTable = (e, index) => {
+        setItem([...item.filter((v, i) => i !== index)])
     }
 
-    const onChangeCheckTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
+    const onChangeByIndex = (index, object) => {
+        const temp = item.map((v, i) => {
+            if(i === index){
                 return {
                     ...v,
-                    status: e.target.checked
+                    ...object
                 }
             }
             return v
         })
-        setItem([...newItem])
+        setItem([...temp])
+    }
+
+    const [importLoading, setImportLoading] = useState(false)
+    const handleFileImport = (e) => {
+        e.preventDefault()
+        setImportLoading(true)
+        if (e.target.files) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = e.target.result;
+                const workbook = read(data, { type: "array" });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = utils.sheet_to_json(worksheet);
+                setItem([...json])
+            };
+            reader.onloadend = () => {
+                setImportLoading(false)
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+            e.target.value = null;
+        }
     }
 
     const onSubmit = (e) => {
@@ -145,18 +127,6 @@ const Form = (props) => {
             variant: 'success'
         })
     }
-
-    useEffect(() => {
-        let mounted = true
-        if(mounted){
-            if(!!props.data){
-                setItem([...itemDataEdit])
-            }
-        }
-
-        return () => mounted = false
-
-    }, [props])
 
     return (
         <Stack>
@@ -182,7 +152,6 @@ const Form = (props) => {
                                 fullWidth 
                                 label='PO Number'
                                 select
-                                onChange={() => setItem([...itemDataEdit])}
                             >
                                 <MenuItem value='1'>PO Number 1</MenuItem>
                                 <MenuItem value='2'>PO Number 2</MenuItem>
@@ -238,9 +207,31 @@ const Form = (props) => {
                             </TextField> 
                         </Grid>
                         <Grid item xs={12} md={12}>
+                            <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
+                                <TextField
+                                    size='small'
+                                    label='Item'
+                                    value={form.item}
+                                    onChange={onChangeItem}
+                                    fullWidth 
+                                    select
+                                >
+                                    {itemData.map((v, i) => {
+                                        return (
+                                            <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
+                                        )
+                                    })}
+                                </TextField> 
+                                <LoadingButton loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                    <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
+                                    Import
+                                </LoadingButton>
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer sx={{ maxWidth: 2000 }}>
-                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -254,68 +245,24 @@ const Form = (props) => {
                                                 <TableCell></TableCell>
                                                 : null
                                                 }
-                                                <TableCell>No.</TableCell>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Brand</TableCell>
-                                                <TableCell>Description</TableCell>
-                                                <TableCell>Harga</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Current Stock</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Shipment Charge</TableCell>
-                                                <TableCell>Total Price</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Brand</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => {
-                                                const temp = v.shipment_charge
-                                                const total = (v.harga * v.quantity) + temp
-                                                const grand_total = total + (total * 11 / 100) + isNaN(temp) ? 0 : temp
-                                                return (
-                                                    <TableRow key={i}>
-                                                        {/* {props.type === 'approval' ? 
-                                                            <TableCell>
-                                                                <Checkbox
-                                                                    checked={v.status}
-                                                                    onChange={(e) => onChangeCheckTable(e, v.code)}
-                                                                />
-                                                            </TableCell>
-                                                            : null
-                                                        } */}
-                                                        <TableCell>{i + 1}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        <TableCell>{v.brand}</TableCell>
-                                                        <TableCell>{v.description}</TableCell>
-                                                        <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-                                                        <TableCell>{v.quantity}</TableCell>
-                                                        <TableCell>20</TableCell>
-                                                        <TableCell>{v.tax}%</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                label='Shipment Charge'
-                                                                name='shipment_charge'
-                                                                value={NumberFormat(v.shipment_charge, 'Rp')}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
-                                                        <TableCell align='center'>
-                                                            <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
+                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
                             : 
                             null
                             }
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={item} />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>

@@ -1,50 +1,12 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import Iconify from '../../../components/Iconify'
+import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../../utils/Format'
-import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
-
-const itemData = [
-    {
-        code: '1',
-        name: 'item 1',
-        brand: 'brand 1',
-        description: '',
-        harga: 1000000,
-        quantity: 0,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
-        status: false,
-    },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: '',
-        harga: 2000000,
-        quantity: 0,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        status: true,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: '',
-        harga: 3000000,
-        quantity: 0,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        status: false,
-    }
-]
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
+import TableInputRow from '@components/do-catering/TableInputRow'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
 
 let itemDataEdit = []
 for(let i = 0; i < 4; i++){
@@ -53,14 +15,17 @@ for(let i = 0; i < 4; i++){
         code: i + index,
         name: 'item '+ index,
         brand: 'brand '+ index,
-        description: 'Test '+ index,
+        description: 'Description '+ index,
+        size: '100gr',
+        unit: 'KG',
         harga: index * 1000000,
-        quantity: 5 + index,
-        tax: 11,
+        quantity: 1,
+        vat: 11,
         total: 0,
         shipment_charge: 0,
         grand_total: 0,
         status: true,
+        remark: 'remark ' + index
     }
 }
 
@@ -94,14 +59,6 @@ const Form = (props) => {
          }
     }
 
-    const onChangeItem = (e) => {
-        setForm({
-            ...form,
-            item: ''
-        })
-        setItem([...item, itemData.find(v => v.code === e.target.value)])
-    }
-
     const onChangeItemTable = (e, id) => {
         const newItem = item.map((v, i) => {
             if(v.code === id){
@@ -115,8 +72,21 @@ const Form = (props) => {
         setItem([...newItem])
     }
 
-    const deleteItemTable = (e, id) => {
-        setItem([...item.filter(v => v.code !== id)])
+    const deleteItemTable = (e, index) => {
+        setItem([...item.filter((v, i) => i !== index)])
+    }
+
+    const onChangeByIndex = (index, object) => {
+        const temp = item.map((v, i) => {
+            if(i === index){
+                return {
+                    ...v,
+                    ...object
+                }
+            }
+            return v
+        })
+        setItem([...temp])
     }
 
     const onChangeCheckTable = (e, id) => {
@@ -171,7 +141,10 @@ const Form = (props) => {
                                 label='PR Number'
                                 select
                                 value={form.item}
-                                onChange={onChangeItem}
+                                onChange={(e) => { 
+                                    setForm({ ...form, item: e.target.value }); 
+                                    setItem([...itemDataEdit]); 
+                                }}
                             >
                                 <MenuItem value='1'>PR Number 1</MenuItem>
                                 <MenuItem value='2'>PR Number 2</MenuItem>
@@ -292,8 +265,8 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
-                                <TableContainer sx={{ maxWidth: 2000 }}>
-                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow
                                                 sx={{
@@ -307,50 +280,24 @@ const Form = (props) => {
                                                 <TableCell></TableCell>
                                                 : null
                                                 }
-                                                <TableCell>No.</TableCell>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Brand</TableCell>
-                                                <TableCell>Description</TableCell>
-                                                <TableCell>Harga</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Current Stock</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Shipment Charge</TableCell>
-                                                <TableCell>Total Price</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Brand</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Vat</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Remarks</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => {
-                                                const temp = parseInt(v.shipment_charge)
-                                                const total = (v.harga * v.quantity) 
-                                                const grand_total = total + (total * 11 / 100) + temp
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{i + 1}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        <TableCell>{v.brand}</TableCell>
-                                                        <TableCell>{v.description}</TableCell>
-                                                        <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-                                                        <TableCell>{v.quantity}</TableCell>
-                                                        <TableCell>20</TableCell>
-                                                        <TableCell>{v.tax}%</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                label='Shipment Charge'
-                                                                name='shipment_charge'
-                                                                value={NumberFormat(v.shipment_charge, 'Rp')}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-                                                        <TableCell align='center'>
-                                                            <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
+                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
