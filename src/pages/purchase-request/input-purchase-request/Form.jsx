@@ -1,5 +1,5 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Autocomplete, Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
@@ -8,6 +8,8 @@ import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/input-purchase-request/TableInputRow'
 import { read, utils } from 'xlsx'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import useFetchLocation from '@hooks/location/useFetchLocation'
+import Loading from '@components/Loading'
 
 const itemData = [
     {
@@ -87,6 +89,34 @@ const itemDataEdit = [
     }
 ]
 
+const CustomAutocomplete = ({ label, errors = {}, options, getOptionLabel, selectedValue, inputValue, setInputValue, setSelectedValue }) => {
+    return (
+        <Autocomplete
+            freeSolo
+            options={options}
+            getOptionLabel={getOptionLabel}
+            value={selectedValue || null} 
+            inputValue={inputValue}
+            onInputChange={(e, value, reason) => {
+                setInputValue(value)
+            }}
+            onChange={(event, newValue) => {
+                setSelectedValue(newValue);
+            }}
+            renderInput={(params) => (
+                <TextField 
+                    {...params} 
+                    required
+                    fullWidth
+                    label={label}
+                    error={!!errors?.parent_location_id}
+                    helperText={!!errors?.parent_location_id && errors?.parent_location_id[0]}
+                />
+            )}
+        />
+    )
+}
+
 const Form = (props) => {
     const sb = useCustomSnackbar()
     const navigate = useNavigate()
@@ -100,6 +130,10 @@ const Form = (props) => {
             file_url: '',
         }
     })
+
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [inputLocation, setInputLocation] = useState('')
+    const { data: dataLocation, isLoading: loadingLocation } = useFetchLocation({ paginate: 0 })
 
     const handleFile = (e) => {
         if (e.target.files[0] !== undefined) {
@@ -179,10 +213,8 @@ const Form = (props) => {
         item.forEach((v, i) => {
             formData.append(`description[${i}]`, v.description)
         })
-        // console.log(Object.fromEntries(formData))
-        // navigate('/purchase-request/input-purchase-request', {
-        //     variant: 'success'
-        // })
+        formData.append('location_id', selectedLocation?.id || '')
+        console.log(Object.fromEntries(formData))
     }
 
     useEffect(() => {
@@ -196,6 +228,10 @@ const Form = (props) => {
         return () => mounted = false
 
     }, [props])
+
+    if(loadingLocation){
+        return <Loading />
+    }
 
     return (
         <Stack>
@@ -217,14 +253,17 @@ const Form = (props) => {
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
+                            <CustomAutocomplete 
+                                options={dataLocation.data}
+                                getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
                                 label='Location'
-                                select
-                            >
-                                <MenuItem value='1'>Location 1</MenuItem>
-                                <MenuItem value='2'>Location 2</MenuItem>
-                            </TextField> 
+                                inputValue={inputLocation}
+                                setInputValue={setInputLocation}
+                                selectedValue={selectedLocation}
+                                setSelectedValue={setSelectedLocation}
+                                errors={{}}
+                                key='location'
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField

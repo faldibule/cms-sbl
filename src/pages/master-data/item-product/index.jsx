@@ -307,7 +307,7 @@ const index = () => {
                             </Typography>
                             {!loading ? 
                                 <Grid container spacing={2} component='form' onSubmit={onSubmit}>
-                                    <Grid item xs={12} md={12}>
+                                    <Grid item xs={12} md={6}>
                                         <TextField
                                             fullWidth 
                                             label='Code'
@@ -327,6 +327,17 @@ const index = () => {
                                             required
                                             helperText={!!errors?.name && errors?.name[0]}
                                             error={!!errors?.name}
+                                        /> 
+                                    </Grid>
+                                    <Grid item xs={12} md={6}>
+                                        <TextField
+                                            fullWidth 
+                                            label='Brand'
+                                            name='brand'
+                                            defaultValue={staging?.brand}
+                                            required
+                                            helperText={!!errors?.brand && errors?.brand[0]}
+                                            error={!!errors?.brand}
                                         /> 
                                     </Grid>
                                     <Grid item xs={12} md={6}>
