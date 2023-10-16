@@ -290,9 +290,6 @@ const index = () => {
                                             required
                                             helperText={!!errors?.phone && errors?.phone[0]}
                                             error={!!errors?.phone}
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start">+62</InputAdornment>,
-                                            }}
                                         /> 
                                     </Grid>
                                     <Grid item xs={12} md={12}>

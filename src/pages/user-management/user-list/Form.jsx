@@ -161,9 +161,6 @@ const Form = (props) => {
                                 <TextField
                                     fullWidth 
                                     label='Phone Number'
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start">+62</InputAdornment>,
-                                    }}
                                     type='number'
                                     name="phone"
                                     defaultValue={defaultValue?.phone}

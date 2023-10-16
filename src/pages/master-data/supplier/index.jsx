@@ -323,9 +323,6 @@ const index = () => {
                                         <TextField
                                             fullWidth 
                                             label='Supplier Phone'
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start">+62</InputAdornment>,
-                                            }}
                                             type='number'
                                             name='phone'
                                             defaultValue={staging?.phone}
