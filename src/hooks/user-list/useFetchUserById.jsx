@@ -10,6 +10,8 @@ const useFetchUserById = (id) => {
         } catch (err) {
             // console.log(err)
         }
+    }, {
+        cacheTime: 0
     })
 }
 
