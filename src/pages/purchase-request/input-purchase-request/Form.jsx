@@ -10,6 +10,7 @@ import { read, utils } from 'xlsx'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import Loading from '@components/Loading'
+import CustomAutocomplete from '@components/CustomAutocomplete'
 
 const itemData = [
     {
@@ -88,34 +89,6 @@ const itemDataEdit = [
         vat: 0,
     }
 ]
-
-const CustomAutocomplete = ({ label, errors = {}, options, getOptionLabel, selectedValue, inputValue, setInputValue, setSelectedValue }) => {
-    return (
-        <Autocomplete
-            freeSolo
-            options={options}
-            getOptionLabel={getOptionLabel}
-            value={selectedValue || null} 
-            inputValue={inputValue}
-            onInputChange={(e, value, reason) => {
-                setInputValue(value)
-            }}
-            onChange={(event, newValue) => {
-                setSelectedValue(newValue);
-            }}
-            renderInput={(params) => (
-                <TextField 
-                    {...params} 
-                    required
-                    fullWidth
-                    label={label}
-                    error={!!errors?.parent_location_id}
-                    helperText={!!errors?.parent_location_id && errors?.parent_location_id[0]}
-                />
-            )}
-        />
-    )
-}
 
 const Form = (props) => {
     const sb = useCustomSnackbar()
@@ -214,7 +187,7 @@ const Form = (props) => {
             formData.append(`description[${i}]`, v.description)
         })
         formData.append('location_id', selectedLocation?.id || '')
-        console.log(Object.fromEntries(formData))
+        // console.log(Object.fromEntries(formData))
     }
 
     useEffect(() => {

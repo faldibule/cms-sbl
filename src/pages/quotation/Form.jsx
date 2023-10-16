@@ -9,38 +9,16 @@ import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/quotation/TableInputRow'
 import { read, utils } from 'xlsx'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
-
-const itemData = [
-    {
-        code: '1',
-        name: 'item 1',
-        weight: '1',
-        unit: 'kg',
-        harga: 1000000,
-        quantity: 0,
-        vat: 0,
-        tnt: '',
-        remarks: ''
-    },
-]
-
-const itemDataEdit = [
-    {
-        code: '1',
-        name: 'item 1',
-        weight: '1',
-        unit: 'kg',
-        harga: 1000000,
-        quantity: 0,
-        vat: 0,
-        tnt: '',
-        remarks: ''
-    },
-]
+import useFetchCustomer from '@hooks/customer/useFetchCustomer'
+import useFetchUser from '@hooks/user-list/useFetchUser'
+import Loading from '@components/Loading'
+import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
+import CustomAutocomplete from '@components/CustomAutocomplete'
+import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
 
 const Form = (props) => {
-    const sb = useCustomSnackbar()
-    const navigate = useNavigate()
+    const { data } = props
+    const [defaultValue, setDefaultValue] = useState({})
     const [item, setItem] = useState([])
     const [form, setForm] = useState({
         item: '',
@@ -51,6 +29,49 @@ const Form = (props) => {
             file_url: '',
         }
     })
+
+    const [customerState, setCustomerState] = useState({
+        input: '',
+        selected: null
+    })
+    const handleSelectedCustomer = (value) => setCustomerState({ ...customerState, selected: value })
+    const handleInputCustomer = (value) => setCustomerState({ ...customerState, input: value })
+    const { data: dataCustomer, isLoading: loadingCustomer } = useFetchCustomer({ paginate: 0 })
+
+    const [userState, setUserState] = useState({
+        prepared_by: {
+            input: '',
+            selected: null
+        },
+        checked_by: {
+            input: '',
+            selected: null
+        },
+        approved_by: {
+            input: '',
+            selected: null
+        },
+    })
+    const handleUser = (name, type) => {
+        return (value) => {
+            setUserState({
+                ...userState,
+                [name]: {
+                    ...userState[name],
+                    [type]: value
+                }
+            })
+        }
+    }
+    const { data: dataUser, isLoading: loadingUser } = useFetchUser({ paginate: 0 })
+
+    const [itemState, setItemState] = useState({
+        input: '',
+        selected: null
+    })
+    const handleSelectedItem = (value) => setItem([...item, value])
+    const handleInputItem = (value) => setItemState({ ...itemState, input: value })
+    const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0 })
 
     const handleFile = (e) => {
         if (e.target.files[0] !== undefined) {
@@ -76,7 +97,6 @@ const Form = (props) => {
             ...form,
             item: ''
         })
-        setItem([...item, itemData.find(v => v.code === e.target.value)])
     }
 
     const deleteItemTable = (e, index) => {
@@ -118,25 +138,72 @@ const Form = (props) => {
         }
     }
 
+    const { mutate: save, isLoading: loadingSave, error  } = useSaveQuotation({
+        onSuccess: () => {}
+    })
+    const errors = error?.response?.data?.errors
+
     const onSubmit = (e) => {
         e.preventDefault()
-        sb.success('Success!')
-        navigate('/quotation', {
-            variant: 'success'
+        const formData = new FormData(e.target)
+        formData.append('customer_id', customerState.selected?.id)
+        formData.append('prepared_by', userState.prepared_by.selected?.id)
+        formData.append('checked_by', userState.checked_by.selected?.id)
+        formData.append('approved_by', userState.approved_by.selected?.id)
+        item.forEach((v, i) => {
+            const name = v?.name || v?.item_product?.name || v?.item_name
+            const price = parseInt(v?.price) || parseInt(v?.item_price)
+            const unit = v.item_product?.unit?.param || v?.unit 
+            formData.append(`item_product[${i}][item_name]`, name )
+            formData.append(`item_product[${i}][weight]`, v?.weight)
+            formData.append(`item_product[${i}][unit]`, unit)
+            formData.append(`item_product[${i}][quantity]`, v.quantity)
+            formData.append(`item_product[${i}][item_price]`, price)
+            formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
+            formData.append(`item_product[${i}][tnt]`, !!v.tnt ? v.tnt : '')
+            formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
+        save({ formData, id: data?.id })
     }
 
+    const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!props.data){
-                setItem([...itemDataEdit])
+                setTimeout(() => {
+                    handleInputCustomer(`${data?.customer.code} - ${data?.customer.name}`)
+                    handleSelectedCustomer(data?.customer)
+
+                    setUserState({
+                        ...userState,
+                        prepared_by: {
+                            input: data?.prepared_by?.name,
+                            selected: data?.prepared_by,
+                        },
+                        checked_by: {
+                            input: data?.checked_by?.name,
+                            selected: data?.checked_by,
+                        },
+                        approved_by: {
+                            input: data?.approved_by?.name,
+                            selected: data?.approved_by,
+                        }
+                    })
+                    setItem([...data?.item_product])
+
+                    setPageLoading(false)
+                }, 500);
             }
         }
 
         return () => mounted = false
 
-    }, [props])
+    }, [props?.id])
+
+    if(loadingCustomer || loadingUser || loadingPricelist || pageLoading){
+        return <Loading />
+    }
 
     return (
         <Stack>
@@ -152,25 +219,37 @@ const Form = (props) => {
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
+                                options={dataCustomer.data}
                                 label='Customer'
-                                select
-                            >
-                                <MenuItem value='1'>Customer 1</MenuItem>
-                                <MenuItem value='2'>Customer 2</MenuItem>
-                            </TextField> 
+                                inputValue={customerState.input}
+                                setInputValue={handleInputCustomer}
+                                selectedValue={customerState.selected}
+                                setSelectedValue={handleSelectedCustomer}
+                                errors={errors?.customer_id}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Attention'
+                                name='attention'
+                                defaultValue={data?.attention}
+                                required
+                                helperText={!!errors?.attention && errors?.attention[0]}
+                                error={!!errors?.attention}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Address'
+                                name='address'
+                                defaultValue={data?.address}
+                                required
+                                helperText={!!errors?.address && errors?.address[0]}
+                                error={!!errors?.address}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -178,22 +257,36 @@ const Form = (props) => {
                                 type='date'
                                 name='delivery_date'
                                 label="Delivery Date"
+                                defaultValue={data?.delivery_date}
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
+                                required
+                                helperText={!!errors?.delivery_date && errors?.delivery_date[0]}
+                                error={!!errors?.delivery_date}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Vessel'
+                                name='vessel'
+                                defaultValue={data?.vessel}
+                                required
+                                helperText={!!errors?.vessel && errors?.vessel[0]}
+                                error={!!errors?.vessel}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Shipping Address'
+                                name='shipping_address'
+                                defaultValue={data?.shipping_address}
+                                required
+                                helperText={!!errors?.shipping_address && errors?.shipping_address[0]}
+                                error={!!errors?.shipping_address}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -205,37 +298,47 @@ const Form = (props) => {
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
+                                required
+                                defaultValue={data?.shipment_date}
+                                helperText={!!errors?.shipment_date && errors?.shipment_date[0]}
+                                error={!!errors?.shipment_date}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
                                 label='Prepared By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
+                                inputValue={userState.prepared_by.input}
+                                setInputValue={handleUser('prepared_by', 'input')}
+                                selectedValue={userState.prepared_by.selected}
+                                setSelectedValue={handleUser('prepared_by', 'selected')}
+                                errors={errors?.prepared_by}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
                                 label='Checked By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
+                                inputValue={userState.checked_by.input}
+                                setInputValue={handleUser('checked_by', 'input')}
+                                selectedValue={userState.checked_by.selected}
+                                setSelectedValue={handleUser('checked_by', 'selected')}
+                                errors={errors?.checked_by}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Approved By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
+                                label='Checked By'
+                                inputValue={userState.approved_by.input}
+                                setInputValue={handleUser('approved_by', 'input')}
+                                selectedValue={userState.approved_by.selected}
+                                setSelectedValue={handleUser('approved_by', 'selected')}
+                                errors={errors?.approved_by}
+                            />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
@@ -243,25 +346,27 @@ const Form = (props) => {
                                 label='Term & Condition'
                                 multiline
                                 rows={3}
+                                name='term_condition'
+                                defaultValue={data?.term_condition}
+                                required
+                                helperText={!!errors?.term_condition && errors?.term_condition[0]}
+                                error={!!errors?.term_condition}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
-                                <TextField
-                                    size='small'
+                                <CustomAutocomplete 
+                                    getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
+                                    options={dataPricelist.data}
                                     label='Item'
-                                    value={form.item}
-                                    onChange={onChangeItem}
-                                    fullWidth 
-                                    select
-                                >
-                                    {itemData.map((v, i) => {
-                                        return (
-                                            <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
-                                        )
-                                    })}
-                                </TextField> 
-                                <LoadingButton loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                    inputValue={itemState.input}
+                                    setInputValue={handleInputItem}
+                                    selectedValue={null}
+                                    setSelectedValue={handleSelectedItem}
+                                    isAutoCompleteItem={true}
+                                    size='small'
+                                />
+                                <LoadingButton fullWidth loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
                                     Import
                                 </LoadingButton>
@@ -295,7 +400,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} errors={errors} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -304,17 +409,17 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent tax={false} item={item} />
+                            <CustomGrandTotalComponent dummy={false} tax={false} item={item} />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
-                                <LoadingButton variant='contained' type='submit'>
-                                    submit
+                                <LoadingButton loading={loadingSave} variant='contained' type='submit'>
+                                    Submit
                                 </LoadingButton>
-                                {props.title == 'edit' ?
-                                    <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                        Print
-                                    </LoadingButton>
+                                {props.title == 'edit' ? ''
+                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
+                                    //     Print
+                                    // </LoadingButton>
                                 : null
                                 }
                             </Stack>
