@@ -14,9 +14,12 @@ import Loading from '@components/Loading';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import ApproveDialog from '@components/ApproveDialog';
 import useApproveQuotation from '@hooks/quotation/useApproveQuotation';
+import { useRecoilValue } from 'recoil';
+import { authentication } from '@recoil/Authentication';
 
 const index = () => {
     const navigate = useNavigate()
+    const { user } = useRecoilValue(authentication)
     const [params, setParams] = useState({
         page: 1,
         limit: 5,
@@ -142,6 +145,8 @@ const index = () => {
                 label: !!value.approved_date ? 'Approved' : !!value.checked_date ? 'Checked' : 'Pending',
                 color: !!value.approved_date ? 'success' : !!value.checked_date ? 'primary' : 'warning'
             }
+            const isChecker = true
+            const isApprover = true
             return (
                 <TableRow key={key}>
                     <TableCell
@@ -168,7 +173,7 @@ const index = () => {
                     </TableCell>
                     <TableCell>
                         <CustomActionTableComponent 
-                            approve={!value.checked_date || !value.approved_date}
+                            approve={(isChecker &&!value.checked_date) || (isApprover && !value.approved_date)}
                             handleApprove={() => handleCloseApprove(value)}
                             handleDelete={() => handleClose(value.id)}
                         />

@@ -18,7 +18,6 @@ import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
 
 const Form = (props) => {
     const { data } = props
-    const [defaultValue, setDefaultValue] = useState({})
     const [item, setItem] = useState([])
     const [form, setForm] = useState({
         item: '',
@@ -332,7 +331,7 @@ const Form = (props) => {
                             <CustomAutocomplete 
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
-                                label='Checked By'
+                                label='Approved By'
                                 inputValue={userState.approved_by.input}
                                 setInputValue={handleUser('approved_by', 'input')}
                                 selectedValue={userState.approved_by.selected}

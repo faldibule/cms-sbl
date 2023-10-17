@@ -2,10 +2,10 @@ import http from '@variable/Api'
 import React from 'react'
 import { useQuery } from 'react-query'
 
-const useFetchPricelist = (params, config = {}) => {
-    return useQuery(['price-lists', params], async ({ signal }) => {
+const useFetchPurchaseRequest = (params) => {
+    return useQuery(['purchase-requests', params], async ({ signal }) => {
         try {
-            const res = await http.get('price-list', {
+            const res = await http.get('purchase-request', {
                 signal,
                 params
             })
@@ -13,7 +13,7 @@ const useFetchPricelist = (params, config = {}) => {
         } catch (err) {
             // console.log(err)
         }
-    }, config)
+    })
 }
 
-export default useFetchPricelist
+export default useFetchPurchaseRequest

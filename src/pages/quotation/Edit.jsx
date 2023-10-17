@@ -12,7 +12,7 @@ const Edit = () => {
     <Page title='Form Edit Quotation'>
         <Container>
             {!isLoading ?
-              <Form title='edit' data={data} />
+              <Form title='edit' data={data} id={id} />
             : null
             }
         </Container>

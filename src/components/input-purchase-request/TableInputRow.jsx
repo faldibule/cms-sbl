@@ -1,37 +1,53 @@
 import Iconify from "@components/Iconify"
-import { Stack, TableCell, TableRow } from "@mui/material"
+import { Stack, TableCell, TableRow, Typography } from "@mui/material"
 import { useMemo, useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 import { NumberFormat } from "@utils/Format"
 
-const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex }) => {
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {} }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
-    const total = useMemo(() => (v.harga * v.quantity), [v.harga, v.quantity])
-    const tax = useMemo(() => total * parseInt(v.vat) / 100, [total, v.vat])
-    const grand_total = useMemo(() => total + tax, [total, tax])
+
+    const price = useMemo(() => parseInt(v?.price) || parseInt(v?.item_price), [v?.price, v?.item_price])
+
+    const total = useMemo(() => (price * (v?.quantity || 0)), [price, v.quantity])
+    const tax = useMemo(() => {
+        let vat = 11
+        if(!!v.vat){
+            vat = parseInt(v.vat)
+        }
+        return total * vat / 100
+    }, [total, v.vat])
+    const grand_total = useMemo(() => {
+        return total + (isNaN(tax) ? 0 : tax)
+    }, [total, tax])
+
     return (
         <TableRow hover key={i}>
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{v.name}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{v.brand}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.name || v?.item_name || ''}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.brand || v?.item_brand || ''}</TableCell>
             <TableCell sx={{ minWidth: 150 }} align="left">
-                {v.description}
+                {
+                    !!v.description ? v.description : !!errors[`item_product.${i}.description`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>Description required</Typography> : ''
+                }
             </TableCell>
-            <TableCell>{v?.size}</TableCell>
-            <TableCell>KG</TableCell>
-            <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.size || v?.item_size || v?.size || ''}</TableCell>
+            <TableCell>{v.item_product?.unit?.param || v?.unit || ''}</TableCell>
+            <TableCell>{NumberFormat(price, 'Rp')}</TableCell>
             <TableCell>
-                {v.quantity}
+                {v.quantity || 0}
             </TableCell>
             <TableCell>
-                {v.vat}%
+                {v.vat || 11}%
             </TableCell>
             <TableCell>{NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
             <TableCell sx={{ minWidth: 100 }} align="left">
-                {v?.remarks || ''}
+                {
+                    !!v.remark ? v.remark : !!errors[`item_product.${i}.remark`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>Remark required</Typography> : ''
+                }
             </TableCell>
             <TableCell align='center'>
                 <Stack direction='row' spacing={2}>

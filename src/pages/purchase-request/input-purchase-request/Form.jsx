@@ -11,86 +11,13 @@ import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import Loading from '@components/Loading'
 import CustomAutocomplete from '@components/CustomAutocomplete'
-
-const itemData = [
-    {
-        code: '1',
-        name: 'item 1',
-        brand: 'brand 1',
-        description: '',
-        harga: 1000000,
-        quantity: 0,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
-        vat: 0,
-    },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: '',
-        harga: 2000000,
-        quantity: 0,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        vat: 0,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: '',
-        harga: 3000000,
-        quantity: 0,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        vat: 0,
-    }
-]
-
-const itemDataEdit = [
-    {
-        code: '1',
-        name: 'item 1',
-        brand: 'brand 1',
-        description: 'Test 1',
-        harga: 1000000,
-        quantity: 5,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
-        vat: 0,
-    },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: 'test 2',
-        harga: 2000000,
-        quantity: 3,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        vat: 0,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: 'test 3',
-        harga: 3000000,
-        quantity: 1,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        vat: 0,
-    }
-]
+import useSavePurchaseRequest from '@hooks/purchase-request/useSavePurchaseRequest'
+import useFetchCustomer from '@hooks/customer/useFetchCustomer'
+import useFetchUser from '@hooks/user-list/useFetchUser'
+import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
 
 const Form = (props) => {
+    const { data } = props
     const sb = useCustomSnackbar()
     const navigate = useNavigate()
     const [item, setItem] = useState([])
@@ -104,9 +31,56 @@ const Form = (props) => {
         }
     })
 
-    const [selectedLocation, setSelectedLocation] = useState(null);
-    const [inputLocation, setInputLocation] = useState('')
+    const [customerState, setCustomerState] = useState({
+        input: '',
+        selected: null
+    })
+    const handleSelectedCustomer = (value) => setCustomerState({ ...customerState, selected: value })
+    const handleInputCustomer = (value) => setCustomerState({ ...customerState, input: value })
+    const { data: dataCustomer, isLoading: loadingCustomer } = useFetchCustomer({ paginate: 0 })
+
+    const [userState, setUserState] = useState({
+        prepared_by: {
+            input: '',
+            selected: null
+        },
+        checked_by: {
+            input: '',
+            selected: null
+        },
+        approved_by: {
+            input: '',
+            selected: null
+        },
+    })
+    const handleUser = (name, type) => {
+        return (value) => {
+            setUserState({
+                ...userState,
+                [name]: {
+                    ...userState[name],
+                    [type]: value
+                }
+            })
+        }
+    }
+    const { data: dataUser, isLoading: loadingUser } = useFetchUser({ paginate: 0 })
+
+    const [locationState, setLocationState] = useState({
+        input: '',
+        selected: null
+    })
+    const handleSelectedLocation = (value) => setLocationState({...locationState, selected: value})
+    const handleInputLocation = (value) => setLocationState({...locationState, input: value})
     const { data: dataLocation, isLoading: loadingLocation } = useFetchLocation({ paginate: 0 })
+
+    const [itemState, setItemState] = useState({
+        input: '',
+        selected: null
+    })
+    const handleSelectedItem = (value) => setItem([...item, value])
+    const handleInputItem = (value) => setItemState({ ...itemState, input: value })
+    const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0, location_id: locationState.selected?.id || '' }, { enabled: !!locationState.selected?.id })
 
     const handleFile = (e) => {
         if (e.target.files[0] !== undefined) {
@@ -132,12 +106,6 @@ const Form = (props) => {
             ...form,
             item: ''
         })
-        const dummy = []
-        const dataById = itemData.find(v => v.code === e.target.value)
-        for(let i = 0; i < 50; i++){
-            dummy.push(dataById)
-        }
-        setItem([...item, ...dummy])
     }
     
     const onChangeByIndex = (index, object) => {
@@ -179,30 +147,75 @@ const Form = (props) => {
         }
     }
 
+    const { mutate: save, isLoading: loadingSave, error  } = useSavePurchaseRequest({
+        onSuccess: () => {}
+    })
+    const errors = error?.response?.data?.errors
+
     const onSubmit = (e) => {
         e.preventDefault()
-        sb.success('Success!')
         const formData = new FormData(e.target)
+        formData.append('location_id', locationState.selected?.id)
+        formData.append('prepared_by', userState.prepared_by.selected?.id)
+        formData.append('checked_by', userState.checked_by.selected?.id)
+        formData.append('approved_by', userState.approved_by.selected?.id)
         item.forEach((v, i) => {
-            formData.append(`description[${i}]`, v.description)
+            const name = v?.name || v?.item_product?.name || v?.item_name
+            const brand = v?.brand || v?.item_product?.brand || v?.item_brand
+            const size = v?.item_product?.size || v?.item_size || v?.size
+            const price = parseInt(v?.price) || parseInt(v?.item_price)
+            const unit = v.item_product?.unit?.param || v?.unit 
+            formData.append(`item_product[${i}][item_name]`, name)
+            formData.append(`item_product[${i}][item_brand]`, brand)
+            formData.append(`item_product[${i}][description]`, v?.description)
+            formData.append(`item_product[${i}][size]`, size)
+            formData.append(`item_product[${i}][unit]`, unit)
+            formData.append(`item_product[${i}][item_price]`, price)
+            formData.append(`item_product[${i}][quantity]`, v.quantity)
+            formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
+            formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
-        formData.append('location_id', selectedLocation?.id || '')
-        // console.log(Object.fromEntries(formData))
+        save({ formData, id: data?.id })
+
     }
 
-    useEffect(() => {
+    const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
+        useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!props.data){
-                setItem([...itemDataEdit])
+                setTimeout(() => {
+                    setLocationState({
+                        input: `${data.location.location_code} - ${data.location.location}`,
+                        selected: data.location
+                    })
+                    setUserState({
+                        ...userState,
+                        prepared_by: {
+                            input: data?.prepared_by?.name,
+                            selected: data?.prepared_by,
+                        },
+                        checked_by: {
+                            input: data?.checked_by?.name,
+                            selected: data?.checked_by,
+                        },
+                        approved_by: {
+                            input: data?.approved_by?.name,
+                            selected: data?.approved_by,
+                        }
+                    })
+                    setItem([...data?.item_product])
+
+                    setPageLoading(false)
+                }, 500);
             }
         }
 
         return () => mounted = false
 
-    }, [props])
+    }, [props?.id])
 
-    if(loadingLocation){
+    if(loadingLocation || loadingUser || loadingCustomer || pageLoading){
         return <Loading />
     }
 
@@ -220,33 +233,30 @@ const Form = (props) => {
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='PR Number'
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
                                 options={dataLocation.data}
                                 getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
                                 label='Location'
-                                inputValue={inputLocation}
-                                setInputValue={setInputLocation}
-                                selectedValue={selectedLocation}
-                                setSelectedValue={setSelectedLocation}
-                                errors={{}}
+                                inputValue={locationState.input}
+                                setInputValue={handleInputLocation}
+                                selectedValue={locationState.selected}
+                                setSelectedValue={handleSelectedLocation}
+                                errors={errors?.location_id}
                                 key='location'
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 type='date'
-                                name='pr_date'
                                 label="PR Date"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
+                                name='pr_date'
+                                helperText={!!errors?.pr_date && errors?.pr_date[0]}
+                                error={!!errors?.pr_date}
+                                defaultValue={data?.pr_date}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -258,40 +268,49 @@ const Form = (props) => {
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
+                                helperText={!!errors?.shipment_date && errors?.shipment_date[0]}
+                                error={!!errors?.shipment_date}
+                                defaultValue={data?.shipment_date}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
                                 label='Prepared By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
+                                inputValue={userState.prepared_by.input}
+                                setInputValue={handleUser('prepared_by', 'input')}
+                                selectedValue={userState.prepared_by.selected}
+                                setSelectedValue={handleUser('prepared_by', 'selected')}
+                                errors={errors?.prepared_by}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Acknowledge By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
+                                label='Checked By'
+                                inputValue={userState.checked_by.input}
+                                setInputValue={handleUser('checked_by', 'input')}
+                                selectedValue={userState.checked_by.selected}
+                                setSelectedValue={handleUser('checked_by', 'selected')}
+                                errors={errors?.checked_by}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
                                 label='Approved By'
-                                select
-                            >
-                                <MenuItem value='1'>User 1</MenuItem>
-                                <MenuItem value='2'>User 2</MenuItem>
-                            </TextField> 
+                                inputValue={userState.approved_by.input}
+                                setInputValue={handleUser('approved_by', 'input')}
+                                selectedValue={userState.approved_by.selected}
+                                setSelectedValue={handleUser('approved_by', 'selected')}
+                                errors={errors?.approved_by}
+                            />
                         </Grid>
                         
-                        <Grid item xs={12} md={6}>
+                        {/* <Grid item xs={12} md={6}>
                             {form.document.file_url === '' ?
                                 <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
                                     Add Supporting Document *
@@ -323,23 +342,21 @@ const Form = (props) => {
                                     disabled
                                 />
                             }
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
-                                <TextField
-                                    size='small'
+                                <CustomAutocomplete 
+                                    getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
+                                    options={dataPricelist?.data || []}
                                     label='Item'
-                                    value={form.item}
-                                    onChange={onChangeItem}
-                                    fullWidth 
-                                    select
-                                >
-                                    {itemData.map((v, i) => {
-                                        return (
-                                            <MenuItem disabled={!!item.find(i => i.code == v.code)} key={v.code} value={v.code}>{v.name}</MenuItem>
-                                        )
-                                    })}
-                                </TextField> 
+                                    inputValue={itemState.input}
+                                    setInputValue={handleInputItem}
+                                    selectedValue={null}
+                                    setSelectedValue={handleSelectedItem}
+                                    isAutoCompleteItem={true}
+                                    size='small'
+                                    disabled={!dataPricelist || dataPricelist?.data?.length === 0}
+                                />
                                 <LoadingButton loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
                                     Import
@@ -375,7 +392,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            {item.map((v, i) => <TableInputRow errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -388,7 +405,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
-                                <LoadingButton variant='contained' type='submit'>
+                                <LoadingButton loading={loadingSave} variant='contained' type='submit'>
                                     Submit
                                 </LoadingButton>
                                 {props.title == 'edit' ?

@@ -1,8 +1,9 @@
 import { Autocomplete, TextField } from "@mui/material";
 
-const CustomAutocomplete = ({ label, errors, options, getOptionLabel, selectedValue, inputValue, setInputValue, setSelectedValue, size = "medium", isAutoCompleteItem = false }) => {
+const CustomAutocomplete = ({ label, errors, options, getOptionLabel, selectedValue, inputValue, setInputValue, setSelectedValue, size = "medium", isAutoCompleteItem = false, disabled = false }) => {
     return (
         <Autocomplete
+            disabled={disabled}
             fullWidth
             freeSolo
             options={options}
@@ -22,6 +23,7 @@ const CustomAutocomplete = ({ label, errors, options, getOptionLabel, selectedVa
             renderInput={(params) => (
                 <TextField 
                     {...params} 
+                    disabled={disabled}
                     size={size}
                     required={!isAutoCompleteItem}
                     fullWidth
