@@ -2,8 +2,6 @@ import { LoadingButton } from '@mui/lab'
 import { Autocomplete, Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import Iconify from '@components/Iconify'
-import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/input-purchase-request/TableInputRow'
 import { read, utils } from 'xlsx'
@@ -12,32 +10,12 @@ import useFetchLocation from '@hooks/location/useFetchLocation'
 import Loading from '@components/Loading'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import useSavePurchaseRequest from '@hooks/purchase-request/useSavePurchaseRequest'
-import useFetchCustomer from '@hooks/customer/useFetchCustomer'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
 
 const Form = (props) => {
     const { data } = props
-    const sb = useCustomSnackbar()
-    const navigate = useNavigate()
     const [item, setItem] = useState([])
-    const [form, setForm] = useState({
-        item: '',
-        vat: 0,
-        document: {
-            file: '',
-            file_name: '',
-            file_url: '',
-        }
-    })
-
-    const [customerState, setCustomerState] = useState({
-        input: '',
-        selected: null
-    })
-    const handleSelectedCustomer = (value) => setCustomerState({ ...customerState, selected: value })
-    const handleInputCustomer = (value) => setCustomerState({ ...customerState, input: value })
-    const { data: dataCustomer, isLoading: loadingCustomer } = useFetchCustomer({ paginate: 0 })
 
     const [userState, setUserState] = useState({
         prepared_by: {
@@ -153,7 +131,7 @@ const Form = (props) => {
     }
 
     const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
-        useEffect(() => {
+    useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!props.data){
@@ -188,7 +166,7 @@ const Form = (props) => {
 
     }, [props?.id])
 
-    if(loadingLocation || loadingUser || loadingCustomer || pageLoading){
+    if(loadingLocation || loadingUser || pageLoading){
         return <Loading />
     }
 

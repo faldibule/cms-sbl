@@ -2,19 +2,18 @@ import http from '@variable/Api'
 import React from 'react'
 import { useQuery } from 'react-query'
 
-const useFetchFile = (params) => {
-    return useQuery(['files', params], async ({ signal }) => {
+const useFetchPOMasuk = (params) => {
+    return useQuery(['po-masuks', params], async ({ signal }) => {
         try {
-            const res = await http.get('file', {
+            const res = await http.get('incoming-po', {
                 signal,
                 params
             })
             return res.data.data
         } catch (err) {
+            // console.log(err)
         }
-    }, {
-        cacheTime: 0
     })
 }
 
-export default useFetchFile
+export default useFetchPOMasuk
