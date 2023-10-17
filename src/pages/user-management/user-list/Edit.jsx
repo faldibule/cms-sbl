@@ -39,7 +39,7 @@ const Edit = () => {
             <Container>
                 <Typography variant='h4' mb={3}>Edit User List</Typography>
                 {!loading ?
-                    <Form title='edit' data={data} id={id} refetch={refetch} />
+                    <Form title='edit' data={data} id={id} />
                     : <Loading />
                 }
             </Container>

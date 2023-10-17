@@ -47,18 +47,18 @@ const Form = (props) => {
         onSuccess: (res) => {
             const temp = window.URL.createObjectURL(new Blob([res.data]));
             localStorage.setItem("profile_picture", temp);
-            props.refetch()
             navigate('/user/user-list')
         }
     })
     const { mutate: save, isLoading: loading, error } = useSaveUser({
         onSuccess: (res) => {
             const { response } = res
-            if(props.title === 'edit' && res.form.photo.size !== 0 && response.data.id === user.id){
-                getProfilePicture({ file: response.data.photo })
-                return;
+            if(props.title === 'edit'){
+                if(res.form.photo.size !== 0 && response.data.id === user.id){
+                    getProfilePicture({ file: response.data.photo })
+                    return;
+                }
             }
-            props.refetch()
             navigate('/user/user-list')
         }
     })
