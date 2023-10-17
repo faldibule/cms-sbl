@@ -82,32 +82,6 @@ const Form = (props) => {
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
     const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0, location_id: locationState.selected?.id || '' }, { enabled: !!locationState.selected?.id })
 
-    const handleFile = (e) => {
-        if (e.target.files[0] !== undefined) {
-            const file = e.target.files[0]
-            const file_url = URL.createObjectURL(file)
-            const file_name = file.name
-            setForm({
-                ...form,
-                document: {
-                    file,
-                    file_name,
-                    file_url
-                }
-            })
-            e.target.value = null;
-         }
-    }
-
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-
-    const onChangeItem = (e) => {
-        setForm({
-            ...form,
-            item: ''
-        })
-    }
-    
     const onChangeByIndex = (index, object) => {
         const temp = item.map((v, i) => {
             if(i === index){
@@ -176,7 +150,6 @@ const Form = (props) => {
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
         save({ formData, id: data?.id })
-
     }
 
     const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
@@ -309,40 +282,6 @@ const Form = (props) => {
                                 errors={errors?.approved_by}
                             />
                         </Grid>
-                        
-                        {/* <Grid item xs={12} md={6}>
-                            {form.document.file_url === '' ?
-                                <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
-                                    Add Supporting Document *
-                                    <input name="document" type="file" onChange={handleFile} hidden />
-                                </Button>
-                            :
-                                <TextField
-                                    variant="outlined"
-                                    label="Supporting Document *"
-                                    sx={{ mb: 2 }}
-                                    value={form.document.file_name}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Iconify icon='fluent:hard-drive-20-filled' />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                        <InputAdornment position="end">
-                                            <Tooltip title="Delete">
-                                                <IconButton onClick={() => setForm({...form, document: { file_url: '', file: '', file_name: '' }})}>
-                                                    <Iconify icon='zondicons:close-solid' />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </InputAdornment>
-                                        ),
-                                    }}
-                                    fullWidth
-                                    disabled
-                                />
-                            }
-                        </Grid> */}
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <CustomAutocomplete 
@@ -404,14 +343,14 @@ const Form = (props) => {
                             <CustomGrandTotalComponent tax={false} item={item} />
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <Stack direction='row' spacing={2}>
-                                <LoadingButton loading={loadingSave} variant='contained' type='submit'>
-                                    Submit
+                            <Stack direction='row' justifyContent='end' spacing={2}>
+                                <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
+                                    Next
                                 </LoadingButton>
-                                {props.title == 'edit' ?
-                                    <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                        Print
-                                    </LoadingButton>
+                                {props.title == 'edit' ? ''
+                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
+                                    //     Print
+                                    // </LoadingButton>
                                 : null
                                 }
                             </Stack>

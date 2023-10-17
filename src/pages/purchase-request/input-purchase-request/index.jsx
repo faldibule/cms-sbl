@@ -53,7 +53,7 @@ const index = () => {
         setStaging({ id })
     }
 
-    const { mutate: deletePurchaseRequest, isLoading: loadingDelete } = useDeletePurchaseRequest({
+    const { mutate: deletePurchaseRequest, isLoading: loadingDelete, error } = useDeletePurchaseRequest({
         onSuccess: () => {
             refetch()
             handleClose()

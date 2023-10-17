@@ -77,6 +77,9 @@ import SheetDetail from './pages/meal-sheet/sheet-detail'
 import MealSheetDaily from './pages/meal-sheet/sheet-detail/meal-sheet-daily'
 import AddMealSheetDaily from './pages/meal-sheet/sheet-detail/meal-sheet-daily/Add'
 
+// File Management
+import FileManagement from './pages/file-management/Edit'
+
 export default function Router() {
   return useRoutes([
     {
@@ -98,6 +101,16 @@ export default function Router() {
         </Middleware.After>,
       children: [
         { path: '', element: <DashboardApp /> },
+      ],
+    },
+    {
+      path: '/file/:id/:reference_type',
+      element: 
+        <Middleware.After>
+          <DashboardLayout />
+        </Middleware.After>,
+      children: [
+        { path: '', element: <FileManagement /> },
       ],
     },
     {
