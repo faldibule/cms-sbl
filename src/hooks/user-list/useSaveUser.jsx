@@ -9,11 +9,15 @@ const useSaveUser = ({ onSuccess }) => {
             if(title === 'add') {
                 const res = await http.post('user', formData) 
                 success('Success Create User')
+                return res.data
             }
             if(title === 'edit'){
                 const res = await http.post(`user/${id}`, formData)
                 success('Success Edit User')
-                console.log(res.data)
+                return {
+                    form: Object.fromEntries(formData),
+                    response: res.data
+                }
             }
         },
         onSuccess,

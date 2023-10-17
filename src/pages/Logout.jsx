@@ -26,6 +26,7 @@ const index = () => {
                   user: {},
                 })
                 localStorage.removeItem('token')
+                localStorage.removeItem('profile_picture')
             }
         })
         return () => mounted = false

@@ -12,34 +12,53 @@ import useFetchDepartment from '@hooks/department/useFetchDepartment'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import useFetchRole from '@hooks/role/useFetchRole'
 import useSaveUser from '@hooks/user-list/useSaveUser'
+import { useRecoilValue } from 'recoil'
+import { authentication } from '@recoil/Authentication'
+import useShowFile from '@hooks/file-management/useShowFile'
 
 const Form = (props) => {
     const navigate = useNavigate()
+    const { data } = props
+
+    const { user } = useRecoilValue(authentication)
 
     const { data: dataDepartment, isLoading: loadingDepartment } = useFetchDepartment({})
     const { data: dataRole, isLoading: loadingRole } = useFetchRole({})
     const { data: dataLocation, isLoading: loadingLocation } = useFetchLocation({})
 
-    const [defaultValue, setDefaultValue] = useState({})
-    
+    const profile_user_by_id = localStorage.getItem('profile_user_by_id')
+
     const [image, setImage] = useState({
-        image_preview: '',
+        image_preview: !!data?.photo ? profile_user_by_id : '',
         image_file: ''
-    })
+    }) 
     const handleImage = (e) => {
-        let image_preview = URL.createObjectURL(e.target.files[0]);
-        let image_file = e.target.files[0];
-        setImage({
-           image_preview,
-           image_file,
-        });
+        if(!!e.target.files[0]){
+            let image_preview = URL.createObjectURL(e.target.files[0]);
+            let image_file = e.target.files[0];
+            setImage({
+               image_preview,
+               image_file,
+            });
+        }
     };
     
+    const { mutate: getProfilePicture } = useShowFile({
+        onSuccess: (res) => {
+            const temp = window.URL.createObjectURL(new Blob([res.data]));
+            localStorage.setItem("profile_picture", temp);
+            props.refetch()
+            navigate('/user/user-list')
+        }
+    })
     const { mutate: save, isLoading: loading, error } = useSaveUser({
-        onSuccess: () => {
-            if(props.title === 'edit'){
-                props.refetch()
+        onSuccess: (res) => {
+            const { response } = res
+            if(props.title === 'edit' && res.form.photo.size !== 0 && response.data.id === user.id){
+                getProfilePicture({ file: response.data.photo })
+                return;
             }
+            props.refetch()
             navigate('/user/user-list')
         }
     })
@@ -55,28 +74,7 @@ const Form = (props) => {
         })
     }
     
-    const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
-    useEffect(() => {
-        let mounted = true
-        if(!!props.data){
-            const { data } = props
-            if(mounted){
-                setTimeout(() => {
-                    if(!!data.photo){
-                        setImage({
-                            image_file: '',
-                            image_preview: baseURL + data.photo
-                        })
-                    }
-                    setDefaultValue(data)
-                    setPageLoading(false)
-                }, 500);
-            }
-        }
-        return () => mounted = false
-    }, [props.id])
-
-    if(loadingDepartment || loadingLocation || loadingRole || pageLoading ){
+    if(loadingDepartment || loadingLocation || loadingRole){
         return <Loading />
     }
     return (
@@ -118,7 +116,7 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Employee Code'
                                     name="code"
-                                    defaultValue={defaultValue?.code}
+                                    defaultValue={data?.code}
                                     required
                                     helperText={!!errors?.code && errors?.code[0]}
                                     error={!!errors?.code}
@@ -129,7 +127,7 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Full Name'
                                     name="name"
-                                    defaultValue={defaultValue?.name}
+                                    defaultValue={data?.name}
                                     required
                                     helperText={!!errors?.name && errors?.name[0]}
                                     error={!!errors?.name}
@@ -140,7 +138,7 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Username'
                                     name="username"
-                                    defaultValue={defaultValue?.username}
+                                    defaultValue={data?.username}
                                     required
                                     helperText={!!errors?.username && errors?.username[0]}
                                     error={!!errors?.username}
@@ -151,7 +149,7 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Email Address'
                                     name="email"
-                                    defaultValue={defaultValue?.email}
+                                    defaultValue={data?.email}
                                     required
                                     helperText={!!errors?.username && errors?.username[0]}
                                     error={!!errors?.username}
@@ -163,7 +161,7 @@ const Form = (props) => {
                                     label='Phone Number'
                                     type='number'
                                     name="phone"
-                                    defaultValue={defaultValue?.phone}
+                                    defaultValue={data?.phone}
                                     required
                                     helperText={!!errors?.phone && errors?.phone[0]}
                                     error={!!errors?.phone}
@@ -174,13 +172,13 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Department'
                                     name="department_id"
-                                    defaultValue={defaultValue?.department?.id}
+                                    defaultValue={data?.department?.id}
                                     select
                                     required
                                     helperText={!!errors?.department && errors?.department[0]}
                                     error={!!errors?.department}
                                 >
-                                    {dataDepartment.data.map((v, i) => {
+                                    {dataDepartment?.data.map((v, i) => {
                                         return (
                                             <MenuItem key={v.id} value={v.id}>{v.department_code} - {v.department}</MenuItem>
                                         )
@@ -192,13 +190,13 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Role'
                                     name="role"
-                                    defaultValue={defaultValue?.role}
+                                    defaultValue={data?.role}
                                     select
                                     required
                                     helperText={!!errors?.role && errors?.role[0]}
                                     error={!!errors?.role}
                                 >
-                                    {dataRole.map((v, i) => {
+                                    {dataRole?.map((v, i) => {
                                         return (
                                             <MenuItem key={v.name} value={v.name}>{v.name}</MenuItem>
                                         )
@@ -210,13 +208,13 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Location'
                                     name="location_id"
-                                    defaultValue={defaultValue?.location?.id}
+                                    defaultValue={data?.location?.id}
                                     select
                                     required
                                     helperText={!!errors?.location && errors?.location[0]}
                                     error={!!errors?.location}
                                 >
-                                    {dataLocation.data.map((v, i) => {
+                                    {dataLocation?.data.map((v, i) => {
                                         return (
                                             <MenuItem key={v.id} value={v.id}>{v.location_code} - {v.location}</MenuItem>
                                         )
@@ -228,7 +226,7 @@ const Form = (props) => {
                                     fullWidth 
                                     label='Address'
                                     name="address"
-                                    defaultValue={defaultValue?.address}
+                                    defaultValue={data?.address}
                                     required
                                     multiline
                                     rows={3}
@@ -239,7 +237,7 @@ const Form = (props) => {
                             <Grid item xs={12} md={12}>
                                 <FormControl required>
                                     <FormLabel id="demo-row-radio-buttons-group-label">Status</FormLabel>
-                                    <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name='status' defaultValue={defaultValue?.status}>
+                                    <RadioGroup row aria-labelledby="demo-row-radio-buttons-group-label" name='status' defaultValue={data?.status}>
                                         <FormControlLabel value="active" control={<Radio />} label="Active" />
                                         <FormControlLabel value="not_active" control={<Radio />} label="Not Active" />
                                     </RadioGroup>
@@ -254,7 +252,7 @@ const Form = (props) => {
                                         label='Password'
                                         name="password"
                                         type='password'
-                                        defaultValue={defaultValue?.password}
+                                        defaultValue={data?.password}
                                         required
                                         helperText={!!errors?.password && errors?.password[0]}
                                         error={!!errors?.password}
@@ -266,7 +264,7 @@ const Form = (props) => {
                                         label='Password Confirmation'
                                         name="password_confirmation"
                                         type='password'
-                                        defaultValue={defaultValue?.password_confirmation}
+                                        defaultValue={data?.password_confirmation}
                                         required
                                         helperText={!!errors?.password && errors?.password[0]}
                                         error={!!errors?.password}
