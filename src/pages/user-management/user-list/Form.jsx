@@ -12,7 +12,7 @@ import useFetchDepartment from '@hooks/department/useFetchDepartment'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import useFetchRole from '@hooks/role/useFetchRole'
 import useSaveUser from '@hooks/user-list/useSaveUser'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { authentication } from '@recoil/Authentication'
 import useShowFile from '@hooks/file-management/useShowFile'
 
@@ -20,7 +20,7 @@ const Form = (props) => {
     const navigate = useNavigate()
     const { data } = props
 
-    const { user } = useRecoilValue(authentication)
+    const [{ user }, setAuth] = useRecoilState(authentication)
 
     const { data: dataDepartment, isLoading: loadingDepartment } = useFetchDepartment({})
     const { data: dataRole, isLoading: loadingRole } = useFetchRole({})
@@ -45,9 +45,18 @@ const Form = (props) => {
     
     const { mutate: getProfilePicture } = useShowFile({
         onSuccess: (res) => {
-            const temp = window.URL.createObjectURL(new Blob([res.data]));
-            localStorage.setItem("profile_picture", temp);
-            navigate('/user/user-list')
+            const reader = new FileReader();
+            reader.onload = function () {
+              const dataURL = reader.result;
+              localStorage.setItem("profile_picture", dataURL);
+              setAuth({
+                    user,
+                    auth: true,
+                    profile_picture: dataURL
+              });
+              navigate('/user/user-list')
+            };
+            reader.readAsDataURL(res.data);
         }
     })
     const { mutate: save, isLoading: loading, error } = useSaveUser({

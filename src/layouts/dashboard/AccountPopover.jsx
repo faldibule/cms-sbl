@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { alpha } from '@mui/material/styles';
@@ -37,10 +37,9 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
     const navigate = useNavigate();
     const anchorRef = useRef(null);
-    const profile_url = localStorage.getItem("profile_picture");
 
     const [open, setOpen] = useState(null);
-    const { user } = useRecoilValue(authentication);
+    const { user, profile_picture } = useRecoilValue(authentication);
 
     const [dialog, setDialog] = useState(false);
     const handleDialog = () => setDialog(!dialog);
@@ -79,11 +78,11 @@ export default function AccountPopover() {
                 }}
             >
                 <Avatar
-                    src={!!profile_url ? profile_url : ""}
+                    src={!!profile_picture ? profile_picture : ""}
                     sx={{ bgcolor: grey[500], width: 40, height: 40 }}
                     aria-label="recipe"
                 >
-                    @
+                    
                 </Avatar>
             </IconButton>
 

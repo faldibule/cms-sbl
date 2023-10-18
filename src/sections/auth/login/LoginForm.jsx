@@ -48,13 +48,18 @@ export default function LoginForm() {
     const [loading, setLoading] = useState(false);
     const { mutate: getProfilePicture } = useShowFile({
         onSuccess: (res) => {
-            const temp = window.URL.createObjectURL(new Blob([res.data]));
-            localStorage.setItem("profile_picture", temp);
-            setAuth({
-                auth: true,
-                user: res.value.data.user,
-            });
-            navigate("/dashboard", { replace: true });
+            const reader = new FileReader();
+            reader.onload = function () {
+              const dataURL = reader.result;
+              localStorage.setItem("profile_picture", dataURL);
+              setAuth({
+                  auth: true,
+                  user: res.value.data.user,
+                  profile_picture: dataURL
+              });
+              navigate("/dashboard", { replace: true });
+            };
+            reader.readAsDataURL(res.data);
         },
     });
     const handleLogin = async (formData) => {
