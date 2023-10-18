@@ -152,11 +152,11 @@ const index = () => {
                             <Iconify icon='carbon:close-filled' sx={{ color: 'red', fontSize: 20 }} />
                         }
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                         <CustomActionTableComponent 
                             handleDelete={() => handleDelete(value.id)}
                         />
-                    </TableCell>                                                             
+                    </TableCell>                                                              */}
                 </TableRow>
             )
         )
@@ -240,7 +240,7 @@ const index = () => {
                                                 <TableCell>Department</TableCell>
                                                 <TableCell>Location</TableCell>
                                                 <TableCell>Status</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                {/* <TableCell>Action</TableCell> */}
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>

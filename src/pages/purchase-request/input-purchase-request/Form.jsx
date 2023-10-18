@@ -193,7 +193,6 @@ const Form = (props) => {
                                 selectedValue={locationState.selected}
                                 setSelectedValue={handleSelectedLocation}
                                 errors={errors?.location_id}
-                                key='location'
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>

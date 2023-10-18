@@ -200,7 +200,7 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>Customer Type</TableCell>
+                                                <TableCell>Customer Code</TableCell>
                                                 <TableCell>Company Name</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>

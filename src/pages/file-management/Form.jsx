@@ -95,7 +95,7 @@ const Form = (props) => {
                             <Grid container spacing={2} justifyContent='start'>
                                 {props?.data?.map((value, i) => {
                                     return (
-                                        <Grid item xs={4} md={4} key={i}>
+                                        <Grid item xs={12} md={4} key={i}>
                                             <DocumentCardComponent refetch={props.refetch} value={value} />
                                         </Grid>
                                     )
