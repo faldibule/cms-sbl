@@ -3,8 +3,6 @@ import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, T
 import React, { useEffect, useMemo, useState } from 'react'
 import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../utils/Format'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/quotation/TableInputRow'
 import { read, utils } from 'xlsx'
@@ -18,16 +16,13 @@ import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
 
 const Form = (props) => {
     const { data } = props
+    const isApproved = useMemo(() => {
+        if(!!!data) return false
+        return data.status === 'finish'
+    }, [data])
+
+    const navigate = useNavigate()
     const [item, setItem] = useState([])
-    const [form, setForm] = useState({
-        item: '',
-        vat: 0,
-        document: {
-            file: '',
-            file_name: '',
-            file_url: '',
-        }
-    })
 
     const [customerState, setCustomerState] = useState({
         input: '',
@@ -46,7 +41,11 @@ const Form = (props) => {
             input: '',
             selected: null
         },
-        approved_by: {
+        approved1_by: {
+            input: '',
+            selected: null
+        },
+        approved2_by: {
             input: '',
             selected: null
         },
@@ -71,32 +70,6 @@ const Form = (props) => {
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
     const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0 })
-
-    const handleFile = (e) => {
-        if (e.target.files[0] !== undefined) {
-            const file = e.target.files[0]
-            const file_url = URL.createObjectURL(file)
-            const file_name = file.name
-            setForm({
-                ...form,
-                document: {
-                    file,
-                    file_name,
-                    file_url
-                }
-            })
-            e.target.value = null;
-         }
-    }
-
-    const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
-
-    const onChangeItem = (e) => {
-        setForm({
-            ...form,
-            item: ''
-        })
-    }
 
     const deleteItemTable = (e, index) => {
         setItem([...item.filter((v, i) => i !== index)])
@@ -148,7 +121,8 @@ const Form = (props) => {
         formData.append('customer_id', customerState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
         formData.append('checked_by', userState.checked_by.selected?.id)
-        formData.append('approved_by', userState.approved_by.selected?.id)
+        formData.append('approved1_by', userState.approved1_by.selected?.id)
+        formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
             const name = v?.name || v?.item_product?.name || v?.item_name
             const price = parseInt(v?.price) || parseInt(v?.item_price)
@@ -165,34 +139,33 @@ const Form = (props) => {
         save({ formData, id: data?.id })
     }
 
-    const [pageLoading, setPageLoading] = useState(props.title === 'add' ? false : true)
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!props.data){
-                setTimeout(() => {
-                    handleInputCustomer(`${data?.customer.code} - ${data?.customer.name}`)
-                    handleSelectedCustomer(data?.customer)
+                handleInputCustomer(`${data?.customer.code} - ${data?.customer.name}`)
+                handleSelectedCustomer(data?.customer)
 
-                    setUserState({
-                        ...userState,
-                        prepared_by: {
-                            input: data?.prepared_by?.name,
-                            selected: data?.prepared_by,
-                        },
-                        checked_by: {
-                            input: data?.checked_by?.name,
-                            selected: data?.checked_by,
-                        },
-                        approved_by: {
-                            input: data?.approved_by?.name,
-                            selected: data?.approved_by,
-                        }
-                    })
-                    setItem([...data?.item_product])
-
-                    setPageLoading(false)
-                }, 500);
+                setUserState({
+                    ...userState,
+                    prepared_by: {
+                        input: data?.prepared_by?.name,
+                        selected: data?.prepared_by,
+                    },
+                    checked_by: {
+                        input: data?.checked_by?.name,
+                        selected: data?.checked_by,
+                    },
+                    approved1_by: {
+                        input: data?.approved1_by?.name,
+                        selected: data?.approved1_by,
+                    },
+                    approved2_by: {
+                        input: data?.approved2_by?.name,
+                        selected: data?.approved2_by,
+                    }
+                })
+                setItem([...data?.item_product])
             }
         }
 
@@ -200,7 +173,7 @@ const Form = (props) => {
 
     }, [props?.id])
 
-    if(loadingCustomer || loadingUser || loadingPricelist || pageLoading){
+    if(loadingCustomer || loadingUser || loadingPricelist){
         return <Loading />
     }
 
@@ -219,6 +192,7 @@ const Form = (props) => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
+                                disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
                                 options={dataCustomer.data}
                                 label='Customer'
@@ -232,6 +206,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
+                                disabled={isApproved}
                                 label='Attention'
                                 name='attention'
                                 defaultValue={data?.attention}
@@ -243,6 +218,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
+                                disabled={isApproved}
                                 label='Address'
                                 name='address'
                                 defaultValue={data?.address}
@@ -253,6 +229,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
+                                disabled={isApproved}
                                 type='date'
                                 name='delivery_date'
                                 label="Delivery Date"
@@ -266,9 +243,10 @@ const Form = (props) => {
                                 error={!!errors?.delivery_date}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <TextField
                                 fullWidth 
+                                disabled={isApproved}
                                 label='Vessel'
                                 name='vessel'
                                 defaultValue={data?.vessel}
@@ -280,6 +258,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
+                                disabled={isApproved}
                                 label='Shipping Address'
                                 name='shipping_address'
                                 defaultValue={data?.shipping_address}
@@ -290,6 +269,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
+                                disabled={isApproved}
                                 type='date'
                                 name='shipment_date'
                                 label="Shipment Date"
@@ -305,6 +285,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
+                                disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Prepared By'
@@ -317,6 +298,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
+                                disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Checked By'
@@ -329,19 +311,34 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
+                                disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
-                                label='Approved By'
-                                inputValue={userState.approved_by.input}
-                                setInputValue={handleUser('approved_by', 'input')}
-                                selectedValue={userState.approved_by.selected}
-                                setSelectedValue={handleUser('approved_by', 'selected')}
-                                errors={errors?.approved_by}
+                                label='Approved By 1'
+                                inputValue={userState.approved1_by.input}
+                                setInputValue={handleUser('approved1_by', 'input')}
+                                selectedValue={userState.approved1_by.selected}
+                                setSelectedValue={handleUser('approved1_by', 'selected')}
+                                errors={errors?.approved1_by}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <CustomAutocomplete 
+                                disabled={isApproved}
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
+                                label='Approved By 2'
+                                inputValue={userState.approved2_by.input}
+                                setInputValue={handleUser('approved2_by', 'input')}
+                                selectedValue={userState.approved2_by.selected}
+                                setSelectedValue={handleUser('approved2_by', 'selected')}
+                                errors={errors?.approved2_by}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
                                 fullWidth 
+                                disabled={isApproved}
                                 label='Term & Condition'
                                 multiline
                                 rows={3}
@@ -355,6 +352,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <CustomAutocomplete 
+                                    disabled={isApproved}       
                                     getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
                                     options={dataPricelist.data}
                                     label='Item'
@@ -365,7 +363,7 @@ const Form = (props) => {
                                     isAutoCompleteItem={true}
                                     size='small'
                                 />
-                                <LoadingButton fullWidth loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                <LoadingButton disabled={isApproved} fullWidth loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
                                     Import
                                 </LoadingButton>
@@ -399,7 +397,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} errors={errors} /> )}
+                                            {item.map((v, i) => <TableInputRow isApproved={isApproved} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} errors={errors} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -412,9 +410,15 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
+                                {isApproved ?
+                                <Button onClick={() => navigate('/quotation')} variant='contained' startIcon={<Iconify icon='pajamas:go-back'  />}>
+                                    Back
+                                </Button>
+                                :
                                 <LoadingButton loading={loadingSave} variant='contained' type='submit'>
                                     Submit
                                 </LoadingButton>
+                                }
                                 {props.title == 'edit' ? ''
                                     // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
                                     //     Print

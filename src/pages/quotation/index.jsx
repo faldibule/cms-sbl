@@ -3,23 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
 import Iconify from '@components/Iconify';
-import moment from 'moment/moment';
 import CustomSearchComponent from '@components/CustomSearchComponent';
-import CustomStatusLabelComponent from '@components/CustomStatusLabelComponent';
-import CustomLinkComponent from '@components/CustomLinkComponent';
 import useFetchQuotation from '@hooks/quotation/useFetchQuotation';
-import useDeleteQuotation from '@hooks/quotation/useDeleteQuotation';
 import DeleteDialog from '@components/DeleteDialog';
 import Loading from '@components/Loading';
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import ApproveDialog from '@components/UpdateStatusDialog';
-import useApproveQuotation from '@hooks/quotation/useApproveQuotation';
-import { useRecoilValue } from 'recoil';
-import { authentication } from '@recoil/Authentication';
+import TableDataRow from '@components/quotation/TableDataRow';
 
 const index = () => {
     const navigate = useNavigate()
-    const { user } = useRecoilValue(authentication)
     const [params, setParams] = useState({
         page: 1,
         limit: 5,
@@ -44,49 +36,6 @@ const index = () => {
             };
         });
     };
-    
-    const [open, setOpen] = useState(false)
-    const [staging, setStaging] = useState({})
-    const handleClose = (id = null) => {
-        setOpen(!open)
-        if(!!!id) return;
-        setStaging({ id })
-    }
-
-    const { mutate: deleteQuotation, isLoading: loadingDelete } = useDeleteQuotation({
-        onSuccess: () => {
-            refetch()
-            handleClose()
-        }
-    })
-    const handleDelete = async () => {
-        deleteQuotation(staging?.id)
-    }
-
-    const [openApprove, setOpenApprove] = useState(false)
-    const handleCloseApprove = (value = null) => {
-        setOpenApprove(!openApprove)
-        if(!!!value) return;
-        setStaging(value)
-    }
-    const { mutate: approveQuotation, isLoading: loadingApprove } = useApproveQuotation({
-        onSuccess: () =>{
-            handleCloseApprove()
-            refetch()
-        }
-    })
-    const handleApprove = async () => {
-        if(!!!staging?.id) return ;
-
-        let status = ''
-        if(!!!staging?.approved_date){
-            status = 'approved'
-        }
-        if(!!!staging?.checked_date){
-            status = 'checked'
-        }
-        approveQuotation({ status, id: staging.id })
-    }
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
@@ -141,45 +90,7 @@ const index = () => {
             )
         }
         return rows.data.map((value, key) => {
-            const status = {
-                label: !!value.approved_date ? 'Approved' : !!value.checked_date ? 'Checked' : 'Pending',
-                color: !!value.approved_date ? 'success' : !!value.checked_date ? 'primary' : 'warning'
-            }
-            const isChecker = true
-            const isApprover = true
-            return (
-                <TableRow key={key}>
-                    <TableCell
-                        component="th"
-                        scope="row"
-                        align="center"
-                    >
-                        {rows.meta.from+key}.
-                    </TableCell>
-                    <TableCell>
-                        <CustomLinkComponent label={value.quotation_number} url={`/quotation/edit/${value.id}`} />
-                    </TableCell>
-                    <TableCell>
-                        {value.customer.name}
-                    </TableCell>
-                    <TableCell>
-                        {moment(value.shipment_date).format('LL')}
-                    </TableCell>
-                    <TableCell>
-                        {value.prepared_by.name}
-                    </TableCell>
-                    <TableCell>
-                        <Chip label={status.label} color={status.color} />
-                    </TableCell>
-                    <TableCell>
-                        <CustomActionTableComponent 
-                            approve={(isChecker &&!value.checked_date) || (isApprover && !value.approved_date)}
-                            handleApprove={() => handleCloseApprove(value)}
-                            handleDelete={() => handleClose(value.id)}
-                        />
-                    </TableCell>                                                             
-                </TableRow>
-            )
+            return <TableDataRow key={key} value={value} rows={rows} i={key} refetch={refetch} />
         })
     }, [rows])
 
@@ -223,6 +134,7 @@ const index = () => {
                                                 <TableCell>Customer Name</TableCell>
                                                 <TableCell>Shipment Date</TableCell>
                                                 <TableCell>Prepared By</TableCell>
+                                                <TableCell>Reject Reasson</TableCell>
                                                 <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
@@ -253,18 +165,6 @@ const index = () => {
                         </Card>
                     </Grid>
                 </Grid>
-                <DeleteDialog 
-                    handleClose={handleClose}
-                    handleDelete={handleDelete}
-                    open={open}
-                    loading={loadingDelete}
-                />
-                <ApproveDialog 
-                    handleClose={handleCloseApprove}
-                    handleApprove={handleApprove}
-                    open={openApprove}
-                    loading={loadingApprove}
-                />
             </Container>
         </Page>
     );

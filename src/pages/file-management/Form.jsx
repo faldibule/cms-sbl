@@ -109,7 +109,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='space-between'>
                                 <Button onClick={() => navigate(-1)} startIcon={<Iconify icon='pajamas:go-back' />}>Back</Button>
-                                <Button onClick={() => navigate(-2)} variant='contained'>Submit</Button>
+                                <Button onClick={() => navigate(-2)} variant='contained'>Finish</Button>
                             </Stack>
                         </Grid>
                     </Grid>

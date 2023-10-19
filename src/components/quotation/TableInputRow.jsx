@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 import { NumberFormat } from "@utils/Format"
 
-const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {} }) => {
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
 
@@ -50,10 +50,14 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {} }) 
                 }
             </TableCell>
             <TableCell align='center'>
+                {isApproved ?
+                '-'
+                : 
                 <Stack direction='row' spacing={2}>
                     <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
                     <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
                 </Stack>
+                }
                 <DialogInputRow 
                     handleClose={handleClose} 
                     open={open} 

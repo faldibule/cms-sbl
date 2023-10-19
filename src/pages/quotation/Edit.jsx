@@ -4,6 +4,7 @@ import { Container } from '@mui/material'
 import Form from './Form'
 import useFetchQuotationById from '@hooks/quotation/useFetchQuotationById'
 import { useParams } from 'react-router-dom'
+import Loading from '@components/Loading'
 
 const Edit = () => {
   const { id } = useParams()
@@ -13,7 +14,7 @@ const Edit = () => {
         <Container>
             {!isLoading ?
               <Form title='edit' data={data} id={id} />
-            : null
+            : <Loading />
             }
         </Container>
     </Page>
