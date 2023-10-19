@@ -12,7 +12,7 @@ import useDeleteQuotation from '@hooks/quotation/useDeleteQuotation';
 import DeleteDialog from '@components/DeleteDialog';
 import Loading from '@components/Loading';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import ApproveDialog from '@components/ApproveDialog';
+import ApproveDialog from '@components/UpdateStatusDialog';
 import useApproveQuotation from '@hooks/quotation/useApproveQuotation';
 import { useRecoilValue } from 'recoil';
 import { authentication } from '@recoil/Authentication';

@@ -26,7 +26,11 @@ const Form = (props) => {
             input: '',
             selected: null
         },
-        approved_by: {
+        approved1_by: {
+            input: '',
+            selected: null
+        },
+        approved2_by: {
             input: '',
             selected: null
         },
@@ -110,7 +114,8 @@ const Form = (props) => {
         formData.append('location_id', locationState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
         formData.append('checked_by', userState.checked_by.selected?.id)
-        formData.append('approved_by', userState.approved_by.selected?.id)
+        formData.append('approved1_by', userState.approved1_by.selected?.id)
+        formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
             const name = v?.name || v?.item_product?.name || v?.item_name
             const brand = v?.brand || v?.item_product?.brand || v?.item_brand
@@ -150,9 +155,13 @@ const Form = (props) => {
                             input: data?.checked_by?.name,
                             selected: data?.checked_by,
                         },
-                        approved_by: {
-                            input: data?.approved_by?.name,
-                            selected: data?.approved_by,
+                        approved1_by: {
+                            input: data?.approved1_by?.name,
+                            selected: data?.approved1_by,
+                        },
+                        approved2_by: {
+                            input: data?.approved2_by?.name,
+                            selected: data?.approved2_by,
                         }
                     })
                     setItem([...data?.item_product])
@@ -251,12 +260,24 @@ const Form = (props) => {
                             <CustomAutocomplete 
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
-                                label='Approved By'
-                                inputValue={userState.approved_by.input}
-                                setInputValue={handleUser('approved_by', 'input')}
-                                selectedValue={userState.approved_by.selected}
-                                setSelectedValue={handleUser('approved_by', 'selected')}
-                                errors={errors?.approved_by}
+                                label='Approved By 1'
+                                inputValue={userState.approved1_by.input}
+                                setInputValue={handleUser('approved1_by', 'input')}
+                                selectedValue={userState.approved1_by.selected}
+                                setSelectedValue={handleUser('approved1_by', 'selected')}
+                                errors={errors?.approved1_by}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
+                                label='Approved By 2'
+                                inputValue={userState.approved2_by.input}
+                                setInputValue={handleUser('approved2_by', 'input')}
+                                selectedValue={userState.approved2_by.selected}
+                                setSelectedValue={handleUser('approved2_by', 'selected')}
+                                errors={errors?.approved2_by}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
