@@ -46,7 +46,7 @@ export default function UpdateStatusDialog({ open, handleClose, value, handleSub
                         :
                         <MenuItem value='submit'>Submit</MenuItem>
                      }
-                     {status !== 'reject' ?
+                     {status !== 'reject' && status !== 'draft' ?
                         <MenuItem value='reject'>Reject</MenuItem>
                      : null
                      }

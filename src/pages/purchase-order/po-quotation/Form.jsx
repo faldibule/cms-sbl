@@ -201,17 +201,6 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                type='date'
-                                name='shipping_date'
-                                label="Shipping Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                            <TextField
                                 fullWidth 
                                 label='Discount'
                                 select
@@ -219,6 +208,15 @@ const Form = (props) => {
                                 <MenuItem value='1'>5%</MenuItem>
                                 <MenuItem value='2'>10%</MenuItem>
                             </TextField> 
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <TextField
+                                name='shipping_date'
+                                label="Shipping Address"
+                                fullWidth
+                                multiline
+                                rows={3}
+                            />
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField

@@ -2,8 +2,7 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent'
 import CustomLinkComponent from '@components/CustomLinkComponent'
 import DeleteDialog from '@components/DeleteDialog'
 import UpdateStatusDialog from '@components/UpdateStatusDialog'
-import useDeletePurchaseRequest from '@hooks/purchase-request/useDeletePurchaseRequest'
-import useUpdateStatusPurchaseRequest from '@hooks/purchase-request/useUpdateStatusPurchaseRequest'
+import useDeleteQuotation from '@hooks/quotation/useDeleteQuotation'
 import useUpdateStatusQuotation from '@hooks/quotation/useUpdateStatusQuotation'
 import { Chip, TableCell, TableRow } from '@mui/material'
 import moment from 'moment'
@@ -20,14 +19,14 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         setOpen(!open)
         if(!!!id) return;
     }
-    const { mutate: deletePurchaseRequest, isLoading: loadingDelete } = useDeletePurchaseRequest({
+    const { mutate: deleteQuotation, isLoading: loadingDelete } = useDeleteQuotation({
         onSuccess: () => {
             refetch()
             handleClose()
         }
     })
     const handleDelete = async () => {
-        deletePurchaseRequest(value.id)
+        deleteQuotation(value.id)
     }
 
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false)

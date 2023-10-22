@@ -153,8 +153,8 @@ const index = () => {
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 
-                        edit={true}
-                        handleEdit={() => handleEdit(value)}
+                        edit={false}
+                        // handleEdit={() => handleEdit(value)}
                         handleDelete={() => handleClose(value.id)}
                     />
                 </TableCell>                                                             

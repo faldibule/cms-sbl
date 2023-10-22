@@ -107,11 +107,11 @@ const Form = (props) => {
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
                                 label="Tanggal PO Diterima"
-                                name='date_received'
-                                defaultValue={data?.date_received}
+                                name='received_date'
+                                defaultValue={data?.received_date}
                                 required
-                                helperText={!!errors?.date_received && errors?.date_received[0]}
-                                error={!!errors?.date_received}
+                                helperText={!!errors?.received_date && errors?.received_date[0]}
+                                error={!!errors?.received_date}
                             />
                         </Grid>
 

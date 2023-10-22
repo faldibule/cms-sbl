@@ -124,11 +124,13 @@ const Form = (props) => {
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name = v?.name || v?.item_product?.name || v?.item_name
-            const brand = v?.brand || v?.item_product?.brand || v?.item_brand
-            const size = v?.item_product?.size || v?.item_size || v?.size
+            const name =  v?.item_product?.name
+            const brand = v?.item_product?.brand
+            const size = v?.item_product?.size
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const unit = v.item_product?.unit?.param || v?.unit 
+            const item_product_id = v.item_product?.id
+            formData.append(`item_product[${i}][item_product_id]`, item_product_id)
             formData.append(`item_product[${i}][item_name]`, name)
             formData.append(`item_product[${i}][item_brand]`, brand)
             formData.append(`item_product[${i}][description]`, v?.description)

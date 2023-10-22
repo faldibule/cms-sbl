@@ -124,10 +124,12 @@ const Form = (props) => {
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name = v?.name || v?.item_product?.name || v?.item_name
+            const name =  v?.item_product?.name
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const unit = v.item_product?.unit?.param || v?.unit 
-            formData.append(`item_product[${i}][item_name]`, name )
+            const item_product_id = v.item_product?.id
+            formData.append(`item_product[${i}][item_product_id]`, item_product_id)
+            formData.append(`item_product[${i}][item_name]`, name)
             formData.append(`item_product[${i}][weight]`, v?.weight)
             formData.append(`item_product[${i}][unit]`, unit)
             formData.append(`item_product[${i}][quantity]`, v.quantity)
