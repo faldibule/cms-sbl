@@ -36,7 +36,7 @@ const Form = (props) => {
     })
     const handleSelectedPr = (value) => setPrState({...prState, selected: value})
     const handleInputPr = (value) => setPrState({...prState, input: value})
-    const { data: dataPrList, isLoading: loadingPrList } = useFetchPurchaseRequest({ paginate: 0 })
+    const { data: dataPrList, isLoading: loadingPrList } = useFetchPurchaseRequest({ paginate: 0, status: ['finish'] })
     const { data: dataPRById, isLoading: loadingPrById } = useFetchPurchaseRequestById(prState.selected?.id, { enabled: !!prState.selected?.id })
 
     useEffect(() => {
@@ -51,6 +51,12 @@ const Form = (props) => {
     }, [prState.selected, dataPRById])
 
     // Supplier Handle
+    const [supplierState, setSupplierState] = useState({
+        input: '',
+        selected: ''
+    })
+    const handleSelectedSupplier = (value) => setSupplierState({...supplierState, selected: value})
+    const handleInputSupplier = (value) => setSupplierState({...supplierState, input: value})
     const { data: dataSupplier, isLoading: loadingSupplier } = useFetchSupplier({ paginate: 0 })
 
     // User Handle
@@ -134,6 +140,7 @@ const Form = (props) => {
         e.preventDefault()
         const formData = new FormData(e.target)
         formData.append('purchase_request_id', prState.selected?.id)
+        formData.append('supplier_id', supplierState.selected?.id)
         formData.append('location_id', locationState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
         formData.append('checked_by', userState.checked_by.selected?.id)
@@ -163,10 +170,14 @@ const Form = (props) => {
     useEffect(() => {
         let mounted = true
         if(mounted){
-            if(!!props.data){
+            if(!!data){
                 setPrState({
-                    input: '',
-                    selected: ''
+                    input: data.purchase_request?.pr_number,
+                    selected: data.purchase_request
+                })
+                setSupplierState({
+                    input: data.supplier.name,
+                    selected: data.supplier
                 })
                 setLocationState({
                     input: `${data.location.location_code} - ${data.location.location}`,
@@ -202,21 +213,6 @@ const Form = (props) => {
         return () => mounted = false
 
     }, [props.id])
-
-    const renderSupplierMenuItem = useCallback(() => {
-        if(loadingSupplier) return null
-        if(dataSupplier.data.length === 0 ){
-            return (
-                <MenuItem value='' disabled>Kosong</MenuItem>
-            )
-        }
-        return dataSupplier.data.map((v) => {
-            return (
-                <MenuItem key={v.id} value={v.id}>{v.name}</MenuItem>
-            )
-        })
-
-    }, [dataSupplier])
 
     const renderDiscountMenuItem = useCallback(() => {
         if(loadingDiscount) return null
@@ -261,22 +257,22 @@ const Form = (props) => {
                                 selectedValue={prState.selected}
                                 setSelectedValue={handleSelectedPr}
                                 errors={errors?.purchase_request_id}
+                                key='PR'
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <TextField
+                            <CustomAutocomplete 
                                 disabled={isApproved}
-                                fullWidth 
+                                options={dataSupplier.data}
+                                getOptionLabel={(option) => `${option.name}`}
                                 label='Supplier'
-                                name='supplier_id'
-                                required
-                                helperText={!!errors?.supplier_id && errors?.supplier_id[0]}
-                                error={!!errors?.supplier_id}
-                                select
-                                defaultValue={data?.supplier?.id}
-                            >
-                                {renderSupplierMenuItem()}
-                            </TextField> 
+                                inputValue={supplierState.input}
+                                setInputValue={handleInputSupplier}
+                                selectedValue={supplierState.selected}
+                                setSelectedValue={handleSelectedSupplier}
+                                errors={errors?.supplier_id}
+                                key='supplier'
+                            /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField

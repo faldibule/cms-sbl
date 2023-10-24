@@ -9,6 +9,8 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import useFetchLocation from '@hooks/location/useFetchLocation';
 import useDeleteLocation from '@hooks/location/useDeleteLocation';
 import useSaveLocation from '@hooks/location/useSaveLocation';
+import Iconify from '@components/Iconify';
+import ImportModal from '@components/ImportModal';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -74,11 +76,15 @@ const index = () => {
         setStaging({ id })
     }
 
+    const refreshData = () => {
+        handleReset()
+        refetch()
+        refetchParentLocation()
+    }
+
     const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteLocation({
         onSuccess: () => {
-            handleReset()
-            refetch()
-            refetchParentLocation()
+            refreshData()
             handleClose()
         }
     })
@@ -88,9 +94,7 @@ const index = () => {
 
     const { mutate: save, isLoading: loadingSave, error } = useSaveLocation({
         onSuccess: () => {
-            handleReset()
-            refetch()
-            refetchParentLocation()
+            refreshData()
         }
     })
     const errors = error?.response?.data?.errors
@@ -112,6 +116,9 @@ const index = () => {
         formData.append('parent_location_id', parent_location_id)
         save({ formData, id: staging?.id })
     }
+
+    const [modalImport, setModalImport] = useState(false)
+    const handleModalImport = () => setModalImport(!modalImport)
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
@@ -211,10 +218,13 @@ const index = () => {
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>
-                                Site Location
-                            </Typography>
+                        <Stack justifyContent='space-between' mb={3} direction='row' alignitems='center'>
+                            <Stack>
+                                <Typography variant='h4'>
+                                    Site Location
+                                </Typography>
+                            </Stack>
+                            <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import</Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={8}>
@@ -334,6 +344,13 @@ const index = () => {
                             handleDelete={handleDelete}
                             open={open}
                             loading={loadingDelete}
+                        />
+                        <ImportModal 
+                            handleClose={handleModalImport}
+                            open={modalImport}
+                            title='Location'
+                            url={'location/import'}
+                            refreshData={refreshData}
                         />
                     </Grid>
                 </Grid>

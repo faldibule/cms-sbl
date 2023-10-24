@@ -9,6 +9,8 @@ import Loading from '@components/Loading';
 import DeleteDialog from '@components/DeleteDialog';
 import useSaveDiscount from '@hooks/discount/useSaveDiscount';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
+import Iconify from '@components/Iconify';
+import ImportModal from '@components/ImportModal';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -63,10 +65,14 @@ const index = () => {
         setStaging({ id })
     }
 
+    const refreshData = () => {
+        handleReset()
+        refetch()
+    }
+
     const { mutate: deleteDiscount, isLoading: loadingDelete } = useDeleteDiscount({
         onSuccess: () => {
-            handleReset()
-            refetch()
+            refreshData()
             handleClose()
         }
     })
@@ -76,8 +82,7 @@ const index = () => {
 
     const { mutate: save, isLoading: loadingSave, error } = useSaveDiscount({
         onSuccess: () => {
-            handleReset()
-            refetch()
+            refreshData()
         }
     })
     const errors = error?.response?.data?.errors
@@ -86,6 +91,9 @@ const index = () => {
         const formData = new FormData(e.target)
         save({ formData, id: staging?.id })
     }
+    
+    const [modalImport, setModalImport] = useState(false)
+    const handleModalImport = () => setModalImport(!modalImport)
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
@@ -167,10 +175,13 @@ const index = () => {
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>
-                                Discount
-                            </Typography>
+                        <Stack justifyContent='space-between' mb={3} direction='row' alignitems='center'>
+                            <Stack>
+                                <Typography variant='h4'>
+                                    Discount
+                                </Typography>
+                            </Stack>
+                            <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import</Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={7}>
@@ -261,6 +272,13 @@ const index = () => {
                             handleDelete={handleDelete}
                             open={open}
                             loading={loadingDelete}
+                        />
+                        <ImportModal 
+                            handleClose={handleModalImport}
+                            open={modalImport}
+                            title='Discount'
+                            url={'discount/import'}
+                            refreshData={refreshData}
                         />
                     </Grid>
                 </Grid>

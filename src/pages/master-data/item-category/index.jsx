@@ -9,6 +9,8 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import useFetchItemCategory from '@hooks/item-category/useFetchItemCategory';
 import useDeleteItemCategory from '@hooks/item-category/useDeleteItemCategory';
 import useSaveItemCategory from '@hooks/item-category/useSaveItemCategory';
+import ImportModal from '@components/ImportModal';
+import Iconify from '@components/Iconify';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -64,11 +66,14 @@ const index = () => {
         setStaging({ id })
     }
 
+    const refreshData = () => {
+        handleReset()
+        refetch()
+        refetchParentCategories()
+    }
     const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteItemCategory({
         onSuccess: () => {
-            handleReset()
-            refetch()
-            refetchParentCategories()
+            refreshData()
             handleClose()
         }
     })
@@ -78,9 +83,7 @@ const index = () => {
 
     const { mutate: save, isLoading: loadingSave, error } = useSaveItemCategory({
         onSuccess: () => {
-            handleReset()
-            refetch()
-            refetchParentCategories()
+            refreshData()
         }
     })
     const errors = error?.response?.data?.errors
@@ -89,6 +92,9 @@ const index = () => {
         const formData = new FormData(e.target)
         save({ formData, id: staging?.id })
     }
+
+    const [modalImport, setModalImport] = useState(false)
+    const handleModalImport = () => setModalImport(!modalImport)
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
@@ -196,10 +202,13 @@ const index = () => {
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifycontent='space-between' alignitems='center'>
-                            <Typography variant='h4' mb={3}>
-                                Item Category
-                            </Typography>
+                        <Stack justifyContent='space-between' mb={3} direction='row' alignitems='center'>
+                            <Stack>
+                                <Typography variant='h4'>
+                                    Item Category
+                                </Typography>
+                            </Stack>
+                            <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import</Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={8}>
@@ -310,6 +319,13 @@ const index = () => {
                             handleDelete={handleDelete}
                             open={open}
                             loading={loadingDelete}
+                        />
+                        <ImportModal 
+                            handleClose={handleModalImport}
+                            open={modalImport}
+                            title='Item Category'
+                            url={'item-category/import'}
+                            refreshData={refreshData}
                         />
                     </Grid>
                 </Grid>
