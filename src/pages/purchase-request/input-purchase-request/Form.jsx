@@ -196,7 +196,7 @@ const Form = (props) => {
             <Box component='form' onSubmit={onSubmit}>
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
                                 options={dataLocation.data}
@@ -278,7 +278,7 @@ const Form = (props) => {
                                 errors={errors?.approved1_by}
                             />
                         </Grid>
-                        <Grid item xs={12} md={12}>
+                        <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.name}`}
@@ -289,6 +289,19 @@ const Form = (props) => {
                                 selectedValue={userState.approved2_by.selected}
                                 setSelectedValue={handleUser('approved2_by', 'selected')}
                                 errors={errors?.approved2_by}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <TextField
+                                fullWidth 
+                                label='Note'
+                                name='note'
+                                defaultValue={data?.note}
+                                required
+                                multiline
+                                rows={3}
+                                helperText={!!errors?.note && errors?.note[0]}
+                                error={!!errors?.note}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>

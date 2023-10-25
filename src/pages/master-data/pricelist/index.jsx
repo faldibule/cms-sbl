@@ -13,6 +13,8 @@ import useFetchLocation from '@hooks/location/useFetchLocation';
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct';
 import useFetchSupplier from '@hooks/supplier/useFetchSupplier';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
+import Iconify from '@components/Iconify';
+import ImportModal from '@components/ImportModal';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -91,10 +93,13 @@ const index = () => {
         setStaging({ id })
     }
 
+    const refreshData = () => {
+        handleReset()
+        refetch()
+    }
     const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeletePricelist({
         onSuccess: () => {
-            handleReset()
-            refetch()
+            refreshData()
             handleClose()
         }
     })
@@ -104,8 +109,7 @@ const index = () => {
 
     const { mutate: save, isLoading: loadingSave, error } = useSavePricelist({
         onSuccess: () => {
-            handleReset()
-            refetch()
+            refreshData()
         }
     })
     const errors = error?.response?.data?.errors
@@ -115,6 +119,9 @@ const index = () => {
         formData.append('price', IntegerFormat(price))
         save({ formData, id: staging?.id })
     }
+    
+    const [modalImport, setModalImport] = useState(false)
+    const handleModalImport = () => setModalImport(!modalImport)
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
@@ -250,10 +257,13 @@ const index = () => {
             <Container>
                 <Grid container spacing={1}>
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>
-                                Pricelist
-                            </Typography>
+                        <Stack justifyContent='space-between' mb={3} direction='row' alignitems='center'>
+                            <Stack>
+                                <Typography variant='h4'>
+                                    Pricelist
+                                </Typography>
+                            </Stack>
+                            <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import Item Category, Product & Pricelist</Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={7}>
@@ -406,6 +416,13 @@ const index = () => {
                             handleDelete={handleDelete}
                             open={open}
                             loading={loadingDelete}
+                        />
+                        <ImportModal 
+                            handleClose={handleModalImport}
+                            open={modalImport}
+                            title='Item Category, Product & Pricelist'
+                            url={'price-list/import-category-product-price'}
+                            refreshData={refreshData}
                         />
                     </Grid>
                 </Grid>

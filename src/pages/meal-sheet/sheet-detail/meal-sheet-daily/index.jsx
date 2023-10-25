@@ -8,6 +8,7 @@ import CustomSearchComponent from '../../../../components/CustomSearchComponent'
 import CustomStatusLabelComponent from '../../../../components/CustomStatusLabelComponent';
 import CustomMenuComponent from '../../../../components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
+import CustomActionTableComponent from '@components/CustomActionTableComponent';
 
 let dummy = []
 for(let i = 0; i < 15; i++){
@@ -20,6 +21,8 @@ for(let i = 0; i < 15; i++){
         l: true,
         d: true,
         s: true,
+        c: true,
+        a: true,
         accom: true
     }
 }
@@ -103,6 +106,8 @@ const index = () => {
                                                 <TableCell align='center'>Lunch</TableCell>
                                                 <TableCell align='center'>Dinner</TableCell>
                                                 <TableCell align='center'>Super</TableCell>
+                                                <TableCell align='center'>Casual</TableCell>
+                                                <TableCell align='center'>Acomodation</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -126,10 +131,16 @@ const index = () => {
                                                         <TableCell align='center'>
                                                             <CheckStatusComponent data={v.s} />
                                                         </TableCell>
+                                                        <TableCell align='center'>
+                                                            <CheckStatusComponent data={v.c} />
+                                                        </TableCell>
+                                                        <TableCell align='center'>
+                                                            <CheckStatusComponent data={v.a} />
+                                                        </TableCell>
                                                         <TableCell>
-                                                            <IconButton onClick={(e) => handleClick(e, v)}>
-                                                                <Iconify icon='mingcute:more-2-fill' />
-                                                            </IconButton>
+                                                            <CustomActionTableComponent 
+                                                                edit={true}
+                                                            />
                                                         </TableCell>
                                                     </TableRow>
                                                 )
@@ -185,12 +196,14 @@ const index = () => {
                                     <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
                                         <FormControlLabel control={<Checkbox  />} label="Breakfast" />
                                         <FormControlLabel control={<Checkbox  />} label="Lunch" />
+                                        <FormControlLabel control={<Checkbox  />} label="Casual" />
                                     </FormGroup>
                                 </Grid>
                                 <Grid item xs={12} md={6}>
                                     <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
                                         <FormControlLabel control={<Checkbox  />} label="Dinner" />
                                         <FormControlLabel control={<Checkbox  />} label="Super" />
+                                        <FormControlLabel control={<Checkbox  />} label="Acomodation" />
                                     </FormGroup>
                                 </Grid>
                                 <Grid item xs={12} md={12}>

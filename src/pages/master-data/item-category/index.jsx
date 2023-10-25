@@ -208,7 +208,7 @@ const index = () => {
                                     Item Category
                                 </Typography>
                             </Stack>
-                            <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import</Button>
+                            {/* <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import</Button> */}
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={8}>

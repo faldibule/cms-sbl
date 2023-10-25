@@ -70,14 +70,14 @@ const navConfig = [
     ]
   },
   {
-    title: 'Purchase Request',
-    icon: getIcon('bxs:purchase-tag'),
-    path: '/purchase-request/input-purchase-request',
-  },
-  {
     title: 'Quotation',
     icon: getIcon('ph:note'),
     path: '/quotation',
+  },
+  {
+    title: 'Purchase Request',
+    icon: getIcon('bxs:purchase-tag'),
+    path: '/purchase-request/input-purchase-request',
   },
   {
     title: 'Purchase Order',

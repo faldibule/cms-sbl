@@ -413,6 +413,19 @@ const index = () => {
                                         </TextField> 
                                     </Grid>
                                     <Grid item xs={12} md={12}>
+                                        <TextField
+                                            fullWidth 
+                                            label='Description'
+                                            name='description'
+                                            defaultValue={staging?.description}
+                                            required
+                                            multiline
+                                            rows={2}
+                                            helperText={!!errors?.description && errors?.description[0]}
+                                            error={!!errors?.description}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={12}>
                                         <Stack direction='row' spacing={2}>
                                             <LoadingButton loading={loadingSave} fullWidth variant='contained' type='submit'>
                                                 Submit
