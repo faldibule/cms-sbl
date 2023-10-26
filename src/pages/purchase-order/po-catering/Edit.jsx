@@ -10,7 +10,7 @@ const Edit = () => {
     const { id } = useParams()
     const { data, isLoading } = useFetchPOCateringById(id)
     return (
-      <Page title='Form Input PO Catering'>
+      <Page title='Form Edit PO Catering'>
           <Container>
             {!isLoading ?
               <Form title='edit' data={data} id={id} />

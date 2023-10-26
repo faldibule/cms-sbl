@@ -66,7 +66,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        Form PO Masuk
+                        {props.title === 'add' ? 'Form Input PO Masuk' : 'Form Edit PO Masuk' }
                     </Typography>
                 </Grid>
             </Grid>

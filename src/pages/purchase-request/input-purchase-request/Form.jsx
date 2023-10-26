@@ -188,7 +188,7 @@ const Form = (props) => {
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        Form Purchase Request
+                        {props.title === 'add' ? 'Form Input Purchase Request' : 'Form Edit Purchase Request' }
                     </Typography>
                 </Grid>
             </Grid>

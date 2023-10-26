@@ -5,9 +5,9 @@ import Form from './Form'
 
 const Add = () => {
   return (
-    <Page title='Input PO Catering'>
+    <Page title='Form Input PO Catering'>
         <Container>
-            <Form title='add' type='input' />
+            <Form title='add' />
         </Container>
     </Page>
   )
