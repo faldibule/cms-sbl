@@ -246,7 +246,7 @@ const Form = (props) => {
             <Box component='form' onSubmit={onSubmit}>
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
                                 options={dataPrList.data}
@@ -260,7 +260,9 @@ const Form = (props) => {
                                 key='PR'
                             /> 
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        {!!prState.selected?.id ?
+                        <>
+                        <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
                                 options={dataSupplier.data}
@@ -490,6 +492,10 @@ const Form = (props) => {
                                 }
                             </Stack>
                         </Grid>
+                        
+                        </>
+                        : null
+                        }
                     </Grid>
                 </Card>
             </Box>
