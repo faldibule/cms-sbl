@@ -240,6 +240,11 @@ const Form = (props) => {
                     <Typography variant='h5'>
                         {props.title === 'add' ? 'Form Input PO Catering' : 'Form Edit PO Catering' }
                     </Typography>
+                    {!!data ? 
+                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                            {data?.po_number}
+                        </Typography>
+                    : null}
                 </Grid>
             </Grid>
 

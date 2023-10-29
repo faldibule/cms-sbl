@@ -190,6 +190,11 @@ const Form = (props) => {
                     <Typography variant='h5'>
                         {props.title === 'add' ? 'Form Input Purchase Request' : 'Form Edit Purchase Request' }
                     </Typography>
+                    {!!data ? 
+                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                            {data?.pr_number}
+                        </Typography>
+                    : null}
                 </Grid>
             </Grid>
 
@@ -293,15 +298,16 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
+                                disabled={isApproved}
                                 fullWidth 
-                                label='Note'
-                                name='note'
-                                defaultValue={data?.note}
+                                label='Description'
+                                name='description'
+                                defaultValue={data?.description}
                                 required
                                 multiline
                                 rows={3}
-                                helperText={!!errors?.note && errors?.note[0]}
-                                error={!!errors?.note}
+                                helperText={!!errors?.description && errors?.description[0]}
+                                error={!!errors?.description}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>

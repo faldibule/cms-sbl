@@ -1,72 +1,18 @@
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import Iconify from '../../../components/Iconify'
+import Iconify from '@components/Iconify'
 import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '../../../hooks/useCustomSnackbar'
-import { NumberFormat } from '../../../utils/Format'
-import CustomGrandTotalComponent from '../../../components/CustomGrandTotalComponent'
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
+import { IntegerFormat, NumberFormat } from '@utils/Format'
+import Loading from '@components/Loading'
+import useFetchSupplier from '@hooks/supplier/useFetchSupplier'
+import CustomAutocomplete from '@components/CustomAutocomplete'
+import useSaveDOMasuk from '@hooks/do-masuk/useSaveDOMasuk'
 
-const itemData = [
-    {
-        code: '1',
-        name: 'item 1',
-        brand: 'brand 1',
-        description: '',
-        harga: 1000000,
-        quantity: 0,
-        tax: 11,
-        total: 1000000,
-        grand_total: 1000000,
-        status: false,
-    },
-    {
-        code: '2',
-        name: 'item 2',
-        brand: 'brand 2',
-        description: '',
-        harga: 2000000,
-        quantity: 0,
-        tax: 11,
-        total: 2000000,
-        grand_total: 2000000,
-        status: true,
-    },
-    {
-        code: '3',
-        name: 'item 3',
-        brand: 'brand 3',
-        description: '',
-        harga: 3000000,
-        quantity: 0,
-        tax: 11,
-        total: 3000000,
-        grand_total: 3000000,
-        status: false,
-    }
-]
-
-let itemDataEdit = []
-for(let i = 0; i < 4; i++){
-    const index = i + 1
-    itemDataEdit[i] = {
-        code: i + index,
-        name: 'item '+ index,
-        brand: 'brand '+ index,
-        description: 'Test '+ index,
-        harga: index * 1000000,
-        quantity: 5 + index,
-        tax: 11,
-        total: 0,
-        shipment_charge: 0,
-        grand_total: 0,
-        status: true,
-    }
-}
 
 const Form = (props) => {
-    const sb = useCustomSnackbar()
-    const navigate = useNavigate()
+    const { data } = props
     const [item, setItem] = useState([])
     const [form, setForm] = useState({
         item: '',
@@ -77,92 +23,55 @@ const Form = (props) => {
         }
     })
 
-    const handleFile = (e) => {
-        if (e.target.files[0] !== undefined) {
-            const file = e.target.files[0]
-            const file_url = URL.createObjectURL(file)
-            const file_name = file.name
-            setForm({
-                ...form,
-                document: {
-                    file,
-                    file_name,
-                    file_url
-                }
-            })
-            e.target.value = null;
-         }
-    }
+    const [supplierState, setSupplierState] = useState({
+        input: '',
+        selected: ''
+    })
+    const handleSelectedSupplier = (value) => setSupplierState({...supplierState, selected: value})
+    const handleInputSupplier = (value) => setSupplierState({...supplierState, input: value})
+    const { data: dataSupplier, isLoading: loadingSupplier } = useFetchSupplier({ paginate: 0 })
 
-    const onChangeItem = (e) => {
-        setForm({
-            ...form,
-            item: ''
-        })
-        setItem([...item, itemData.find(v => v.code === e.target.value)])
-    }
+    const [total, setTotal] = useState('')
+    const handleTotal = (v) => setTotal(NumberFormat(v, 'Rp'))
 
-    const onChangeItemTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                if(e.target.name === 'shipment_charge'){
-                    return {
-                        ...v,
-                        shipment_charge: e.target.value.replaceAll('Rp', '').replaceAll('.', '')
-                    }
-                }
-                return {
-                    ...v,
-                    [e.target.name]: e.target.value,
-                }
-            }
-            return v
-        })
-        setItem([...newItem])
-    }
-
-    const deleteItemTable = (e, id) => {
-        setItem([...item.filter(v => v.code !== id)])
-    }
-
-    const onChangeCheckTable = (e, id) => {
-        const newItem = item.map((v, i) => {
-            if(v.code === id){
-                return {
-                    ...v,
-                    status: e.target.checked
-                }
-            }
-            return v
-        })
-        setItem([...newItem])
-    }
+    const { mutate: save, isLoading: loadingSave, error } = useSaveDOMasuk({
+        onSuccess: () => {
+        }
+    })
+    const errors = error?.response?.data?.errors
 
     const onSubmit = (e) => {
         e.preventDefault()
-        sb.success('Success!')
-        navigate('/delivery-order/do-masuk', {
-            variant: 'success'
-        })
+        const formData = new FormData(e.target)
+        formData.append('supplier_id', supplierState.selected?.id)
+        formData.append('total', IntegerFormat(total))
+        save({ formData, id: data?.id })
     }
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!props.data){
-                setItem([...itemDataEdit])
+                setSupplierState({
+                    input: data.supplier.name,
+                    selected: data.supplier
+                })
+                handleTotal(data.total)
             }
         }
 
         return () => mounted = false
 
     }, [props])
+    if(loadingSupplier){
+        return <Loading />
+    }
 
     return (
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
                     <Typography variant='h5'>
-                        Form Delivery Order
+                        {props.title === 'add' ? 'Form Input DO Masuk' : 'Form Edit DO Masuk' }
                     </Typography>
                 </Grid>
             </Grid>
@@ -173,68 +82,68 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='DO From Supplier'
-                                select
-                            >
-                                <MenuItem value='1'>DO From Supplier 1</MenuItem>
-                                <MenuItem value='2'>DO From Supplier 2</MenuItem>
-                            </TextField> 
+                                label='DO Number'
+                                name='do_number'
+                                defaultValue={data?.do_number}
+                                required
+                                helperText={!!errors?.do_number && errors?.do_number[0]}
+                                error={!!errors?.do_number}
+                            /> 
+                        </Grid> 
+                        <Grid item xs={12} md={6}>
+                            <CustomAutocomplete 
+                                options={dataSupplier.data}
+                                getOptionLabel={(option) => `${option.name}`}
+                                label='Supplier'
+                                inputValue={supplierState.input}
+                                setInputValue={handleInputSupplier}
+                                selectedValue={supplierState.selected}
+                                setSelectedValue={handleSelectedSupplier}
+                                errors={errors?.supplier_id}
+                                key='supplier'
+                            /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                fullWidth 
-                                label='DO Number'
-                            /> 
-                        </Grid> 
-                        <Grid item xs={12} md={4}>
-                            <TextField
                                 type='date'
-                                name='tanggal_pengiriman'
-                                label="Tanggal Pengiriman"
+                                label="Delivery Date"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
+                                name='delivery_date'
+                                defaultValue={data?.delivery_date}
+                                required
+                                helperText={!!errors?.delivery_date && errors?.delivery_date[0]}
+                                error={!!errors?.delivery_date}
                             />
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                type='date'
+                                label="Receieved Date"
+                                fullWidth
+                                InputProps={{
+                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                }}
+                                name='received_date'
+                                defaultValue={data?.received_date}
+                                required
+                                helperText={!!errors?.received_date && errors?.received_date[0]}
+                                error={!!errors?.received_date}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={12}>
                             <TextField
                                 fullWidth 
                                 label='Total'
+                                name='total'
+                                value={total}
+                                onChange={(e) => handleTotal(e.target.value)}
+                                required
+                                helperText={!!errors?.total && errors?.total[0]}
+                                error={!!errors?.total}
                             /> 
-                        </Grid>
-                        <Grid item xs={12} md={4}>
-                            {form.document.file_url === '' ?
-                                <Button size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
-                                    Add Supporting Document *
-                                    <input name="document" type="file" onChange={handleFile} hidden />
-                                </Button>
-                            :
-                                <TextField
-                                    variant="outlined"
-                                    label="Supporting Document *"
-                                    sx={{ mb: 2 }}
-                                    value={form.document.file_name}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Iconify icon='fluent:hard-drive-20-filled' />
-                                            </InputAdornment>
-                                        ),
-                                        endAdornment: (
-                                        <InputAdornment position="end">
-                                            <Tooltip title="Delete">
-                                                <IconButton onClick={() => setForm({...form, document: { file_url: '', file: '', file_name: '' }})}>
-                                                    <Iconify icon='zondicons:close-solid' />
-                                                </IconButton>
-                                            </Tooltip>
-                                        </InputAdornment>
-                                        ),
-                                    }}
-                                    fullWidth
-                                    disabled
-                                />
-                            }
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
@@ -242,97 +151,22 @@ const Form = (props) => {
                                 label='Keterangan DO'
                                 multiline
                                 rows={3}
+                                name='description'
+                                defaultValue={data?.description}
+                                required
+                                helperText={!!errors?.description && errors?.description[0]}
+                                error={!!errors?.description}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            {item.length > 0 ? 
-                                <TableContainer sx={{ maxWidth: 2000 }}>
-                                    <Table sx={{ minWidth: 1500, overflowX: 'auto' }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow
-                                                sx={{
-                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
-                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
-                                                    bgcolor: '#d6e9ff'
-                                                }}
-                                            >
-
-                                                {props.type === 'approval' ? 
-                                                <TableCell></TableCell>
-                                                : null
-                                                }
-                                                <TableCell>No.</TableCell>
-                                                <TableCell>Item Name</TableCell>
-                                                <TableCell>Item Brand</TableCell>
-                                                <TableCell>Description</TableCell>
-                                                <TableCell>Harga</TableCell>
-                                                <TableCell>Quantity</TableCell>
-                                                <TableCell>Current Stock</TableCell>
-                                                <TableCell>Tax</TableCell>
-                                                <TableCell>Shipment Charge</TableCell>
-                                                <TableCell>Total Price</TableCell>
-                                                <TableCell>Action</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {item.map((v, i) => {
-                                                const temp = parseInt(v.shipment_charge)
-                                                const total = (v.harga * v.quantity) 
-                                                const grand_total = total + (total * 11 / 100) + temp
-                                                return (
-                                                    <TableRow key={i}>
-                                                        {/* {props.type === 'approval' ? 
-                                                            <TableCell>
-                                                                <Checkbox
-                                                                    checked={v.status}
-                                                                    onChange={(e) => onChangeCheckTable(e, v.code)}
-                                                                />
-                                                            </TableCell>
-                                                            : null
-                                                        } */}
-                                                        <TableCell>{i + 1}</TableCell>
-                                                        <TableCell>{v.name}</TableCell>
-                                                        <TableCell>{v.brand}</TableCell>
-                                                        <TableCell>{v.description}</TableCell>
-                                                        <TableCell>{NumberFormat(v.harga, 'Rp')}</TableCell>
-                                                        <TableCell>{v.quantity}</TableCell>
-                                                        <TableCell>20</TableCell>
-                                                        <TableCell>{v.tax}%</TableCell>
-                                                        <TableCell>
-                                                            <TextField
-                                                                fullWidth 
-                                                                label='Shipment Charge'
-                                                                name='shipment_charge'
-                                                                value={NumberFormat(v.shipment_charge, 'Rp')}
-                                                                onChange={(e) => onChangeItemTable(e, v.code)}
-                                                            /> 
-                                                        </TableCell>
-                                                        <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-                                                        <TableCell align='center'>
-                                                            <Iconify onClick={(e) => deleteItemTable(e, v.code)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                                                        </TableCell>
-                                                    </TableRow>
-                                                )
-                                            })}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            : 
-                            null
-                            }
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                            {/* <CustomGrandTotalComponent item={item} /> */}
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                            <Stack direction='row' spacing={2}>
-                                <LoadingButton variant='contained' type='submit'>
-                                    submit
+                            <Stack direction='row' spacing={2} justifyContent='end'>
+                                <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
+                                    Next
                                 </LoadingButton>
-                                {props.title == 'edit' ?
-                                    <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                        Print
-                                    </LoadingButton>
+                                {props.title == 'edit' ? ''
+                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
+                                    //     Print
+                                    // </LoadingButton>
                                 : null
                                 }
                             </Stack>

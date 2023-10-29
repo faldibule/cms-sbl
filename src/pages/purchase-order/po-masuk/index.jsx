@@ -61,13 +61,6 @@ const index = () => {
         deleteQuotation(staging?.id)
     }
 
-    const [openApprove, setOpenApprove] = useState(false)
-    const handleCloseApprove = (value = null) => {
-        setOpenApprove(!openApprove)
-        if(!!!value) return;
-        setStaging(value)
-    }
-
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
         setParams({ ...params, page: rows.meta.last_page })
     }

@@ -41,8 +41,16 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                             name='vat'
                             type='number'
                             label='VAT'
-                            defaultValue={v?.vat || 0}
+                            defaultValue={v?.vat || 11}
                         /> 
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            label='Weight'
+                            name='weight'
+                            defaultValue={v?.weight}
+                        />  
                     </Grid>
                     <Grid item xs={12} md={12}>
                         <TextField
