@@ -44,6 +44,12 @@ const Form = (props) => {
         if(!!!prState.selected?.id) return
         if(!!!dataPRById) return
         if(!mounted) return 
+
+        if(props.title === 'edit' && prState.selected?.id === data.purchase_request?.id){
+            setItem([...data.item_product])
+            return
+        }
+
         setItem([...dataPRById.item_product])
 
         return () => mounted = false

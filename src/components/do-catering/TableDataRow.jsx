@@ -2,8 +2,8 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent'
 import CustomLinkComponent from '@components/CustomLinkComponent'
 import DeleteDialog from '@components/DeleteDialog'
 import UpdateStatusDialog from '@components/UpdateStatusDialog'
-import useDeletePOCatering from '@hooks/po-catering/useDeletePOCatering'
-import useUpdateStatusPOCatering from '@hooks/po-catering/useUpdateStatusPOCatering'
+import useDeleteDOCatering from '@hooks/do-catering/useDeleteDOCatering'
+import useUpdateStatusDOCatering from '@hooks/do-catering/useUpdateStatusDOCatering'
 import { Chip, TableCell, TableRow } from '@mui/material'
 import moment from 'moment'
 import React, { useMemo, useState } from 'react'
@@ -19,21 +19,21 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         setOpen(!open)
         if(!!!id) return;
     }
-    const { mutate: deletePOCatering, isLoading: loadingDelete } = useDeletePOCatering({
+    const { mutate: deleteDOCatering, isLoading: loadingDelete } = useDeleteDOCatering({
         onSuccess: () => {
             refetch()
             handleClose()
         }
     })
     const handleDelete = async () => {
-        deletePOCatering(value.id)
+        deleteDOCatering(value.id)
     }
 
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false)
     const handleCloseUpdateStatus = (value = null) => {
         setOpenUpdateStatus(!openUpdateStatus)
     }
-    const { mutate: updateStatus, isLoading: loadingUpdateStatus } = useUpdateStatusPOCatering({
+    const { mutate: updateStatus, isLoading: loadingUpdateStatus } = useUpdateStatusDOCatering({
         onSuccess: () =>{
             handleCloseUpdateStatus()
             setForm({
@@ -118,7 +118,7 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {rows.meta.from+i}.
             </TableCell>
             <TableCell>
-                <CustomLinkComponent label={value.po_number} url={`/purchase-order/po-catering/edit/${value.id}`} />
+                <CustomLinkComponent label={value.do_number} url={`/delivery-order/do-catering/edit/${value.id}`} />
             </TableCell>
             <TableCell>
                 {value.location.location}

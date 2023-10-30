@@ -5,7 +5,6 @@ import Page from '@components/Page';
 import Iconify from '@components/Iconify';
 import moment from 'moment/moment';
 import CustomSearchComponent from '@components/CustomSearchComponent';
-import CustomStatusLabelComponent from '@components/CustomStatusLabelComponent';
 import CustomLinkComponent from '@components/CustomLinkComponent';
 import useFetchDOMasuk from '@hooks/do-masuk/useFetchDOMasuk';
 import useDeleteDOMasuk from '@hooks/do-masuk/useDeleteDOMasuk';

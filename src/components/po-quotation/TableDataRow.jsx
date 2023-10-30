@@ -21,14 +21,14 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         setOpen(!open)
         if(!!!id) return;
     }
-    const { mutate: deletePurchaseRequest, isLoading: loadingDelete } = useDeletePOQuotation({
+    const { mutate: deletePOQuotation, isLoading: loadingDelete } = useDeletePOQuotation({
         onSuccess: () => {
             refetch()
             handleClose()
         }
     })
     const handleDelete = async () => {
-        deletePurchaseRequest(value.id)
+        deletePOQuotation(value.id)
     }
 
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false)

@@ -47,6 +47,7 @@ const Form = (props) => {
         formData.append('total', IntegerFormat(total))
         save({ formData, id: data?.id })
     }
+
     useEffect(() => {
         let mounted = true
         if(mounted){
@@ -62,6 +63,7 @@ const Form = (props) => {
         return () => mounted = false
 
     }, [props])
+
     if(loadingSupplier){
         return <Loading />
     }

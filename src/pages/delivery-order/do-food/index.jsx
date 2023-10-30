@@ -1,270 +1,146 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '../../../components/Page';
-import Iconify from '../../../components/Iconify';
-import moment from 'moment/moment';
-import CustomSearchComponent from '../../../components/CustomSearchComponent';
-import CustomStatusLabelComponent from '../../../components/CustomStatusLabelComponent';
+import Page from '@components/Page';
+import Iconify from '@components/Iconify';
+import CustomSearchComponent from '@components/CustomSearchComponent';
+import Loading from '@components/Loading';
+import useFetchDOFood from '@hooks/do-food/useFetchDOFood';
+import DeleteDialog from '@components/DeleteDialog';
+import useDeleteDOFood from '@hooks/do-food/useDeleteDOFood';
 import CustomLinkComponent from '@components/CustomLinkComponent';
-
-const dummy = [
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-    {
-        pr_number: '123',
-        customer_name: 'Customer 1',
-        shipment_date: new Date(),
-        user: 'user 1',
-        status: 'pending',
-    },
-    {
-        pr_number: '124',
-        customer_name: 'Customer 2',
-        shipment_date: new Date(),
-        user: 'user 2',
-        status: 'approved',
-    },
-    {
-        pr_number: '321',
-        customer_name: 'Customer 3',
-        shipment_date: new Date(),
-        user: 'user 3',
-        status: 'rejected',
-    },
-]
+import moment from 'moment';
+import { NumberFormat } from '@utils/Format';
+import CustomActionTableComponent from '@components/CustomActionTableComponent';
 
 const index = () => {
     const navigate = useNavigate()
-    const [rows, setRows] = useState(dummy);
     const [params, setParams] = useState({
-        page: 0,
+        page: 1,
         limit: 5,
-        search: ''
+        search: '',
+        paginate: 1,
     })
-
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchDOFood(params)
     const handleChangePage = (event, newPage) => {
-        setParams({
-            ...params,
-            page: newPage
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: newPage + 1,
+            };
         });
+    };
+    const handleChangeRowsPerPage = (event) => {
+        setParams((prev) => {
+            return {
+                ...prev,
+                page: 1,
+                limit: +event.target.value,
+            };
+        });
+    };
+    
+    const [open, setOpen] = useState(false)
+    const [staging, setStaging] = useState({})
+    const handleClose = (id = null) => {
+        setOpen(!open)
+        if(!!!id) return;
+        setStaging({ id })
     }
 
-    const handleChangeRowsPerPage = (event) => {
-        setParams({
-            ...params,
-            page: 0,
-            limit: parseInt(event.target.value, 10)
-        })
+    const { mutate: deleteDOFood, isLoading: loadingDelete } = useDeleteDOFood({
+        onSuccess: () => {
+            refetch()
+            handleClose()
+        }
+    })
+    const handleDelete = async () => {
+        deleteDOFood(staging?.id)
     }
+
+    if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
+        setParams({ ...params, page: rows.meta.last_page })
+    }
+
+    const renderData = useCallback(() => {
+        if(rows === undefined) {
+            return (
+                <TableRow>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                            textAlign: "center",
+                            py: 5,
+                        }}
+                        colSpan={10}
+                    >
+                        <Loading />
+                    </TableCell>
+                </TableRow>
+            )
+        } 
+        if(rows.data.length === 0){
+            return (
+                <TableRow>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        sx={{
+                            textAlign:
+                                "center",
+                            py: 10,
+                        }}
+                        colSpan={10}
+                    >
+                        No result found
+                        {params.search !==
+                            "" && (
+                            <div
+                                style={{
+                                    display:
+                                        "inline-block",
+                                }}
+                            >
+                                &nbsp;for "<b>{params.search}</b>"
+                            </div>
+                        )}
+                        .
+                    </TableCell>
+                </TableRow>
+            )
+        }
+        return rows.data.map((value, key) => {
+            return (
+                <TableRow key={key}>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        align="center"
+                    >
+                        {rows.meta.from+key}.
+                    </TableCell>
+                    <TableCell>
+                        <CustomLinkComponent label={value.do_number} url={`/delivery-order/do-food/edit/${value.id}`} />
+                    </TableCell>
+                    <TableCell>
+                        {value.customer.name}
+                    </TableCell>
+                    <TableCell>
+                        {value.location.location}
+                    </TableCell>
+                    <TableCell>
+                        {moment(value.date_received).format('LL')}
+                    </TableCell>
+                    <TableCell>
+                        <CustomActionTableComponent 
+                            handleDelete={() => handleClose(value.id)}
+                        />
+                    </TableCell>                                                             
+                </TableRow>
+            )
+        })
+    }, [rows])
 
     return (
         <Page title='DO Keluar Food Supply'>
@@ -273,7 +149,7 @@ const index = () => {
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                DO Keluar Food Supply
+                                PO Keluar Food Supply
                             </Typography>
                             <Button onClick={() => navigate('/delivery-order/do-food/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
@@ -285,7 +161,11 @@ const index = () => {
                             <CardContent>
                                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
                                     <Grid item xs={12} md={12}>
-                                        <CustomSearchComponent />
+                                        <CustomSearchComponent 
+                                            params={params}
+                                            search={params.search}
+                                            setParams={setParams}
+                                        />
                                     </Grid>
                                 </Grid>
                                 <TableContainer>
@@ -298,64 +178,45 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>PO Number</TableCell>
+                                                <TableCell>DO Number</TableCell>
                                                 <TableCell>Customer Name</TableCell>
+                                                <TableCell>Shipment To</TableCell>
                                                 <TableCell>Shipment Date</TableCell>
-                                                <TableCell>User Maker</TableCell>
-                                                <TableCell>Status</TableCell>
+                                                <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {rows.slice(params.page * params.limit, params.page * params.limit + params.limit).map((v, i) => {
-                                                const { status } = v
-                                                let statusLabel = {
-                                                    title: 'default',
-                                                    color: 'white',
-                                                    bgcolor: 'green'
-                                                }
-                                                if(status === 'approved') statusLabel = { title: 'Approve', color: 'white', bgcolor: 'green' }
-                                                if(status === 'pending') statusLabel = { title: 'Pending', color: 'black', bgcolor: 'yellow' }
-                                                if(status === 'rejected') statusLabel = { title: 'Rejected', color: 'white', bgcolor: 'red' }
-                                                return (
-                                                    <TableRow key={i}>
-                                                        <TableCell>{params.page * params.limit + i + 1}</TableCell>
-                                                        <TableCell>
-                                                            <CustomLinkComponent label={v.pr_number} url='/delivery-order/do-food/edit/1' />
-                                                        </TableCell>
-                                                        <TableCell>{v.customer_name}</TableCell>
-                                                        <TableCell>{moment(v.shipment_date).format('LL')}</TableCell>
-                                                        <TableCell>{v.user}</TableCell>
-                                                        <TableCell>
-                                                            <CustomStatusLabelComponent 
-                                                                title={statusLabel.title}
-                                                                color={statusLabel.color}
-                                                                bgcolor={statusLabel.bgcolor}
-                                                            />
-                                                        </TableCell>
-                                                        
-                                                    </TableRow>
-                                                )
-                                            })}
-                                            
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                <TablePagination
-                                    component="div"
-                                    count={rows.length}
-                                    page={params.page}
-                                    rowsPerPage={params.limit}
-                                    onPageChange={handleChangePage}
-                                    onRowsPerPageChange={handleChangeRowsPerPage}
-                                    rowsPerPageOptions={[1, 5, 25, 50]}
-                                    showFirstButton
-                                    showLastButton
-                                />
+                                {rows !== undefined && rows.data.length > 0 && (
+                                    <TablePagination
+                                        component="div"
+                                        count={rows.meta.total}
+                                        page={params.page - 1}
+                                        rowsPerPage={params.limit}
+                                        onPageChange={handleChangePage}
+                                        onRowsPerPageChange={
+                                            handleChangeRowsPerPage
+                                        }
+                                        rowsPerPageOptions={[
+                                            1, 5, 10, 25, 50, 100,
+                                        ]}
+                                        showFirstButton
+                                        showLastButton
+                                    />
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>
                 </Grid>
-
+                <DeleteDialog 
+                    handleClose={handleClose}
+                    handleDelete={handleDelete}
+                    open={open}
+                    loading={loadingDelete}
+                />
             </Container>
         </Page>
     );
