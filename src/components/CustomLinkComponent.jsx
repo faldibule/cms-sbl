@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom"
 
-const CustomLinkComponent = ({ label = 'defaul', url = '/dashboard' }) => {
+const CustomLinkComponent = ({ label = 'defaul', url = '/dashboard', style = { textDecoration: 'none', color: 'blue' } }) => {
     return (
-        <Link style={{ textDecoration: 'none', color: 'blue' }} to={url}>
+        <Link style={style} to={url}>
             {label}
         </Link>
     )

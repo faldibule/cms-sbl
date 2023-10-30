@@ -11,6 +11,7 @@ import { grey } from '@mui/material/colors';
 import { useRecoilValue } from 'recoil';
 import { authentication } from '@recoil/Authentication';
 import ResetPasswordDialog from '@components/ResetPasswordDialog';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 
 // ----------------------------------------------------------------------
 
@@ -109,23 +110,21 @@ export default function AccountPopover() {
                         sx={{ color: "text.secondary" }}
                         noWrap
                     >
-                        {user?.email}
+                        {user?.username}
                     </Typography>
                 </Box>
 
                 <Divider sx={{ borderStyle: "dashed" }} />
 
                 <Stack sx={{ p: 1 }}>
-                    {MENU_OPTIONS.map((option) => (
-                        <MenuItem
-                            key={option.label}
-                            to={option.linkTo}
-                            component={RouterLink}
-                            onClick={handleDialog}
-                        >
-                            {option.label}
-                        </MenuItem>
-                    ))}
+                    <MenuItem onClick={handleClose}>
+                        <CustomLinkComponent style={{ textDecoration: 'none', color: 'black' }} label='Edit Profil' url={`/user/user-list/edit/${user?.id}`} />
+                    </MenuItem>
+                    <MenuItem
+                        onClick={handleDialog}
+                    >
+                        Change Password
+                    </MenuItem>
                 </Stack>
 
                 <Divider sx={{ borderStyle: "dashed" }} />

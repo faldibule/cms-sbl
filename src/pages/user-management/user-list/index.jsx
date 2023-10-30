@@ -1,7 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-    Avatar,
     Button,
     Card,
     CardContent,
@@ -20,13 +19,14 @@ import {
 import Page from "@components/Page";
 import Iconify from "@components/Iconify";
 import CustomSearchComponent from "@components/CustomSearchComponent";
-import CustomActionTableComponent from "@components/CustomActionTableComponent";
 import CustomLinkComponent from "@components/CustomLinkComponent";
-import http from "@variable/Api";
 import Loading from "@components/Loading";
 import useFetchUser from "@hooks/user-list/useFetchUser";
+import { useRecoilValue } from "recoil";
+import { authentication } from "@recoil/Authentication";
 
 const index = () => {
+    const { user } = useRecoilValue(authentication)
     const [params, setParams] = useState({
         page: 1,
         limit: 5,
@@ -69,8 +69,18 @@ const index = () => {
         }
     }
 
+    const filteredData = useMemo(() => {
+        if(!!!rows) return undefined
+        const tempData = rows.data.filter(v => v.id !== user?.id)
+        return {
+            ...rows,
+            data: tempData
+        }
+        
+    }, [rows])
+
     const renderData = useCallback(() => {
-        if(rows === undefined) {
+        if(filteredData === undefined) {
             return (
                 <TableRow>
                     <TableCell
@@ -87,7 +97,7 @@ const index = () => {
                 </TableRow>
             )
         } 
-        if(rows.data.length === 0){
+        if(filteredData.data.length === 0){
             return (
                 <TableRow>
                     <TableCell
@@ -117,15 +127,16 @@ const index = () => {
                 </TableRow>
             )
         }
-        return rows.data.map(
-            (value, key) => (
+        return filteredData.data.map((value, key) => {
+            if(value.id === user?.id) return
+            return (
                 <TableRow key={key}>
                     <TableCell
                         component="th"
                         scope="row"
                         align="center"
                     >
-                        {rows.meta.from+key}.
+                        {filteredData.meta.from+key}.
                     </TableCell>
                     <TableCell>
                         <CustomLinkComponent 
@@ -159,7 +170,7 @@ const index = () => {
                     </TableCell>                                                              */}
                 </TableRow>
             )
-        )
+        })
     }, [rows])
 
     return (
@@ -248,10 +259,10 @@ const index = () => {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                {rows !== undefined && rows.data.length > 0 && (
+                                {filteredData !== undefined && filteredData.data.length > 0 && (
                                     <TablePagination
                                         component="div"
-                                        count={rows.meta.total}
+                                        count={filteredData.meta.total - 1}
                                         page={params.page - 1}
                                         rowsPerPage={params.limit}
                                         onPageChange={handleChangePage}
