@@ -8,6 +8,7 @@ const useImport = ({ onSuccess, onError }) => {
         mutationFn: async ({ formData, url = '', title }) => {
             const res = await http.post(url, formData)
             success(`Success Import ${title}!`)
+            return res.data
         },
         onSuccess,
         onError,

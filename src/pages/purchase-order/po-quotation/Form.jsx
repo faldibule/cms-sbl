@@ -16,6 +16,7 @@ import useFetchDiscount from '@hooks/discount/useFetchDiscount'
 import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import useSavePOQuotation from '@hooks/po-quotation/useSavePOQuotation'
+import ImportModal from '@components/ImportModal'
 
 const Form = (props) => {
     const { data } = props
@@ -109,6 +110,12 @@ const Form = (props) => {
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
     const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0 })
     
+    // Handle Import
+    const [modalImport, setModalImport] = useState(false)
+    const handleModalImport = () => setModalImport(!modalImport)
+    const onSuccessImport = (data) => {
+        setItem(data.data)
+    }
 
     const deleteItemTable = (e, index) => {
         setItem([...item.filter((v, i) => i !== index)])
@@ -125,28 +132,6 @@ const Form = (props) => {
             return v
         })
         setItem([...temp])
-    }
-
-    const [importLoading, setImportLoading] = useState(false)
-    const handleFileImport = (e) => {
-        e.preventDefault()
-        setImportLoading(true)
-        if (e.target.files) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = e.target.result;
-                const workbook = read(data, { type: "array" });
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const json = utils.sheet_to_json(worksheet);
-                setItem([...json])
-            };
-            reader.onloadend = () => {
-                setImportLoading(false)
-            };
-            reader.readAsArrayBuffer(e.target.files[0]);
-            e.target.value = null;
-        }
     }
 
     const { mutate: save, isLoading: loadingSave, error  } = useSavePOQuotation({
@@ -435,10 +420,9 @@ const Form = (props) => {
                                     isAutoCompleteItem={true}
                                     size='small'
                                 />
-                                <LoadingButton disabled={isApproved} fullWidth loading={importLoading} component='label' sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
-                                    <input type='file' accept='.xlsx' onChange={handleFileImport} id='import' hidden />
+                                <Button onClick={handleModalImport} disabled={isApproved} fullWidth sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     Import
-                                </LoadingButton>
+                                </Button>
                             </Stack>
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -506,7 +490,13 @@ const Form = (props) => {
                     </Grid>
                 </Card>
             </Box>
-
+            <ImportModal 
+                handleClose={handleModalImport}
+                open={modalImport}
+                title='Product PO Keluar Quotation'
+                url={'read-excel/product-price'}
+                onSuccessImport={onSuccessImport}
+            />
         </Stack>
     )
 }

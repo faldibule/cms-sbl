@@ -33,7 +33,7 @@ const ErrorModal = (props) => {
    )
 }
 
-const ImportModal = ({ open, handleClose, url, title, refreshData }) => {
+const ImportModal = ({ open, handleClose, url, title, refreshData = () => {}, onSuccessImport = () => {} }) => {
     const [openModalError, setOpenModalError] = useState(false);
     const [dataError, setDataError] = useState([]);
     const [document, setDocument] = useState({
@@ -41,13 +41,14 @@ const ImportModal = ({ open, handleClose, url, title, refreshData }) => {
         file_url: "",
     });
     const { mutate: upload, isLoading: loadingImport, error } = useImport({
-        onSuccess: () => {
+        onSuccess: (res) => {
             setDocument({
                 file: "",
                 file_url: "",
             })
             handleClose()
             refreshData()
+            onSuccessImport(res)
         },
         onError: (err) => {
             if (err.response) {
