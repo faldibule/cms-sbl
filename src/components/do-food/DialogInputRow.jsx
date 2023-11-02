@@ -7,7 +7,7 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
     const handleShipmentCharge = (value) => setShipmentCharge(NumberFormat(value, 'Rp'))
     const onSubmit = (e) => {
         e.preventDefault()
-        const formElem = document.querySelector('#test') 
+        const formElem = document.querySelector('#formElement') 
         const formData = new FormData(formElem)
         formData.append('shipment_charge', IntegerFormat(shipmentCharge))
         const formObject = Object.fromEntries(formData)
@@ -25,7 +25,7 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
         >
             <DialogTitle>Edit Form {v.name}</DialogTitle>
             <DialogContent>
-                <Grid container id='test' component='form' spacing={2} p={1}>
+                <Grid container id='formElement' component='form' spacing={2} p={1}>
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
