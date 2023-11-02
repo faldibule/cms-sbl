@@ -12,6 +12,9 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     const total = useMemo(() => (price * (v?.quantity || 0)), [price, v.quantity])
     const tax = useMemo(() => {
         let vat = 11
+        if(v?.item_product?.tax !== 'yes'){
+            return 0
+        }
         if(!!v.vat){
             vat = parseInt(v.vat)
         }
@@ -26,12 +29,8 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell>{v?.item_product?.name || v?.item_name || ''}</TableCell>
             <TableCell>{v?.item_product?.brand || v?.item_brand || ''}</TableCell>
+            <TableCell sx={{ minWidth: 150 }} align="left">{v.item_product?.description || v.item_description}</TableCell>
             <TableCell>{v?.item_product?.size || v?.item_size || ''}</TableCell>
-            <TableCell align="left">
-                {
-                    !!v.description ? v.description : !!errors[`item_product.${i}.description`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>Description required</Typography> : ''
-                }
-            </TableCell>
             <TableCell>{v.item_product?.unit?.param || v?.unit || ''}</TableCell>
             <TableCell>
                 {v?.quantity || 0}

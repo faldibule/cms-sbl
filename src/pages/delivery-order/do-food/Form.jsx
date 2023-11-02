@@ -309,8 +309,8 @@ const Form = (props) => {
                                                 <TableCellHeaderColor>No.</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Item Name</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Brand</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Unit</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Quantity</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Action</TableCellHeaderColor>

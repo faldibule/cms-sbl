@@ -3,13 +3,14 @@ import { IntegerFormat, NumberFormat } from "@utils/Format"
 import { useState } from "react"
 
 const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
-    const [shipmentCharge, setShipmentCharge] = useState(v?.shipment_charge || '')
-    const handleShipmentCharge = (value) => setShipmentCharge(NumberFormat(value, 'Rp'))
+    const [price, setPrice] = useState(NumberFormat(v.price || parseInt(v?.item_price), 'Rp'))
+    const handlePrice = (v) => setPrice(NumberFormat(v, 'Rp')) 
+
     const onSubmit = (e) => {
         e.preventDefault()
         const formElem = document.querySelector('#test') 
         const formData = new FormData(formElem)
-        formData.append('shipment_charge', IntegerFormat(shipmentCharge))
+        formData.append('price', IntegerFormat(price))
         const formObject = Object.fromEntries(formData)
         onChangeByIndex(i, formObject)
         handleClose()
@@ -38,19 +39,20 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
+                            label='Price'
+                            name='price'
+                            value={price}
+                            onChange={(e) => handlePrice(e.target.value)}
+                        />  
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
                             name='vat'
                             type='number'
                             label='VAT'
                             defaultValue={v?.vat || 11}
                         /> 
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
-                            label='Weight'
-                            name='weight'
-                            defaultValue={v?.weight}
-                        />  
                     </Grid>
                     <Grid item xs={12} md={12}>
                         <TextField

@@ -482,7 +482,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent discount={discount.value} tax={false} item={item} />
+                            <CustomGrandTotalComponent item={item} discount={discount.value} />
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>

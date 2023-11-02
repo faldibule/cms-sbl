@@ -12,6 +12,9 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     const total = useMemo(() => (price * (v?.quantity || 0)), [price, v.quantity])
     const tax = useMemo(() => {
         let vat = 11
+        if(v?.item_product?.tax !== 'yes'){
+            return 0
+        }
         if(!!v.vat){
             vat = parseInt(v.vat)
         }
@@ -25,9 +28,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
         <TableRow key={i}>
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.name || v?.item_name || ''}</TableCell>
-            <TableCell>
-                {!!v.weight ? v.weight : !!errors[`item_product.${i}.weight`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>Weight required</Typography> : ''}
-            </TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.size || v?.item_size || ''}</TableCell>
             <TableCell>{v.item_product?.unit?.param || v?.unit || ''}</TableCell>
             <TableCell>
                 {v?.quantity || 0}
@@ -36,7 +37,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             <TableCell>
                 {v.vat || 11}%
             </TableCell>
-            <TableCell>{NumberFormat(tax, 'Rp')}</TableCell>
+            <TableCell>{v?.item_product?.tax !== 'yes' ? 'No' : NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
             <TableCell>
