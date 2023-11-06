@@ -56,10 +56,6 @@ const navConfig = [
         path: 'supplier'
       },
       {
-        title: 'Pricelist',
-        path: 'pricelist'
-      },
-      {
         title: 'Customer',
         path: 'customer'
       },

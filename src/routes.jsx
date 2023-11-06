@@ -22,8 +22,10 @@ import AddUserList from './pages/user-management/user-list/Add'
 import EditUserList from './pages/user-management/user-list/Edit'
 
 // Master Data
-// Item Category
 import ItemProduct from './pages/master-data/item-product'
+import AddItemProduct from './pages/master-data/item-product/Add'
+import EditItemProduct from './pages/master-data/item-product/Edit'
+
 import ItemCategory from './pages/master-data/item-category'
 import SiteLocation from './pages/master-data/site-location'
 import CostCenter from './pages/master-data/cost-center'
@@ -135,6 +137,8 @@ export default function Router() {
       children: [
         { path: 'item-category', element: <ItemCategory /> },
         { path: 'item-product', element: <ItemProduct /> },
+        { path: 'item-product/add', element: <AddItemProduct /> },
+        { path: 'item-product/edit/:id', element: <EditItemProduct /> },
         { path: 'site-location', element: <SiteLocation /> },
         { path: 'cost-center', element: <CostCenter /> },
         { path: 'department', element: <Department /> },

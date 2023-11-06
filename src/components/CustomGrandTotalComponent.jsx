@@ -6,13 +6,13 @@ const CustomGrandTotalComponent = ({ item, discount = 0 }) => {
 
     const grand_total = useMemo(() => {
       const temp = item.reduce((sum, v) => {
-          const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.harga)
+          const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
 
           let tax = 0;
-          if(v.item_product?.tax === 'yes'){
+          if(v?.tax === 'yes' || v?.item_product?.tax === 'yes'){
             tax = v.vat ? (price * v.quantity) * parseInt(v.vat) / 100 : 0
           }
-          const total = (price * (v?.quantity || 0)) + tax
+          const total = parseInt((price * (v?.quantity || 0)) + tax)
           return sum + total
           
       }, 0)

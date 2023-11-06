@@ -1,10 +1,20 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Stack, TextField } from "@mui/material"
 import { IntegerFormat, NumberFormat } from "@utils/Format"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
-const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
-    const [price, setPrice] = useState(NumberFormat(v.price || parseInt(v?.item_price), 'Rp'))
+const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i, priceProps }) => {
+    const [price, setPrice] = useState(0)
     const handlePrice = (v) => setPrice(NumberFormat(v, 'Rp'))
+
+    useEffect(() => {
+        let mounted = true
+        if(mounted){
+            handlePrice(priceProps)
+        }
+        
+        return () => mounted = false
+
+    }, [priceProps])
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -24,7 +34,7 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle>Edit Form {v.name}</DialogTitle>
+            <DialogTitle>Edit Form Product PR</DialogTitle>
             <DialogContent>
                 <Grid container id='formElement' component='form' spacing={2} p={1}>
                     <Grid item xs={12} md={12}>

@@ -1,9 +1,11 @@
 import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import http from '@variable/Api'
 import { useMutation } from 'react-query'
+import { useNavigate } from 'react-router-dom'
 
 const useSaveItemProduct = ({ onSuccess }) => {
     const { success } = useCustomSnackbar()
+    const navigate = useNavigate()
     return useMutation({
         mutationFn: async ({ formData, id }) => {
             if(!!id){
@@ -17,6 +19,7 @@ const useSaveItemProduct = ({ onSuccess }) => {
                 const res = await http.post('item-product', formData)
                 success('Success Add Item Product!')
             }
+            navigate('/master-data/item-product')
         },
         onSuccess,
     })

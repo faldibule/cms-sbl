@@ -1,15 +1,11 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Stack, TextField } from "@mui/material"
 import { IntegerFormat, NumberFormat } from "@utils/Format"
-import { useState } from "react"
 
 const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
-    const [shipmentCharge, setShipmentCharge] = useState(v?.shipment_charge || '')
-    const handleShipmentCharge = (value) => setShipmentCharge(NumberFormat(value, 'Rp'))
     const onSubmit = (e) => {
         e.preventDefault()
         const formElem = document.querySelector('#formElement') 
         const formData = new FormData(formElem)
-        formData.append('shipment_charge', IntegerFormat(shipmentCharge))
         const formObject = Object.fromEntries(formData)
         onChangeByIndex(i, formObject)
         handleClose()

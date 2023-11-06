@@ -13,10 +13,10 @@ import Loading from '@components/Loading'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
-import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import useSavePOQuotation from '@hooks/po-quotation/useSavePOQuotation'
 import ImportModal from '@components/ImportModal'
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 
 const Form = (props) => {
     const { data } = props
@@ -108,7 +108,7 @@ const Form = (props) => {
     })
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0 })
+    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0 })
     
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -149,10 +149,12 @@ const Form = (props) => {
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const price = parseInt(v?.price) || parseInt(v?.item_price)
-            const item_product_id = v.item_product?.id
+            const size = v?.size || v?.item_product?.size
+            const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
+            const item_product_id = v?.item_product?.id || v?.id
+
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
-            formData.append(`item_product[${i}][weight]`, v.weight)
+            formData.append(`item_product[${i}][weight]`, size)
             formData.append(`item_product[${i}][item_price]`, price)
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
@@ -219,7 +221,7 @@ const Form = (props) => {
 
     }, [dataDiscount])
 
-    if(loadingSupplier || loadingLocation || loadingDiscount || loadingUser || loadingPricelist){
+    if(loadingSupplier || loadingLocation || loadingDiscount || loadingUser || loadingItemProduct){
         return <Loading />
     }
 
@@ -327,19 +329,6 @@ const Form = (props) => {
                                 {renderDiscountMenuItem()}
                             </TextField> 
                         </Grid>
-                        {/* <Grid item xs={12} md={12}>
-                            <TextField
-                                label="Shipping Address"
-                                fullWidth
-                                multiline
-                                rows={3}
-                                name='shipping_address'
-                                required
-                                defaultValue={data?.shipping_address}
-                                helperText={!!errors?.shipping_address && errors?.shipping_address[0]}
-                                error={!!errors?.shipping_address}
-                            />
-                        </Grid> */}
                         <Grid item xs={12} md={12}>
                             <TextField
                                 disabled={isApproved}       
@@ -410,8 +399,8 @@ const Form = (props) => {
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <CustomAutocomplete 
                                     disabled={isApproved}       
-                                    getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
-                                    options={dataPricelist.data}
+                                    getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
+                                    options={dataItemProduct.data}
                                     label='Item'
                                     inputValue={itemState.input}
                                     setInputValue={handleInputItem}

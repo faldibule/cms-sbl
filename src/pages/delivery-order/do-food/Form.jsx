@@ -8,7 +8,7 @@ import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import { read, utils } from 'xlsx'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import useFetchLocation from '@hooks/location/useFetchLocation'
-import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import Loading from '@components/Loading'
 import useFetchCustomer from '@hooks/customer/useFetchCustomer'
 import useFetchPOMasuk from '@hooks/po-masuk/useFetchPOMasuk'
@@ -78,7 +78,7 @@ const Form = (props) => {
     })
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0 })
+    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0 })
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -117,9 +117,10 @@ const Form = (props) => {
         formData.append('prepared_by', userState.prepared_by.selected?.id)
         formData.append('received_by', userState.received_by.selected?.id)
         item.forEach((v, i) => {
-            const item_product_id = v.item_product?.id
+            const item_product_id = v?.item_product?.id || v?.id
+            const description = v?.description || v?.item_product?.description
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
-            formData.append(`item_product[${i}][description]`, !!v.description ? v.description : '')
+            formData.append(`item_product[${i}][description]`, description)
             formData.append(`item_product[${i}][quantity]`, !!v.quantity ? v.quantity : '')
         })
         save({ formData, id: data?.id })
@@ -273,8 +274,8 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <CustomAutocomplete 
-                                    getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
-                                    options={dataPricelist?.data || []}
+                                    getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
+                                    options={dataItemProduct?.data || []}
                                     label='Item'
                                     inputValue={itemState.input}
                                     setInputValue={handleInputItem}
@@ -282,7 +283,7 @@ const Form = (props) => {
                                     setSelectedValue={handleSelectedItem}
                                     isAutoCompleteItem={true}
                                     size='small'
-                                    disabled={!dataPricelist || dataPricelist?.data?.length === 0}
+                                    disabled={!dataItemProduct || dataItemProduct?.data?.length === 0}
                                 />
                                 <Button onClick={handleModalImport} fullWidth sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     Import

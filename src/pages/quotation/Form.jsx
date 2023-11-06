@@ -10,10 +10,10 @@ import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import useFetchCustomer from '@hooks/customer/useFetchCustomer'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import Loading from '@components/Loading'
-import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
 import ImportModal from '@components/ImportModal'
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 
 const Form = (props) => {
     const { data } = props
@@ -70,7 +70,7 @@ const Form = (props) => {
     })
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0 })
+    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0 })
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -96,7 +96,7 @@ const Form = (props) => {
         setItem([...temp])
     }
 
-    const { mutate: save, isLoading: loadingSave, error  } = useSaveQuotation({
+    const { mutate: save, isLoading: loadingSave, error } = useSaveQuotation({
         onSuccess: () => {}
     })
     const errors = error?.response?.data?.errors
@@ -110,13 +110,15 @@ const Form = (props) => {
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name =  v?.item_product?.name
-            const price = parseInt(v?.price) || parseInt(v?.item_price)
-            const unit = v.item_product?.unit?.param || v?.unit 
-            const item_product_id = v.item_product?.id
+            const name =  v?.name || v?.item_product?.name
+            const size = v?.size || v?.item_product?.size
+            const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
+            const unit = v.item_product?.unit?.param || v?.unit?.param 
+            const item_product_id = v?.item_product?.id || v?.id
+
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
             formData.append(`item_product[${i}][item_name]`, name)
-            formData.append(`item_product[${i}][weight]`, v?.weight)
+            formData.append(`item_product[${i}][weight]`, size)
             formData.append(`item_product[${i}][unit]`, unit)
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][item_price]`, price)
@@ -133,7 +135,6 @@ const Form = (props) => {
             if(!!props.data){
                 handleInputCustomer(`${data?.customer.code} - ${data?.customer.name}`)
                 handleSelectedCustomer(data?.customer)
-
                 setUserState({
                     ...userState,
                     prepared_by: {
@@ -161,7 +162,7 @@ const Form = (props) => {
 
     }, [props?.id])
 
-    if(loadingCustomer || loadingUser || loadingPricelist){
+    if(loadingCustomer || loadingUser || loadingItemProduct){
         return <Loading />
     }
 
@@ -341,8 +342,8 @@ const Form = (props) => {
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <CustomAutocomplete 
                                     disabled={isApproved}       
-                                    getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
-                                    options={dataPricelist.data}
+                                    getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
+                                    options={dataItemProduct.data}
                                     label='Item'
                                     inputValue={itemState.input}
                                     setInputValue={handleInputItem}

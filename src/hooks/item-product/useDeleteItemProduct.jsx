@@ -2,7 +2,7 @@ import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import http from '@variable/Api'
 import { useMutation } from 'react-query'
 
-const useDeleteItemProduct = ({ onSuccess }) => {
+const useDeleteItemProduct = ({ onSuccess, onError }) => {
     const { success } = useCustomSnackbar()
     return useMutation({
         mutationFn: async (id) => {
@@ -10,6 +10,7 @@ const useDeleteItemProduct = ({ onSuccess }) => {
             success('Success Delete Item Product!')
         },
         onSuccess,
+        onError,
     })
 }
 

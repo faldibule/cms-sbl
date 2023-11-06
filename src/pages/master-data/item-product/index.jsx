@@ -11,6 +11,12 @@ import useDeleteItemProduct from '@hooks/item-product/useDeleteItemProduct';
 import useSaveItemProduct from '@hooks/item-product/useSaveItemProduct';
 import useFetchItemCategory from '@hooks/item-category/useFetchItemCategory';
 import useFetchUnit from '@hooks/unit/useFetchUnit';
+import CustomLinkComponent from '@components/CustomLinkComponent';
+import { Link } from 'react-router-dom';
+import Iconify from '@components/Iconify';
+import ImportModal from '@components/ImportModal';
+import { NumberFormat } from '@utils/Format';
+import useCustomSnackbar from '@hooks/useCustomSnackbar';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -21,50 +27,7 @@ const index = () => {
     })
     const { data: rows, refetch, isFetchedAfterMount } = useFetchItemProduct(params)
 
-    // Unit 
-    const { data: unitData, isLoading: loadingUnit } = useFetchUnit({ paginate: 0 })
-
-    // Category & Sub Category
-    const [category, setCategory] = useState('')
-    const { data: itemCategory, isLoading: loadingCategory } = useFetchItemCategory({ paginate: 0 })
-    const handleCategory = (e) => setCategory(e.target.value)
-    const filteredDataParentCategory = useMemo(() => {
-        const temp = itemCategory?.data.filter(v => {
-            return !!!v.parent_category?.id
-        })
-        return !!temp ? temp : []
-    }, [itemCategory]) 
-    const filteredDataChildCategory = useMemo(() => {
-        if(category === '') return []
-        const temp = itemCategory?.data.filter(v => {
-            return !!v.parent_category?.id && v.parent_category?.id === category
-        })
-        return !!temp ? temp : []
-    }, [itemCategory, category]) 
-    const renderInputParentCategory = () => {
-        if(filteredDataParentCategory.length === 0){
-            return (
-                <MenuItem value='' disabled>Kosong</MenuItem>
-            )
-        }
-        return filteredDataParentCategory.map((v) => {
-            return (
-                <MenuItem key={v.id} value={v.id}>{v.category_code} - {v.category}</MenuItem>
-            )
-        })
-    }
-    const renderInputChildCategory = () => {
-        if(filteredDataChildCategory.length === 0){
-            return (
-                <MenuItem value='' disabled>Kosong</MenuItem>
-            )
-        }
-        return filteredDataChildCategory.map((v) => {
-            return (
-                <MenuItem key={v.id} value={v.id}>{v.category_code} - {v.category}</MenuItem>
-            )
-        })
-    }
+    const { failed } = useCustomSnackbar()
 
     // Handle Page
     const handleChangePage = (event, newPage) => {
@@ -96,14 +59,9 @@ const index = () => {
             setLoading(false)
         }, 0);
     }
-    const handleEdit = (data) => {
-        setLoading(true)
-        setTimeout(() => {
-            setStaging(data)
-            setCategory(data.item_category.id)
-            setLoading(false)
-        }, 500);
-    }
+    
+    const [modalImport, setModalImport] = useState(false)
+    const handleModalImport = () => setModalImport(!modalImport)
     
     // Handle Dialog Delete
     const [open, setOpen] = useState(false)
@@ -115,29 +73,21 @@ const index = () => {
         if(!!!id) return;
         setStaging({ id })
     }
-    const { mutate: deleteDepartment, isLoading: loadingDelete } = useDeleteItemProduct({
+    const { mutate: deleteItemProduct, isLoading: loadingDelete } = useDeleteItemProduct({
         onSuccess: () => {
             handleReset()
             refetch()
             handleClose()
+        },
+        onError: (err) => {
+            if(err.response.status === 500){
+                failed('Unable to delete this Item Product!')
+            }
+            handleClose()
         }
     })
     const handleDelete = async () => {
-        deleteDepartment(staging?.id)
-    }
-
-    // HandleSubmit
-    const { mutate: save, isLoading: loadingSave, error } = useSaveItemProduct({
-        onSuccess: () => {
-            handleReset()
-            refetch()
-        }
-    })
-    const errors = error?.response?.data?.errors
-    const onSubmit = (e) => {
-        e.preventDefault()
-        const formData = new FormData(e.target)
-        save({ formData, id: staging?.id })
+        deleteItemProduct(staging?.id)
     }
 
     // HandleTable
@@ -202,39 +152,28 @@ const index = () => {
                     {rows.meta.from+key}.
                 </TableCell>
                 <TableCell>
-                    {value.code}
+                    <CustomLinkComponent label={value.code} url={`/master-data/item-product/edit/${value.id}`} />
                 </TableCell>
                 <TableCell>
                     {value.name}
+                </TableCell>
+                <TableCell>
+                    {NumberFormat(value.price, 'Rp')}
+                </TableCell>
+                <TableCell>
+                    {value.supplier.name}
                 </TableCell>
                 <TableCell>
                     {value.tax}
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 
-                        edit={true}
-                        handleEdit={() => handleEdit(value)}
                         handleDelete={() => handleClose(value.id)}
                     />
                 </TableCell>                                                             
             </TableRow>
         ))
     }, [rows])
-
-    const renderUnitMenuItem = useCallback(() => {
-        if(loadingUnit) return null
-        if(unitData.length === 0 ){
-            return (
-                <MenuItem value='' disabled>Kosong</MenuItem>
-            )
-        }
-        return unitData.map((v) => {
-            return (
-                <MenuItem key={v.id} value={v.id}>{v.param}</MenuItem>
-            )
-        })
-
-    }, [unitData])
 
     return (
         <Page title='Item Product'>
@@ -245,9 +184,13 @@ const index = () => {
                             <Typography variant='h4' mb={3}>
                                 Item Product
                             </Typography>
+                            <Stack direction='row' spacing={1}>
+                                <Button variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />} LinkComponent={Link} to='/master-data/item-product/add'>Input</Button>
+                                <Button variant='contained' onClick={handleModalImport} startIcon={<Iconify icon='uil:import' />}>Import</Button>
+                            </Stack>
                         </Stack>
                     </Grid>
-                    <Grid item xs={12} md={7}>
+                    <Grid item xs={12}>
                         <Card>
                             <CardContent>
                                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
@@ -271,6 +214,8 @@ const index = () => {
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Code</TableCell>
                                                 <TableCell>Name</TableCell>
+                                                <TableCell>Price</TableCell>
+                                                <TableCell>Supplier</TableCell>
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
@@ -300,150 +245,19 @@ const index = () => {
                             </CardContent>
                         </Card>
                     </Grid>
-                    <Grid item xs={12} md={5}>
-                        <Card sx={{ p: 2 }}>
-                            <Typography mb={3} variant='h6'>
-                                {!!staging.id ? 'Form Edit Item Product' : 'Form Add Item Product'}
-                            </Typography>
-                            {!loading ? 
-                                <Grid container spacing={2} component='form' onSubmit={onSubmit}>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Code'
-                                            name='code'
-                                            defaultValue={staging?.code}
-                                            required
-                                            helperText={!!errors?.code && errors?.code[0]}
-                                            error={!!errors?.code}
-                                        /> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Name'
-                                            name='name'
-                                            defaultValue={staging?.name}
-                                            required
-                                            helperText={!!errors?.name && errors?.name[0]}
-                                            error={!!errors?.name}
-                                        /> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Brand'
-                                            name='brand'
-                                            defaultValue={staging?.brand}
-                                            required
-                                            helperText={!!errors?.brand && errors?.brand[0]}
-                                            error={!!errors?.brand}
-                                        /> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Size'
-                                            name='size'
-                                            defaultValue={staging?.size}
-                                            required
-                                            helperText={!!errors?.size && errors?.size[0]}
-                                            error={!!errors?.size}
-                                        /> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            disabled={loadingCategory}
-                                            fullWidth 
-                                            label='Category'
-                                            select
-                                            name='item_category_id'
-                                            value={category}
-                                            onChange={handleCategory}
-                                            required
-                                            helperText={!!errors?.item_category_id && errors?.item_category_id[0]}
-                                            error={!!errors?.item_category_id}
-                                        >
-                                            {renderInputParentCategory()}
-                                        </TextField> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            disabled={category === ''}
-                                            fullWidth 
-                                            label='Sub Category'
-                                            select
-                                            name='sub_item_category_id'
-                                            defaultValue={staging?.sub_item_category?.id || ''}
-                                            required
-                                            helperText={!!errors?.sub_item_category_id && errors?.sub_item_category_id[0]}
-                                            error={!!errors?.sub_item_category_id}
-                                        >
-                                            {renderInputChildCategory()}
-                                        </TextField> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Unit'
-                                            select
-                                            name='unit_id'
-                                            defaultValue={staging?.unit?.id || ''}
-                                            required
-                                            helperText={!!errors?.unit_id && errors?.unit_id[0]}
-                                            error={!!errors?.unit_id}
-                                            disabled={loadingUnit}
-                                        >
-                                            {renderUnitMenuItem()} 
-                                        </TextField> 
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Tax'
-                                            select
-                                            name='tax'
-                                            defaultValue={staging?.tax}
-                                            required
-                                            helperText={!!errors?.tax && errors?.tax[0]}
-                                            error={!!errors?.tax}
-                                        >
-                                            <MenuItem value='yes'>Yes</MenuItem>
-                                            <MenuItem value='no'>No</MenuItem>
-                                        </TextField> 
-                                    </Grid>
-                                    <Grid item xs={12} md={12}>
-                                        <TextField
-                                            fullWidth 
-                                            label='Description'
-                                            name='description'
-                                            defaultValue={staging?.description}
-                                            required
-                                            multiline
-                                            rows={2}
-                                            helperText={!!errors?.description && errors?.description[0]}
-                                            error={!!errors?.description}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={12}>
-                                        <Stack direction='row' spacing={2}>
-                                            <LoadingButton loading={loadingSave} fullWidth variant='contained' type='submit'>
-                                                Submit
-                                            </LoadingButton>
-                                            <Button variant='outlined' onClick={handleReset} fullWidth>Reset</Button>
-                                        </Stack>
-                                    </Grid>
-                                </Grid>
-                            : <Loading />
-                            }
-                        </Card>
-                    </Grid>
                     <Grid item xs={12} md={12}>
                         <DeleteDialog 
                             handleClose={handleClose}
                             handleDelete={handleDelete}
                             open={open}
                             loading={loadingDelete}
+                        />
+                        <ImportModal 
+                            handleClose={handleModalImport}
+                            open={modalImport}
+                            title='Item Product & Category'
+                            url={'item-product/import-category-product-price'}
+                            refreshData={refetch}
                         />
                     </Grid>
                 </Grid>

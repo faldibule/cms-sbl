@@ -4,16 +4,15 @@ import React, { useEffect, useMemo, useState } from 'react'
 import Iconify from '@components/Iconify'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import TableInputRow from '@components/input-purchase-request/TableInputRow'
-import { read, utils } from 'xlsx'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import Loading from '@components/Loading'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import useSavePurchaseRequest from '@hooks/purchase-request/useSavePurchaseRequest'
 import useFetchUser from '@hooks/user-list/useFetchUser'
-import useFetchPricelist from '@hooks/pricelist/useFetchPricelist'
 import { useNavigate } from 'react-router-dom'
 import ImportModal from '@components/ImportModal'
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 
 const Form = (props) => {
     const { data } = props
@@ -70,13 +69,13 @@ const Form = (props) => {
     })
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataPricelist, isLoading: loadingPricelist } = useFetchPricelist({ paginate: 0, location_id: locationState.selected?.id || '' }, { enabled: !!locationState.selected?.id })
+    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0, location_id: locationState.selected?.id || '' }, { enabled: !!locationState.selected?.id })
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
     const handleModalImport = () => setModalImport(!modalImport)
     const onSuccessImport = (data) => {
-        setItem(data.data)
+        setItem([...data.data])
     }
 
     const onChangeByIndex = (index, object) => {
@@ -110,12 +109,13 @@ const Form = (props) => {
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name =  v?.item_product?.name
-            const brand = v?.item_product?.brand
-            const size = v?.item_product?.size
-            const price = parseInt(v?.price) || parseInt(v?.item_price)
-            const unit = v.item_product?.unit?.param || v?.unit 
-            const item_product_id = v.item_product?.id
+            const name =  v?.name || v?.item_product?.name
+            const brand = v?.brand || v?.item_product?.brand
+            const size = v?.size || v?.item_product?.size
+            const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
+            const unit = v.item_product?.unit?.param || v?.unit?.param 
+            const item_product_id = v?.item_product?.id || v?.id
+
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
             formData.append(`item_product[${i}][item_name]`, name)
             formData.append(`item_product[${i}][item_brand]`, brand)
@@ -299,8 +299,8 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='center' alignItems='center' spacing={1}>
                                 <CustomAutocomplete 
-                                    getOptionLabel={(opt) => `${opt.item_product.code} - ${opt.item_product.name}`}
-                                    options={dataPricelist?.data || []}
+                                    getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
+                                    options={dataItemProduct?.data || []}
                                     label='Item'
                                     inputValue={itemState.input}
                                     setInputValue={handleInputItem}
@@ -308,7 +308,7 @@ const Form = (props) => {
                                     setSelectedValue={handleSelectedItem}
                                     isAutoCompleteItem={true}
                                     size='small'
-                                    disabled={!dataPricelist || dataPricelist?.data?.length === 0 || isApproved}
+                                    disabled={!dataItemProduct || dataItemProduct?.data?.length === 0 || isApproved}
                                 />
                                 <Button onClick={handleModalImport} disabled={isApproved} fullWidth sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     Import

@@ -3,41 +3,33 @@ import { Stack, TableCell, TableRow, Typography } from "@mui/material"
 import { useMemo, useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 import { NumberFormat } from "@utils/Format"
+import useValueConverter from "@hooks/useValueConverter"
 
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved = false }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
 
-    const price = useMemo(() => parseInt(v?.price) || parseInt(v?.item_price), [v?.price, v?.item_price])
-    const total = useMemo(() => (price * (v?.quantity || 0)), [price, v.quantity])
-    const tax = useMemo(() => {
-        let vat = 11
-        if(v?.item_product?.tax !== 'yes'){
-            return 0
-        }
-        if(!!v.vat){
-            vat = parseInt(v.vat)
-        }
-        return total * vat / 100
-    }, [total, v.vat])
-    const grand_total = useMemo(() => {
-        return total + (isNaN(tax) ? 0 : tax)
-    }, [total, tax])
+    const { valueMemo, tax, total, grand_total } = useValueConverter(v) 
 
     return (
         <TableRow key={i}>
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.name || v?.item_name || ''}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{v?.item_product?.size || v?.item_size || ''}</TableCell>
-            <TableCell>{v.item_product?.unit?.param || v?.unit || ''}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>
+                {valueMemo.name}
+                {
+                    !!errors[`item_product.${i}.item_product_id`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>(duplicate)</Typography> : ''
+                }
+            </TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{valueMemo.size}</TableCell>
+            <TableCell>{valueMemo.size}</TableCell>
             <TableCell>
                 {v?.quantity || 0}
             </TableCell>
-            <TableCell>{NumberFormat(price, 'Rp')}</TableCell>
+            <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
             <TableCell>
                 {v.vat || 11}%
             </TableCell>
-            <TableCell>{v?.item_product?.tax !== 'yes' ? 'No' : NumberFormat(tax, 'Rp')}</TableCell>
+            <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
             <TableCell>
@@ -60,6 +52,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                     v={v} 
                     onChangeByIndex={onChangeByIndex}
                     i={i}
+                    priceProps={valueMemo.price}
                 />
             </TableCell>
         </TableRow>
