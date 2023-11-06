@@ -28,6 +28,7 @@ import EditItemProduct from './pages/master-data/item-product/Edit'
 
 import ItemCategory from './pages/master-data/item-category'
 import SiteLocation from './pages/master-data/site-location'
+import Client from './pages/master-data/client'
 import CostCenter from './pages/master-data/cost-center'
 import Department from './pages/master-data/department'
 import Supplier from './pages/master-data/supplier'
@@ -139,6 +140,7 @@ export default function Router() {
         { path: 'item-product', element: <ItemProduct /> },
         { path: 'item-product/add', element: <AddItemProduct /> },
         { path: 'item-product/edit/:id', element: <EditItemProduct /> },
+        { path: 'client', element: <Client /> },
         { path: 'site-location', element: <SiteLocation /> },
         { path: 'cost-center', element: <CostCenter /> },
         { path: 'department', element: <Department /> },

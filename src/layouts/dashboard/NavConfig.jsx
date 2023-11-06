@@ -40,6 +40,10 @@ const navConfig = [
         path: 'item-product'
       },
       {
+        title: 'Client',
+        path: 'client'
+      },
+      {
         title: 'Site Location',
         path: 'site-location'
       },
