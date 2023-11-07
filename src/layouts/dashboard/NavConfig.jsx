@@ -131,8 +131,8 @@ const navConfig = [
     path: '/meal-sheet',
     children: [
       {
-        title: 'Sheet Detail',
-        path: 'sheet-detail'
+        title: 'Meal Sheet Group',
+        path: 'group'
       },
     ]
   },

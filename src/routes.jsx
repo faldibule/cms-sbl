@@ -76,9 +76,10 @@ import AddDeliveryOrderFood from './pages/delivery-order/do-food/Add'
 import EditDeliveryOrderFood from './pages/delivery-order/do-food/Edit'
 
 // Sheet Detail
-import SheetDetail from './pages/meal-sheet/sheet-detail'
-import MealSheetDaily from './pages/meal-sheet/sheet-detail/meal-sheet-daily'
-import AddMealSheetDaily from './pages/meal-sheet/sheet-detail/meal-sheet-daily/Add'
+import MealSheatGroup from './pages/meal-sheet-group'
+import AddMealSheatGroup from './pages/meal-sheet-group/Add'
+import EditMealSheatGroup from './pages/meal-sheet-group/Edit'
+import MealSheetDaily from './pages/meal-sheet-daily'
 
 // File Management
 import FileManagement from './pages/file-management/Edit'
@@ -230,9 +231,13 @@ export default function Router() {
         <DashboardLayout />,
       </Middleware.After>,
       children: [
-        { path: 'sheet-detail', element: <SheetDetail /> },
-        { path: 'sheet-detail/:id/meal-sheet-daily', element: <MealSheetDaily /> },
-        { path: 'sheet-detail/:id/meal-sheet-daily/add', element: <AddMealSheetDaily /> },
+        { path: 'group', element: <MealSheatGroup /> },
+        { path: 'group/add', element: <AddMealSheatGroup /> },
+        { path: 'group/edit/:id', element: <EditMealSheatGroup /> },
+
+        { path: 'daily/:group_id', element: <MealSheetDaily /> },
+
+        { path: 'detail/:daily_id', element: <MealSheetDaily /> },
       ],
     },
     {
