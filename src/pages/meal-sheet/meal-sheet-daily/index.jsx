@@ -27,14 +27,6 @@ for(let i = 0; i < 15; i++){
 
 }
 
-const CheckStatusComponent = ({ data }) => {
-    if(data){
-        return <Iconify icon='mdi:check-bold' sx={{ color: 'green', fontSize: '1rem' }} />
-    }
-    return <Iconify icon='mingcute:close-fill' sx={{ color: 'red', fontSize: '1rem' }} />
-
-}
-
 const index = () => {
     const { group_id } = useParams()
     const [params, setParams] = useState({

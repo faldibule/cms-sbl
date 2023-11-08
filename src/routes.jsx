@@ -76,10 +76,14 @@ import AddDeliveryOrderFood from './pages/delivery-order/do-food/Add'
 import EditDeliveryOrderFood from './pages/delivery-order/do-food/Edit'
 
 // Sheet Detail
-import MealSheatGroup from './pages/meal-sheet-group'
-import AddMealSheatGroup from './pages/meal-sheet-group/Add'
-import EditMealSheatGroup from './pages/meal-sheet-group/Edit'
-import MealSheetDaily from './pages/meal-sheet-daily'
+import MealSheatGroup from './pages/meal-sheet/meal-sheet-group'
+import AddMealSheatGroup from './pages/meal-sheet/meal-sheet-group/Add'
+import EditMealSheatGroup from './pages/meal-sheet/meal-sheet-group/Edit'
+
+import MealSheetDaily from './pages/meal-sheet/meal-sheet-daily'
+
+import MealSheetDetail from './pages/meal-sheet/meal-sheet-detail'
+import AddMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Add'
 
 // File Management
 import FileManagement from './pages/file-management/Edit'
@@ -237,7 +241,9 @@ export default function Router() {
 
         { path: 'daily/:group_id', element: <MealSheetDaily /> },
 
-        { path: 'detail/:daily_id', element: <MealSheetDaily /> },
+        { path: 'detail/:daily_id', element: <MealSheetDetail /> },
+        { path: 'detail/:daily_id/add', element: <AddMealSheetDetail /> },
+        { path: 'detail/:daily_id/edit/:id', element: <MealSheetDetail /> },
       ],
     },
     {

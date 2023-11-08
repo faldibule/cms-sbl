@@ -123,7 +123,6 @@ const index = () => {
                     </TableCell>
                     <TableCell>
                         {value.location.location}
-                        {/* <CustomLinkComponent label={value.location.location} url={`/meal-sheet/group/edit/${value.id}`} /> */}
                     </TableCell>
                     <TableCell>
                         {value.client[0].client_name}
