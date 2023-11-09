@@ -22,7 +22,7 @@ const index = () => {
         search: '',
         paginate: 1,
         meal_sheet_group_id: group_id,
-        meal_sheet_date: moment(new Date()).format('yyyy/MM/DD')
+        meal_sheet_date: ''
     })
     const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetDaily(params)
     const handleChangePage = (event, newPage) => {
