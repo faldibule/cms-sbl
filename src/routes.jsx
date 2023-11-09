@@ -84,6 +84,7 @@ import MealSheetDaily from './pages/meal-sheet/meal-sheet-daily'
 
 import MealSheetDetail from './pages/meal-sheet/meal-sheet-detail'
 import AddMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Add'
+import EditMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Edit'
 
 // File Management
 import FileManagement from './pages/file-management/Edit'
@@ -241,9 +242,9 @@ export default function Router() {
 
         { path: 'daily/:group_id', element: <MealSheetDaily /> },
 
-        { path: 'detail/:daily_id', element: <MealSheetDetail /> },
-        { path: 'detail/:daily_id/add', element: <AddMealSheetDetail /> },
-        { path: 'detail/:daily_id/edit/:id', element: <MealSheetDetail /> },
+        { path: 'detail/:group_id/:daily_id', element: <MealSheetDetail /> },
+        { path: 'detail/:group_id/:daily_id/add', element: <AddMealSheetDetail /> },
+        { path: 'detail/:group_id/:daily_id/edit/:id', element: <EditMealSheetDetail /> },
       ],
     },
     {

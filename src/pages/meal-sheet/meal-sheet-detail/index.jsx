@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Breadcrumbs, Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Link, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
 import Iconify from '@components/Iconify';
 import CustomSearchComponent from '@components/CustomSearchComponent';
@@ -10,20 +10,21 @@ import { authentication } from '@recoil/Authentication';
 import DeleteDialog from '@components/DeleteDialog';
 import Loading from '@components/Loading';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import useFetchMealSheetGroup from '@hooks/meal-sheet-group/useFetchMealSheetGroup';
-import useDeleteMealSheetGroup from '@hooks/meal-sheet-group/useDeleteMealSheetGroup';
+import useFetchMealSheetDetail from '@hooks/meal-sheet-detail/useFetchMealSheetDetail';
+import useDeleteMealSheetDetail from '@hooks/meal-sheet-detail/useDeleteMealSheetDetail';
 
 const index = () => {
     const navigate = useNavigate()
-    const { daily_id } = useParams()
+    const { daily_id, group_id } = useParams()
     const { user } = useRecoilValue(authentication)
     const [params, setParams] = useState({
         page: 1,
         limit: 5,
         search: '',
         paginate: 1,
+        meal_sheet_daily_id: daily_id,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetGroup(params)
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetDetail(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -50,14 +51,14 @@ const index = () => {
         setStaging({ id })
     }
 
-    const { mutate: deleteMealSheetGroup, isLoading: loadingDelete } = useDeleteMealSheetGroup({
+    const { mutate: deleteMealSheetDetail, isLoading: loadingDelete } = useDeleteMealSheetDetail({
         onSuccess: () => {
             refetch()
             handleClose()
         }
     })
     const handleDelete = async () => {
-        deleteMealSheetGroup(staging?.id)
+        deleteMealSheetDetail(staging?.id)
     }
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
@@ -120,25 +121,32 @@ const index = () => {
                         scope="row"
                         align="center"
                     >
-                        {rows.meta.from+key}.
+                        {key + 1}.
                     </TableCell>
                     <TableCell>
-                        {value.location.location}
+                        <CustomLinkComponent 
+                            label={value.client.client_name}
+                            url={`/meal-sheet/detail/${group_id}/${daily_id}/edit/${value.id}`}
+                        />
                     </TableCell>
                     <TableCell>
-                        {value.client[0].client_name}
+                        {value.mandays}
                     </TableCell>
                     <TableCell>
-                        {value.client[1].client_name}
+                        {value.meal_sheet_daily.contract_value}
                     </TableCell>
                     <TableCell>
-                        <CustomLinkComponent label='View' url={`/meal-sheet/daily/${value.id}`} />
+                        {value.casual_breakfast}
+                    </TableCell>
+                    <TableCell>
+                        {value.casual_lunch}
+                    </TableCell>
+                    <TableCell>
+                        {value.casual_dinner}
                     </TableCell>
                     <TableCell>
                         <CustomActionTableComponent 
                             handleDelete={() => handleClose(value.id)}
-                            edit={true}
-                            handleEdit={() => navigate(`/meal-sheet/group/edit/${value.id}`)}
                         />
                     </TableCell>                                                             
                 </TableRow>
@@ -152,8 +160,15 @@ const index = () => {
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>Meal Sheet detail</Typography>
-                            <Button onClick={() => navigate(`/meal-sheet/detail/${daily_id}/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Stack spacing={1} mb={3}>
+                                <Typography variant='h4'>Meal Sheet Detail</Typography>
+                                <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
+                                    <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
+                                    <Link underline="hover" color="inherit" href={`/meal-sheet/daily/${group_id}`}>Meal Sheet Daily</Link>
+                                    <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Meal Sheet Detail</Typography>
+                                </Breadcrumbs>
+                            </Stack>
+                            <Button onClick={() => navigate(`/meal-sheet/detail/${group_id}/${daily_id}/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>
@@ -180,10 +195,12 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>Location</TableCell>
-                                                <TableCell>Client 1</TableCell>
-                                                <TableCell>Client 2</TableCell>
-                                                <TableCell>Meal Sheet Daily</TableCell>
+                                                <TableCell>Client Name</TableCell>
+                                                <TableCell>Mandays</TableCell>
+                                                <TableCell>As Contract</TableCell>
+                                                <TableCell>Casual Breakfast</TableCell>
+                                                <TableCell>Casual Lunch</TableCell>
+                                                <TableCell>Casual Dinner</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -192,23 +209,7 @@ const index = () => {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                {rows !== undefined && rows.data.length > 0 && (
-                                    <TablePagination
-                                        component="div"
-                                        count={rows.meta.total}
-                                        page={params.page - 1}
-                                        rowsPerPage={params.limit}
-                                        onPageChange={handleChangePage}
-                                        onRowsPerPageChange={
-                                            handleChangeRowsPerPage
-                                        }
-                                        rowsPerPageOptions={[
-                                            1, 5, 10, 25, 50, 100,
-                                        ]}
-                                        showFirstButton
-                                        showLastButton
-                                    />
-                                )}
+                                
                             </CardContent>
                         </Card>
                     </Grid>

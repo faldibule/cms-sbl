@@ -12,7 +12,7 @@ const CheckStatusComponent = ({ isChecked }) => {
     return <Iconify icon='mingcute:close-fill' sx={{ color: 'red', fontSize: '1rem' }} />
 }
 
-const exceptProperti = ['name', 'position']
+const exceptProperti = ['name', 'position', 'company']
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
@@ -21,6 +21,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
         return {
             name: v.name, 
             position: v.position, 
+            company: v.company, 
             breakfast: v.breakfast, 
             lunch: v.lunch, 
             casual: v.casual, 
@@ -32,7 +33,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     const total = useMemo(() => {
         let onCount = 0;
         for (const key in valueMemo) {
-            if (valueMemo[key] === "on" && !exceptProperti.includes(key)) {
+            if ((valueMemo[key] === "on" || valueMemo[key] === 1)  && !exceptProperti.includes(key)) {
                 onCount++;
             }
         }
@@ -44,6 +45,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{valueMemo.name}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{valueMemo.position}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{valueMemo.company}</TableCell>
             <TableCell>
                 <CheckStatusComponent isChecked={!!valueMemo.breakfast} />
             </TableCell>
@@ -57,23 +59,16 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 <CheckStatusComponent isChecked={!!valueMemo.super} />
             </TableCell>
             <TableCell>
-                <CheckStatusComponent isChecked={!!valueMemo.casual} />
-            </TableCell>
-            <TableCell>
                 <CheckStatusComponent isChecked={!!valueMemo.acomodation} />
             </TableCell>
             <TableCell>
                 {total}
             </TableCell>
             <TableCell align='center'>
-                {isApproved ?
-                    '-'
-                :
-                    <Stack direction='row' spacing={2}>
-                        <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
-                        <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                    </Stack>
-                }
+                <Stack direction='row' spacing={2}>
+                    <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
+                    <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
+                </Stack>
                 <DialogInputRow 
                     handleClose={handleClose} 
                     open={open} 

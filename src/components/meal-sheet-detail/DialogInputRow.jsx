@@ -39,18 +39,25 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                             defaultValue={v?.position}
                         />  
                     </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
+                            label='Company'
+                            name='company'
+                            defaultValue={v?.company}
+                        />  
+                    </Grid>
                     <Grid item xs={12} md={6}>
                         <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
-                            <FormControlLabel name="breakfast" control={<Checkbox defaultChecked={v?.breakfast}  />} label="Breakfast" />
-                            <FormControlLabel name="lunch" control={<Checkbox defaultChecked={v?.lunch}  />} label="Lunch" />
-                            <FormControlLabel name="casual" control={<Checkbox defaultChecked={v?.casual}  />} label="Casual" />
+                            <FormControlLabel control={<Checkbox defaultChecked={v?.breakfast}  name="breakfast" />} label="Breakfast" />
+                            <FormControlLabel control={<Checkbox defaultChecked={v?.lunch}  name="lunch" />} label="Lunch" />
+                            <FormControlLabel control={<Checkbox defaultChecked={v?.acomodation}  name="acomodation" />} label="Acomodation" />
                         </FormGroup>
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
-                            <FormControlLabel name="dinner" control={<Checkbox defaultChecked={v?.dinner}  />} label="Dinner" />
-                            <FormControlLabel name="super" control={<Checkbox defaultChecked={v?.super}  />} label="Super" />
-                            <FormControlLabel name="acomodation" control={<Checkbox defaultChecked={v?.acomodation}  />} label="Acomodation" />
+                            <FormControlLabel control={<Checkbox defaultChecked={v?.dinner}  name="dinner" />} label="Dinner" />
+                            <FormControlLabel control={<Checkbox defaultChecked={v?.super}  name="super" />} label="Super" />
                         </FormGroup>
                     </Grid>
                 </Grid>

@@ -1,38 +1,34 @@
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
+import { Box, Breadcrumbs, Button, Card, Grid, IconButton, InputAdornment, Link, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
 import React, { useEffect, useMemo, useState } from 'react'
 import Iconify from '@components/Iconify'
-import { useNavigate } from 'react-router-dom'
-import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
+import { useNavigate, useParams } from 'react-router-dom'
 import TableInputRow from '@components/meal-sheet-detail/TableInputRow'
-import { read, utils } from 'xlsx'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import useFetchCustomer from '@hooks/customer/useFetchCustomer'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import Loading from '@components/Loading'
-import CustomAutocomplete from '@components/CustomAutocomplete'
-import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
 import ImportModal from '@components/ImportModal'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import DialogInputRow from '@components/meal-sheet-detail/DialogInputRow'
+import useSaveMealSheetDetail from '@hooks/meal-sheet-detail/useSaveMealSheetDetail'
+import useFetchMealSheetDailyById from '@hooks/meal-sheet-daily/useFetchMealSheetDailyById'
+import CustomAutocomplete from '@components/CustomAutocomplete'
 
 const Form = (props) => {
     const { data } = props
-    const isApproved = useMemo(() => {
-        if(!!!data) return false
-        return data.status === 'finish'
-    }, [data])
 
+    const { daily_id, group_id } = useParams()
     const navigate = useNavigate()
     const [item, setItem] = useState([])
 
-    const [customerState, setCustomerState] = useState({
+    const [clientState, setClientState] = useState({
         input: '',
         selected: null
     })
-    const handleSelectedCustomer = (value) => setCustomerState({ ...customerState, selected: value })
-    const handleInputCustomer = (value) => setCustomerState({ ...customerState, input: value })
-    const { data: dataCustomer, isLoading: loadingCustomer } = useFetchCustomer({ paginate: 0 })
+    const handleSelectedClient = (value) => setClientState({ ...clientState, selected: value })
+    const handleInputClient = (value) => setClientState({ ...clientState, input: value })
+    const { data: dataClient, isLoading: loadingClient } = useFetchMealSheetDailyById(daily_id)
 
     const [userState, setUserState] = useState({
         prepared_by: {
@@ -105,14 +101,33 @@ const Form = (props) => {
         setItem([...item, object])
     }
 
-    const { mutate: save, isLoading: loadingSave, error } = useSaveQuotation({
-        onSuccess: () => {}
+    const { mutate: save, isLoading: loadingSave, error } = useSaveMealSheetDetail({
+        onSuccess: () => {
+            navigate(`/meal-sheet/detail/${group_id}/${daily_id}`)
+        }
     })
     const errors = error?.response?.data?.errors
 
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
+        formData.append('meal_sheet_daily_id', daily_id)
+        formData.append('client_id', clientState.selected?.id)
+        item.forEach((v, i) => {
+            const breakfast = (v.breakfast === 'on') || (v.breakfast === 1)  ? 1 : 0
+            const lunch = (v.lunch === 'on') || (v.lunch === 1)  ? 1 : 0
+            const dinner = (v.dinner === 'on') || (v.dinner === 1)  ? 1 : 0
+            const superTemp = (v.super === 'on') || (v.super === 1)  ? 1 : 0
+            const accomodation = (v.accomodation === 'on') || (v.accomodation === 1)  ? 1 : 0
+            formData.append(`meal_sheet_record[${i}][name]`, v.name)
+            formData.append(`meal_sheet_record[${i}][position]`, v.position)
+            formData.append(`meal_sheet_record[${i}][company]`, v.company)
+            formData.append(`meal_sheet_record[${i}][breakfast]`, breakfast)
+            formData.append(`meal_sheet_record[${i}][lunch]`, lunch)
+            formData.append(`meal_sheet_record[${i}][dinner]`, dinner)
+            formData.append(`meal_sheet_record[${i}][super]`, superTemp)
+            formData.append(`meal_sheet_record[${i}][accomodation]`, accomodation)
+        })
         save({ formData, id: data?.id })
     }
 
@@ -120,7 +135,11 @@ const Form = (props) => {
         let mounted = true
         if(mounted){
             if(!!props.data){
-                
+                setClientState({
+                    input: data.client.client_name,
+                    selected: data.client
+                })
+                setItem([...data.meal_sheet_record])
             }
         }
 
@@ -128,7 +147,7 @@ const Form = (props) => {
 
     }, [props?.id])
 
-    if(loadingCustomer || loadingUser || loadingItemProduct){
+    if(loadingClient || loadingUser || loadingItemProduct){
         return <Loading />
     }
 
@@ -136,9 +155,19 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input Meal Sheet Detail' : 'Form Edit Meal Sheet Detail' }
-                    </Typography>
+                    <Stack spacing={1}>
+                        <Typography variant='h5'>                       
+                            {props.title === 'add' ? 'Form Input Meal Sheet Detail' : 'Form Edit Meal Sheet Detail' }
+                        </Typography>
+                        <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
+                            <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
+                            <Link underline="hover" color="inherit" href={`/meal-sheet/daily/${group_id}`}>Meal Sheet Daily</Link>
+                            <Link underline="hover" color="inherit" href={`/meal-sheet/detail/${group_id}/${daily_id}`}>Meal Sheet Detail</Link>
+                            <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
+                                {props.title === 'add' ? 'Form Input Meal Sheet Detail' : 'Form Edit Meal Sheet Detail' }
+                            </Typography>
+                        </Breadcrumbs>
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -146,19 +175,16 @@ const Form = (props) => {
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={12}>
-                            <TextField
-                                fullWidth 
-                                label='Client'
-                                name='client'
-                                defaultValue={data?.client}
-                                required
-                                helperText={!!errors?.client && errors?.client[0]}
-                                error={!!errors?.client}
-                                select
-                            > 
-                                <MenuItem value='1'>PHE OSES</MenuItem>
-                                <MenuItem value='2'>Andromeda</MenuItem>
-                            </TextField>
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => opt.client_name}
+                                options={dataClient?.meal_sheet_group?.client}
+                                label='Customer'
+                                inputValue={clientState.input}
+                                setInputValue={handleInputClient}
+                                selectedValue={clientState.selected}
+                                setSelectedValue={handleSelectedClient}
+                                errors={errors?.client_id}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
@@ -175,33 +201,33 @@ const Form = (props) => {
                             <TextField
                                 fullWidth 
                                 label='Casual Break Fast'
-                                name='casual_b'
-                                defaultValue={data?.casual_b}
+                                name='casual_breakfast'
+                                defaultValue={data?.casual_breakfast}
                                 required
-                                helperText={!!errors?.casual_b && errors?.casual_b[0]}
-                                error={!!errors?.casual_b}
+                                helperText={!!errors?.casual_breakfast && errors?.casual_breakfast[0]}
+                                error={!!errors?.casual_breakfast}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Casual Lunch'
-                                name='casual_l'
-                                defaultValue={data?.casual_l}
+                                name='casual_lunch'
+                                defaultValue={data?.casual_lunch}
                                 required
-                                helperText={!!errors?.casual_l && errors?.casual_l[0]}
-                                error={!!errors?.casual_l}
+                                helperText={!!errors?.casual_lunch && errors?.casual_lunch[0]}
+                                error={!!errors?.casual_lunch}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Casual Dinner'
-                                name='casual_d'
-                                defaultValue={data?.casual_d}
+                                name='casual_dinner'
+                                defaultValue={data?.casual_dinner}
                                 required
-                                helperText={!!errors?.casual_d && errors?.casual_d[0]}
-                                error={!!errors?.casual_d}
+                                helperText={!!errors?.casual_dinner && errors?.casual_dinner[0]}
+                                error={!!errors?.casual_dinner}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -211,8 +237,8 @@ const Form = (props) => {
                                 name='prepared_by[name]'
                                 defaultValue={data?.prepared_by['name']}
                                 required
-                                helperText={!!errors?.prepared_by['name'] && errors?.prepared_by['name'][0]}
-                                error={!!errors?.prepared_by['name']}
+                                helperText={!!errors?.['prepared_by.name'] && errors?.['prepared_by.name'][0]}
+                                error={!!errors?.['prepared_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -222,8 +248,8 @@ const Form = (props) => {
                                 name='prepared_by[position]'
                                 defaultValue={data?.prepared_by['position']}
                                 required
-                                helperText={!!errors?.prepared_by['position'] && errors?.prepared_by['position'][0]}
-                                error={!!errors?.prepared_by['position']}
+                                helperText={!!errors?.['prepared_by.position'] && errors?.['prepared_by.position'][0]}
+                                error={!!errors?.['prepared_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -233,8 +259,8 @@ const Form = (props) => {
                                 name='checked_by[name]'
                                 defaultValue={data?.checked_by['name']}
                                 required
-                                helperText={!!errors?.checked_by['name'] && errors?.checked_by['name'][0]}
-                                error={!!errors?.checked_by['name']}
+                                helperText={!!errors?.['checked_by.name'] && errors?.['checked_by.name'][0]}
+                                error={!!errors?.['checked_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -244,8 +270,8 @@ const Form = (props) => {
                                 name='checked_by[position]'
                                 defaultValue={data?.checked_by['position']}
                                 required
-                                helperText={!!errors?.checked_by['position'] && errors?.checked_by['position'][0]}
-                                error={!!errors?.checked_by['position']}
+                                helperText={!!errors?.['checked_by.position'] && errors?.['checked_by.position'][0]}
+                                error={!!errors?.['checked_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -255,8 +281,8 @@ const Form = (props) => {
                                 name='approved_by[name]'
                                 defaultValue={data?.approved_by['name']}
                                 required
-                                helperText={!!errors?.approved_by['name'] && errors?.approved_by['name'][0]}
-                                error={!!errors?.approved_by['name']}
+                                helperText={!!errors?.['approved_by.name'] && errors?.['approved_by.name'][0]}
+                                error={!!errors?.['approved_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -266,8 +292,8 @@ const Form = (props) => {
                                 name='approved_by[position]'
                                 defaultValue={data?.approved_by['position']}
                                 required
-                                helperText={!!errors?.approved_by['position'] && errors?.approved_by['position'][0]}
-                                error={!!errors?.approved_by['position']}
+                                hhelperText={!!errors?.['approved_by.position'] && errors?.['approved_by.position'][0]}
+                                error={!!errors?.['approved_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -295,18 +321,18 @@ const Form = (props) => {
                                                 <TableCellHeaderColor>No.</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Name</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Position</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Company</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Breakfast</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Lunch</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Dinner</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Super</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Casual</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Accomodation</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Total</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow isApproved={isApproved} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} errors={errors} /> )}
+                                            {item.map((v, i) => <TableInputRow key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} errors={errors} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -315,16 +341,10 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <Stack direction='row' justifyContent='end' spacing={2}>
-                                {isApproved ?
-                                    <Button onClick={() => navigate(`/file/${data?.id}/purchase_request`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
-                                        Next
-                                    </Button>
-                                :
-                                    <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
-                                        Next
-                                    </LoadingButton>
-                                }
+                            <Stack direction='row' spacing={2}>
+                                <LoadingButton loading={loadingSave} variant='contained' type='submit'>
+                                    Submit
+                                </LoadingButton>
                                 {props.title == 'edit' ? ''
                                     // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
                                     //     Print
@@ -340,7 +360,7 @@ const Form = (props) => {
                 handleClose={handleModalImport}
                 open={modalImport}
                 title='Meal Sheet Detail'
-                url={'read-excel/product-price'}
+                url={'read-excel/meal-sheet-record'}
                 onSuccessImport={onSuccessImport}
             />
             <DialogInputRow 

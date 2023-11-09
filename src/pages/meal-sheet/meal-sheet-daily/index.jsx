@@ -2,11 +2,8 @@ import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Breadcrumbs, Button, Card, CardContent, Checkbox, Container, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, Link, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Page from '@components/Page';
-import Iconify from '@components/Iconify';
 import moment from 'moment/moment';
 import CustomSearchComponent from '@components/CustomSearchComponent';
-import CustomStatusLabelComponent from '@components/CustomStatusLabelComponent';
-import CustomMenuComponent from '@components/CustomMenuComponent';
 import { LoadingButton } from '@mui/lab';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import CustomLinkComponent from '@components/CustomLinkComponent';
@@ -16,16 +13,6 @@ import useSaveMealSheetDaily from '@hooks/meal-sheet-daily/useSaveMealSheetDaily
 import Loading from '@components/Loading';
 import DeleteDialog from '@components/DeleteDialog';
 import ImportModal from '@components/ImportModal';
-
-let dummy = []
-for(let i = 0; i < 15; i++){
-    dummy[i] = {
-        code: i + 1,
-        date: new Date(),
-        as_contract: 45
-    }
-
-}
 
 const index = () => {
     const { group_id } = useParams()
@@ -183,7 +170,7 @@ const index = () => {
                 <TableCell>
                     <CustomLinkComponent 
                         label='View'
-                        url={`/meal-sheet/detail/${value.id}`}
+                        url={`/meal-sheet/detail/${group_id}/${value.id}`}
                     />
                 </TableCell>
                 <TableCell>
@@ -206,7 +193,7 @@ const index = () => {
                             <Stack spacing={1} mb={3}>
                                 <Typography variant='h4'>Meal Sheet Daily</Typography>
                                 <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
-                                    <Link underline="hover" color="inherit" href="/meal-sheet/sheet-detail">Meal Sheet Group</Link>
+                                    <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
                                     <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Meal Sheet Daily</Typography>
                                 </Breadcrumbs>
                             </Stack>
