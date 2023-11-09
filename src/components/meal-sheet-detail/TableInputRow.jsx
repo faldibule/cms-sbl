@@ -12,7 +12,7 @@ const CheckStatusComponent = ({ isChecked }) => {
     return <Iconify icon='mingcute:close-fill' sx={{ color: 'red', fontSize: '1rem' }} />
 }
 
-const exceptProperti = ['name', 'position', 'company']
+const exceptProperti = ['name', 'position', 'company', 'acomodation']
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
@@ -59,10 +59,10 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 <CheckStatusComponent isChecked={!!valueMemo.super} />
             </TableCell>
             <TableCell>
-                <CheckStatusComponent isChecked={!!valueMemo.acomodation} />
+                {total}
             </TableCell>
             <TableCell>
-                {total}
+                <CheckStatusComponent isChecked={!!valueMemo.acomodation} />
             </TableCell>
             <TableCell align='center'>
                 <Stack direction='row' spacing={2}>

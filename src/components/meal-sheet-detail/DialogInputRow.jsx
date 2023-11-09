@@ -57,7 +57,7 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                     <Grid item xs={12} md={6}>
                         <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
                             <FormControlLabel control={<Checkbox defaultChecked={v?.dinner}  name="dinner" />} label="Dinner" />
-                            <FormControlLabel control={<Checkbox defaultChecked={v?.super}  name="super" />} label="Super" />
+                            <FormControlLabel control={<Checkbox defaultChecked={v?.super}  name="super" />} label="Supper" />
                         </FormGroup>
                     </Grid>
                 </Grid>

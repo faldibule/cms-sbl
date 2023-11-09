@@ -325,9 +325,9 @@ const Form = (props) => {
                                                 <TableCellHeaderColor>Breakfast</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Lunch</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Dinner</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Super</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Accomodation</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Supper</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Accomodation</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
