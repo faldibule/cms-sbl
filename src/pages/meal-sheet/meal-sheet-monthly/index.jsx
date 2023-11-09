@@ -1,18 +1,43 @@
 import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Breadcrumbs, Button, Card, CardContent, Checkbox, Container, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, Link, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import moment from 'moment/moment';
 import CustomSearchComponent from '@components/CustomSearchComponent';
 import { LoadingButton } from '@mui/lab';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import CustomLinkComponent from '@components/CustomLinkComponent';
-import useFetchMealSheetDaily from '@hooks/meal-sheet-daily/useFetchMealSheetDaily';
-import useDeleteMealSheetDaily from '@hooks/meal-sheet-daily/useDeleteMealSheetDaily';
-import useSaveMealSheetDaily from '@hooks/meal-sheet-daily/useSaveMealSheetDaily';
 import Loading from '@components/Loading';
 import DeleteDialog from '@components/DeleteDialog';
 import ImportModal from '@components/ImportModal';
+import RefreshDialog from '@components/RefreshDialog';
+import useFetchMealSheetMonthly from '@hooks/meal-sheet-monthly/useFetchMealSheetMonthly';
+import useDeleteMealSheetMonthly from '@hooks/meal-sheet-monthly/useDeleteMealSheetMonthly';
+import useSaveMealSheetMonthly from '@hooks/meal-sheet-monthly/useSaveMealSheetDaily';
+import DownloadDialog from '@components/DownloadDialog';
+import useDownloadMealSheetMonthly from '@hooks/meal-sheet-monthly/useDownloadMealSheetMonthly';
+
+const dataMonth = [
+    { month: 'Januari', value: 1 },
+    { month: 'Februari', value: 2 },
+    { month: 'Maret', value: 3 },
+    { month: 'April', value: 4 },
+    { month: 'Mei', value: 5 },
+    { month: 'Juni', value: 6 },
+    { month: 'Juli', value: 7 },
+    { month: 'Agustus', value: 8 },
+    { month: 'September', value: 9 },
+    { month: 'Oktober', value: 10 },
+    { month: 'November', value: 11 },
+    { month: 'Desember', value: 12 },
+];
+
+const getYearList = () => {
+    const currentYear = new Date().getFullYear();
+    const yearsBefore = [currentYear - 3, currentYear - 2, currentYear - 1];
+    const yearList = [...yearsBefore, currentYear];
+
+    return yearList;
+};
+
+const getMonthNameByValue = (value) => dataMonth.find(v => v.value === value)?.month || '-'
 
 const index = () => {
     const { group_id } = useParams()
@@ -24,7 +49,7 @@ const index = () => {
         meal_sheet_group_id: group_id,
         meal_sheet_date: ''
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetDaily(params)
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetMonthly(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -52,13 +77,6 @@ const index = () => {
             setLoading(false)
         }, 0);
     }
-    const handleEdit = (data) => {
-        setLoading(true)
-        setTimeout(() => {
-            setStaging(data)
-            setLoading(false)
-        }, 500);
-    }
     
     const [open, setOpen] = useState(false)
     const handleClose = (id = null) => {
@@ -74,19 +92,20 @@ const index = () => {
         handleReset()
         refetch()
     }
-    const { mutate: deleteMealSheetDaily, isLoading: loadingDelete, error: errorDelete } = useDeleteMealSheetDaily({
+    const { mutate: deleteMealSheetMonthly, isLoading: loadingDelete, error: errorDelete } = useDeleteMealSheetMonthly({
         onSuccess: () => {
             refreshData()
             handleClose()
         }
     })
     const handleDelete = async () => {
-        deleteMealSheetDaily(staging?.id)
+        deleteMealSheetMonthly(staging?.id)
     }
 
-    const { mutate: save, isLoading: loadingSave, error } = useSaveMealSheetDaily({
+    const { mutate: save, isLoading: loadingSave, error } = useSaveMealSheetMonthly({
         onSuccess: () => {
             refreshData()
+            setOpenRefresh(false)
         }
     })
     const errors = error?.response?.data?.errors
@@ -95,6 +114,50 @@ const index = () => {
         const formData = new FormData(e.target)
         formData.append('meal_sheet_group_id', group_id)
         save({ formData, id: staging?.id })
+    }
+
+    const [openRefresh, setOpenRefresh] = useState(false)
+    const handleCloseRefresh = (data = null) => {
+        if(openRefresh){
+            handleReset()
+        }
+        setOpenRefresh(!openRefresh)
+        if(!!!data) return;
+        setStaging(data)
+    }
+    const handleRefresh = async (e) => {
+        e.preventDefault()
+        const formData = new FormData()
+        formData.append('meal_sheet_group_id', group_id)
+        formData.append('month', staging?.month)
+        formData.append('year', staging?.year)
+        save({ formData, id: staging?.id })
+    }
+
+    const { mutate: download, isLoading: loadingDownload, error: errorDownload } = useDownloadMealSheetMonthly({
+        onSuccess: (res) => {
+            refreshData()
+            const temp = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = temp;
+            link.setAttribute("download", `monthly_report.pdf`); 
+            document.body.appendChild(link);
+            link.click();
+            setOpenDownload(false)
+        }
+    })
+    const [openDownload, setOpenDownload] = useState(false)
+    const handleCloseDownload = (data = null) => {
+        if(openDownload){
+            handleReset()
+        }
+        setOpenDownload(!openDownload)
+        if(!!!data) return;
+        setStaging(data)
+    }
+    const handleDownload = async (e) => {
+        e.preventDefault()
+        download(staging?.id)
     }
 
     const [modalImport, setModalImport] = useState(false)
@@ -162,21 +225,19 @@ const index = () => {
                     {rows.meta.from+key}.
                 </TableCell>
                 <TableCell>
-                    {value.meal_sheet_date}
+                    {getMonthNameByValue(value.month)}
                 </TableCell>
                 <TableCell>
-                    {value.contract_value}
-                </TableCell>
-                <TableCell>
-                    <CustomLinkComponent 
-                        label='View'
-                        url={`/meal-sheet/detail/${group_id}/${value.id}`}
-                    />
+                    {value.year}
                 </TableCell>
                 <TableCell>
                     <CustomActionTableComponent 
-                        edit={true}
-                        handleEdit={() => handleEdit(value)}
+                        refresh={true}
+                        handleRefresh={() => handleCloseRefresh(value)}
+
+                        download={true}
+                        handleDownload={() => handleCloseDownload(value)}
+
                         handleDelete={() => handleClose(value.id)}
                     />
                 </TableCell>                                                             
@@ -195,25 +256,10 @@ const index = () => {
                                 params={params}
                                 setParams={setParams}
                             />
-                            <TextField
-                                type='date'
-                                label="Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                                value={moment(params.meal_sheet_date).format('yyyy-MM-DD')}
-                                onChange={(e) => {
-                                    setParams({
-                                        ...params,
-                                        meal_sheet_date: e.target.value
-                                    })
-                                }}
-                            />
                         </Stack>
                     </Grid>
                 </Grid>
-                <TableContainer>
+                <TableContainer sx={{ maxWidth: 1000, overflowX: 'auto' }}>
                     <Table sx={{ minWidth: 400 }} aria-label="simple table">
                         <TableHead>
                             <TableRow
@@ -223,9 +269,8 @@ const index = () => {
                                 }}
                             >
                                 <TableCell>No.</TableCell>
-                                <TableCell>Date</TableCell>
-                                <TableCell>As Contract</TableCell>
-                                <TableCell>Meal Sheet Detail</TableCell>
+                                <TableCell>Month</TableCell>
+                                <TableCell>Year</TableCell>
                                 <TableCell>Action</TableCell>
                             </TableRow>
                         </TableHead>
@@ -254,49 +299,50 @@ const index = () => {
             </Grid>
             <Grid item xs={12} md={4} p={2}>
                 <Typography mb={3} variant='h6'>
-                    {!!staging.id ? 'Form Edit Meal Sheet Daily' : 'Form Add Meal Sheet Daily'}
+                    {!!staging.id ? 'Form Edit Meal Sheet Monthly' : 'Form Add Meal Sheet Monthly'}
                 </Typography>
                 {!loading ?
                 <Grid container spacing={2} component='form' onSubmit={onSubmit}>
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
-                            label='As Contract'
-                            name='contract_value'
-                            defaultValue={staging?.contract_value}
+                            label='Month'
+                            name='month'
+                            defaultValue={staging?.month || ''}
                             required
-                            helperText={!!errors?.contract_value && errors?.contract_value[0]}
-                            error={!!errors?.contract_value}
-                        /> 
+                            helperText={!!errors?.month && errors?.month[0]}
+                            error={!!errors?.month || !!errors?.meal_sheet_daily_data}
+                            select
+                        >
+                            {dataMonth.map((v, i) => {
+                                return (
+                                    <MenuItem key={v.value} value={v.value}>{v.month}</MenuItem>
+                                )
+                            })}
+                        </TextField> 
                     </Grid>
                     <Grid item xs={12} md={12}>
                         <TextField
-                            type='date'
-                            label="Date"
-                            fullWidth
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start"></InputAdornment>,
-                            }}
-                            name='meal_sheet_date'
-                            helperText={!!errors?.meal_sheet_date && errors?.meal_sheet_date[0]}
-                            error={!!errors?.meal_sheet_date}
-                            defaultValue={staging?.meal_sheet_date}
-                        />
+                            fullWidth 
+                            label='Year'
+                            name='year'
+                            defaultValue={staging?.year || ''}
+                            required
+                            helperText={!!errors?.year && errors?.year[0]}
+                            error={!!errors?.year || !!errors?.meal_sheet_daily_data}
+                            select
+                        >
+                            {getYearList().map((v, i) => {
+                                return (
+                                    <MenuItem key={v} value={v}>{v}</MenuItem>
+                                )
+                            })}
+                        </TextField> 
+                        {!!errors?.meal_sheet_daily_data ?
+                            <Typography mb={1} fontSize='0.8rem' color='error' variant='body2'>{errors.meal_sheet_daily_data[0]}</Typography>
+                        : null
+                        }
                     </Grid>
-                    {/* <Grid item xs={12} md={6}>
-                        <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
-                            <FormControlLabel control={<Checkbox  />} label="Breakfast" />
-                            <FormControlLabel control={<Checkbox  />} label="Lunch" />
-                            <FormControlLabel control={<Checkbox  />} label="Casual" />
-                        </FormGroup>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <FormGroup sx={{ display: 'flex', ml: 1, justifyContent: { xs: 'space-evenly', md: 'inherit' }}} row={true}>
-                            <FormControlLabel control={<Checkbox  />} label="Dinner" />
-                            <FormControlLabel control={<Checkbox  />} label="Super" />
-                            <FormControlLabel control={<Checkbox  />} label="Acomodation" />
-                        </FormGroup>
-                    </Grid> */}
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' spacing={2}>
                             <LoadingButton loading={loadingSave} fullWidth variant='contained' type='submit'>
@@ -310,11 +356,23 @@ const index = () => {
                 }
             </Grid>
             <Grid item xs={12} md={12}>
+                <DownloadDialog 
+                    handleClose={handleCloseDownload}
+                    handleDownload={handleDownload}
+                    open={openDownload}
+                    loading={loadingDownload}
+                />
                 <DeleteDialog 
                     handleClose={handleClose}
                     handleDelete={handleDelete}
                     open={open}
                     loading={loadingDelete}
+                />
+                <RefreshDialog 
+                    handleClose={handleCloseRefresh}
+                    handleRefresh={handleRefresh}
+                    open={openRefresh}
+                    loading={loadingSave}
                 />
                 <ImportModal 
                     handleClose={handleModalImport}

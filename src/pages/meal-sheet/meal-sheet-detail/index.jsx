@@ -12,6 +12,8 @@ import Loading from '@components/Loading';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import useFetchMealSheetDetail from '@hooks/meal-sheet-detail/useFetchMealSheetDetail';
 import useDeleteMealSheetDetail from '@hooks/meal-sheet-detail/useDeleteMealSheetDetail';
+import useDownloadMealSheetDetail from '@hooks/meal-sheet-detail/useDownloadMealSheetDetail';
+import DownloadDialog from '@components/DownloadDialog';
 
 const index = () => {
     const navigate = useNavigate()
@@ -25,23 +27,6 @@ const index = () => {
         meal_sheet_daily_id: daily_id,
     })
     const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetDetail(params)
-    const handleChangePage = (event, newPage) => {
-        setParams((prev) => {
-            return {
-                ...prev,
-                page: newPage + 1,
-            };
-        });
-    };
-    const handleChangeRowsPerPage = (event) => {
-        setParams((prev) => {
-            return {
-                ...prev,
-                page: 1,
-                limit: +event.target.value,
-            };
-        });
-    };
     
     const [open, setOpen] = useState(false)
     const [staging, setStaging] = useState({})
@@ -59,6 +44,31 @@ const index = () => {
     })
     const handleDelete = async () => {
         deleteMealSheetDetail(staging?.id)
+    }
+
+    const { mutate: download, isLoading: loadingDownload, error: errorDownload } = useDownloadMealSheetDetail({
+        onSuccess: (res) => {
+            const temp = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement("a");
+            link.href = temp;
+            link.setAttribute("download", `daily_mealsheet_report.pdf`); 
+            document.body.appendChild(link);
+            link.click();
+            setOpenDownload(false)
+        }
+    })
+    const [openDownload, setOpenDownload] = useState(false)
+    const handleCloseDownload = (data = null) => {
+        if(openDownload){
+            handleReset()
+        }
+        setOpenDownload(!openDownload)
+        if(!!!data) return;
+        setStaging(data)
+    }
+    const handleDownload = async (e) => {
+        e.preventDefault()
+        download(staging?.id)
     }
 
     if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
@@ -146,6 +156,9 @@ const index = () => {
                     </TableCell>
                     <TableCell>
                         <CustomActionTableComponent 
+                            download={true}
+                            handleDownload={() => handleCloseDownload(value)}
+
                             handleDelete={() => handleClose(value.id)}
                         />
                     </TableCell>                                                             
@@ -164,7 +177,7 @@ const index = () => {
                                 <Typography variant='h4'>Meal Sheet Detail</Typography>
                                 <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
                                     <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
-                                    <Link underline="hover" color="inherit" href={`/meal-sheet/daily/${group_id}`}>Meal Sheet Daily</Link>
+                                    <Link underline="hover" color="inherit" href={`/meal-sheet/report/${group_id}/daily`}>Meal Sheet Report</Link>
                                     <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Meal Sheet Detail</Typography>
                                 </Breadcrumbs>
                             </Stack>
@@ -214,6 +227,12 @@ const index = () => {
                         </Card>
                     </Grid>
                 </Grid>
+                <DownloadDialog 
+                    handleClose={handleCloseDownload}
+                    handleDownload={handleDownload}
+                    open={openDownload}
+                    loading={loadingDownload}
+                />
                 <DeleteDialog 
                     handleClose={handleClose}
                     handleDelete={handleDelete}

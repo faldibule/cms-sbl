@@ -131,7 +131,7 @@ const index = () => {
                         {value.client[1].client_name}
                     </TableCell>
                     <TableCell>
-                        <CustomLinkComponent label='View' url={`/meal-sheet/daily/${value.id}`} />
+                        <CustomLinkComponent label='View' url={`/meal-sheet/report/${value.id}/daily`} />
                     </TableCell>
                     <TableCell>
                         <CustomActionTableComponent 
@@ -182,7 +182,7 @@ const index = () => {
                                                 <TableCell>Location</TableCell>
                                                 <TableCell>Client 1</TableCell>
                                                 <TableCell>Client 2</TableCell>
-                                                <TableCell>Meal Sheet Daily</TableCell>
+                                                <TableCell>Meal Sheet Report</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>

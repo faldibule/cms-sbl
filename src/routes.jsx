@@ -80,7 +80,7 @@ import MealSheatGroup from './pages/meal-sheet/meal-sheet-group'
 import AddMealSheatGroup from './pages/meal-sheet/meal-sheet-group/Add'
 import EditMealSheatGroup from './pages/meal-sheet/meal-sheet-group/Edit'
 
-import MealSheetDaily from './pages/meal-sheet/meal-sheet-daily'
+import MealSheetReport from './pages/meal-sheet/meal-sheet-report'
 
 import MealSheetDetail from './pages/meal-sheet/meal-sheet-detail'
 import AddMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Add'
@@ -240,7 +240,8 @@ export default function Router() {
         { path: 'group/add', element: <AddMealSheatGroup /> },
         { path: 'group/edit/:id', element: <EditMealSheatGroup /> },
 
-        { path: 'daily/:group_id', element: <MealSheetDaily /> },
+        { path: 'report/:group_id/daily', element: <MealSheetReport /> },
+        { path: 'report/:group_id/monthly', element: <MealSheetReport /> },
 
         { path: 'detail/:group_id/:daily_id', element: <MealSheetDetail /> },
         { path: 'detail/:group_id/:daily_id/add', element: <AddMealSheetDetail /> },

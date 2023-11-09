@@ -187,6 +187,10 @@ function DateFormat(date, day) {
   function IntegerFormat(props) {
     return props !== '' ? parseInt(props.replace(/,.*|[^0-9]/g, ''), 10) : '';
   }
+
+  function CapitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
   
-  export { DateFormat, TimeFormat, Duration, TimeAgo, NpwpFormat, Gmt7, NumberFormat, IntegerFormat };
+  export { DateFormat, TimeFormat, Duration, TimeAgo, NpwpFormat, Gmt7, NumberFormat, IntegerFormat, CapitalizeFirstLetter };
   

@@ -161,7 +161,7 @@ const Form = (props) => {
                         </Typography>
                         <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
                             <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
-                            <Link underline="hover" color="inherit" href={`/meal-sheet/daily/${group_id}`}>Meal Sheet Daily</Link>
+                            <Link underline="hover" color="inherit" href={`/meal-sheet/report/${group_id}/daily`}>Meal Sheet Report</Link>
                             <Link underline="hover" color="inherit" href={`/meal-sheet/detail/${group_id}/${daily_id}`}>Meal Sheet Detail</Link>
                             <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
                                 {props.title === 'add' ? 'Form Input Meal Sheet Detail' : 'Form Edit Meal Sheet Detail' }
