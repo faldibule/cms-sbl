@@ -13,6 +13,7 @@ import useDeleteMealSheetMonthly from '@hooks/meal-sheet-monthly/useDeleteMealSh
 import useSaveMealSheetMonthly from '@hooks/meal-sheet-monthly/useSaveMealSheetDaily';
 import DownloadDialog from '@components/DownloadDialog';
 import useDownloadMealSheetMonthly from '@hooks/meal-sheet-monthly/useDownloadMealSheetMonthly';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 
 const dataMonth = [
     { month: 'Januari', value: 1 },
@@ -231,6 +232,12 @@ const index = () => {
                     {value.year}
                 </TableCell>
                 <TableCell>
+                    <CustomLinkComponent 
+                        label='View'
+                        url={`/meal-sheet/print-preview/monthly/${group_id}/${value.id}`}
+                    />
+                </TableCell>
+                <TableCell>
                     <CustomActionTableComponent 
                         refresh={true}
                         handleRefresh={() => handleCloseRefresh(value)}
@@ -271,6 +278,7 @@ const index = () => {
                                 <TableCell>No.</TableCell>
                                 <TableCell>Month</TableCell>
                                 <TableCell>Year</TableCell>
+                                <TableCell>Preview PDF</TableCell>
                                 <TableCell>Action</TableCell>
                             </TableRow>
                         </TableHead>

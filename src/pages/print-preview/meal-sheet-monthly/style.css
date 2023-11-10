@@ -1,0 +1,107 @@
+.tg {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.tg td {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    overflow: hidden;
+    padding: 5px 5px;
+    font-weight: bold;
+    word-break: normal;
+}
+
+.tg th {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: normal;
+    overflow: hidden;
+    padding: 10px 5px;
+    word-break: normal;
+}
+
+.tg .tg-baqh {
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-c3ow {
+    border-color: inherit;
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-7btt {
+    border-color: inherit;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-sn4r {
+    border-color: #333333;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-de2y {
+    border-color: #333333;
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-dvpl {
+    border-color: inherit;
+    text-align: right;
+    vertical-align: top
+}
+
+.tg .tg-fymr {
+    border-color: inherit;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-0pky {
+    border-color: inherit;
+    text-align: center;
+    vertical-align: top
+}
+
+.tg .tg-0lax {
+    text-align: left;
+    vertical-align: top
+}
+.tg .text-left {
+    text-align: center;
+    vertical-align: top;
+    text-align: left;
+}
+.tg .text-center {
+    text-align: center;
+    vertical-align: top;
+}
+.no {
+    width: 10px;
+}
+.br-none {
+    border-right: none;
+}
+.bl-none {
+    border-left: none;
+}
+.bt-none {
+    border-top: none;
+}
+.bb-none {
+    border-bottom: none;
+}

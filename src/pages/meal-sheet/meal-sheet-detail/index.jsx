@@ -155,6 +155,12 @@ const index = () => {
                         {value.casual_dinner}
                     </TableCell>
                     <TableCell>
+                        <CustomLinkComponent 
+                            label='View'
+                            url={`/meal-sheet/print-preview/daily/${group_id}/${daily_id}/${value.id}`}
+                        />
+                    </TableCell>
+                    <TableCell>
                         <CustomActionTableComponent 
                             download={true}
                             handleDownload={() => handleCloseDownload(value)}
@@ -214,6 +220,7 @@ const index = () => {
                                                 <TableCell>Casual Breakfast</TableCell>
                                                 <TableCell>Casual Lunch</TableCell>
                                                 <TableCell>Casual Dinner</TableCell>
+                                                <TableCell>Preview PDF</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>

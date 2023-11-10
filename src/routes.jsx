@@ -86,6 +86,9 @@ import MealSheetDetail from './pages/meal-sheet/meal-sheet-detail'
 import AddMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Add'
 import EditMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Edit'
 
+import PrintPreviewMealSheetDetail from './pages/print-preview/meal-sheet-detail'
+import PrintPreviewMealSheetMonthly from './pages/print-preview/meal-sheet-monthly'
+
 // File Management
 import FileManagement from './pages/file-management/Edit'
 
@@ -246,6 +249,9 @@ export default function Router() {
         { path: 'detail/:group_id/:daily_id', element: <MealSheetDetail /> },
         { path: 'detail/:group_id/:daily_id/add', element: <AddMealSheetDetail /> },
         { path: 'detail/:group_id/:daily_id/edit/:id', element: <EditMealSheetDetail /> },
+
+        { path: 'print-preview/daily/:group_id/:daily_id/:id', element: <PrintPreviewMealSheetDetail /> },
+        { path: 'print-preview/monthly/:group_id/:id', element: <PrintPreviewMealSheetMonthly /> },
       ],
     },
     {
