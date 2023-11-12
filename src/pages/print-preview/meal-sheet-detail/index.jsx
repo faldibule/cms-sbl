@@ -61,7 +61,7 @@ const PreviewDailyRecord = () => {
                     <td className="tg-7btt" colSpan="10" style={{ borderBottom: 'none' }}>Meal Count Sheet and Accomodation Record</td>
                 </tr>
                 <tr>
-                    <td className="tg-sn4r" colSpan="3" style={{ borderRight: 'none', borderTop: 'none' }}>{rows.meal_sheet_daily?.meal_sheet_group?.location?.location}</td>
+                    <td colSpan="3" style={{ borderRight: 'none', fontWeight: 'bold', borderTop: 'none' }}>{rows.meal_sheet_daily?.meal_sheet_group?.location?.location}</td>
                     <td className="tg-de2y" style={{ borderLeft: 'none', borderRight: 'none', borderTop: 'none', }}>{rows.client.client_name}</td>
                     <td className="tg-dvpl" colSpan="6" style={{ borderLeft: 'none', borderTop: 'none', }}>DATE : {moment(rows.meal_sheet_daily.meal_sheet_date).format('LL')}</td>
                 </tr>
