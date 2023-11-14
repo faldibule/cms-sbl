@@ -305,8 +305,10 @@ const index = () => {
                                         helperText={!!errors?.location && errors?.location[0]}
                                         error={!!errors?.location}
                                     /> 
+                                    {console.log(staging)}
                                     <Autocomplete
                                         freeSolo
+                                        disabled={staging?.main === 1}
                                         options={filteredData}
                                         getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
                                         value={selectedValue || null} 
