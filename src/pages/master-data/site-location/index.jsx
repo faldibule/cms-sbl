@@ -11,6 +11,7 @@ import useDeleteLocation from '@hooks/location/useDeleteLocation';
 import useSaveLocation from '@hooks/location/useSaveLocation';
 import Iconify from '@components/Iconify';
 import ImportModal from '@components/ImportModal';
+import useCustomSnackbar from '@hooks/useCustomSnackbar';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -67,13 +68,13 @@ const index = () => {
     }
     
     const [open, setOpen] = useState(false)
-    const handleClose = (id = null) => {
+    const handleClose = (value = null) => {
         if(open){
             handleReset()
         }
         setOpen(!open)
-        if(!!!id) return;
-        setStaging({ id })
+        if(!!!value) return;
+        setStaging(value)
     }
 
     const refreshData = () => {
@@ -88,7 +89,13 @@ const index = () => {
             handleClose()
         }
     })
+    const { failed } = useCustomSnackbar()
     const handleDelete = async () => {
+        if(staging?.main === 1){
+            failed(`Can't Delete Main Location`)
+            handleClose();
+            return
+        }
         deleteDepartment(staging?.id)
     }
 
@@ -197,7 +204,7 @@ const index = () => {
                     <CustomActionTableComponent 
                         edit={true}
                         handleEdit={() => handleEdit(value)}
-                        handleDelete={() => handleClose(value.id)}
+                        handleDelete={() => handleClose(value)}
                     />
                 </TableCell>                                                             
             </TableRow>
@@ -305,7 +312,6 @@ const index = () => {
                                         helperText={!!errors?.location && errors?.location[0]}
                                         error={!!errors?.location}
                                     /> 
-                                    {console.log(staging)}
                                     <Autocomplete
                                         freeSolo
                                         disabled={staging?.main === 1}
