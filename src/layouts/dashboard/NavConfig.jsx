@@ -140,16 +140,6 @@ const navConfig = [
     title: 'Stock Management',
     icon: getIcon('iconamoon:box-fill'),
     path: '/stock-management',
-    children: [
-      {
-        title: 'Data Stock Masuk', // Tampilan mengikuti form excel stock management
-        path: 'data-stock-masuk'
-      },
-      {
-        title: 'Data Stock Kapal',
-        path: 'data-stock-kapal'
-      },
-    ]
   },
   {
     title: 'Activity Log',

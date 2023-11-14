@@ -89,6 +89,11 @@ import EditMealSheetDetail from './pages/meal-sheet/meal-sheet-detail/Edit'
 import PrintPreviewMealSheetDetail from './pages/print-preview/meal-sheet-detail'
 import PrintPreviewMealSheetMonthly from './pages/print-preview/meal-sheet-monthly'
 
+// Stock Management
+import StockManagement from './pages/stock-management'
+import StockByLocation from './pages/stock-management/stock-by-location'
+import StockDetailProduct from './pages/stock-management/stock-by-location/stock-detail-product'
+
 // File Management
 import FileManagement from './pages/file-management/Edit'
 
@@ -262,6 +267,18 @@ export default function Router() {
       </Middleware.After>,
       children: [
         { path: '', element: <ActivityLog /> },
+      ],
+    },
+    {
+      path: '/stock-management',
+      element: 
+      <Middleware.After>
+        <DashboardLayout />,
+      </Middleware.After>,
+      children: [
+        { path: '', element: <StockManagement /> },
+        { path: 'stock-by-location/:location_id', element: <StockByLocation /> },
+        { path: 'stock-by-location/:location_id/detail/:item_product_id', element: <StockDetailProduct /> },
       ],
     },
     {
