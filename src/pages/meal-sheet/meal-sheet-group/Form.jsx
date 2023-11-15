@@ -149,8 +149,8 @@ const Form = (props) => {
                                 name='prepared_by[name]'
                                 defaultValue={data?.prepared_by['name']}
                                 required
-                                helperText={!!errors?.prepared_by['name'] && errors?.prepared_by['name'][0]}
-                                error={!!errors?.prepared_by['name']}
+                                helperText={!!errors?.['prepared_by.name'] && errors?.['prepared_by.name'][0]}
+                                error={!!errors?.['prepared_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -160,8 +160,8 @@ const Form = (props) => {
                                 name='prepared_by[position]'
                                 defaultValue={data?.prepared_by['position']}
                                 required
-                                helperText={!!errors?.prepared_by['position'] && errors?.prepared_by['position'][0]}
-                                error={!!errors?.prepared_by['position']}
+                                helperText={!!errors?.['prepared_by.position'] && errors?.['prepared_by.position'][0]}
+                                error={!!errors?.['prepared_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -171,8 +171,8 @@ const Form = (props) => {
                                 name='checked_by[name]'
                                 defaultValue={data?.checked_by['name']}
                                 required
-                                helperText={!!errors?.checked_by['name'] && errors?.checked_by['name'][0]}
-                                error={!!errors?.checked_by['name']}
+                                helperText={!!errors?.['checked_by.name'] && errors?.['checked_by.name'][0]}
+                                error={!!errors?.['checked_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -182,8 +182,8 @@ const Form = (props) => {
                                 name='checked_by[position]'
                                 defaultValue={data?.checked_by['position']}
                                 required
-                                helperText={!!errors?.checked_by['position'] && errors?.checked_by['position'][0]}
-                                error={!!errors?.checked_by['position']}
+                                helperText={!!errors?.['checked_by.position'] && errors?.['checked_by.position'][0]}
+                                error={!!errors?.['checked_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -193,8 +193,8 @@ const Form = (props) => {
                                 name='approved_by[name]'
                                 defaultValue={data?.approved_by['name']}
                                 required
-                                helperText={!!errors?.approved_by['name'] && errors?.approved_by['name'][0]}
-                                error={!!errors?.approved_by['name']}
+                                helperText={!!errors?.['approved_by.name'] && errors?.['approved_by.name'][0]}
+                                error={!!errors?.['approved_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -204,8 +204,8 @@ const Form = (props) => {
                                 name='approved_by[position]'
                                 defaultValue={data?.approved_by['position']}
                                 required
-                                helperText={!!errors?.approved_by['position'] && errors?.approved_by['position'][0]}
-                                error={!!errors?.approved_by['position']}
+                                helperText={!!errors?.['approved_by.position'] && errors?.['approved_by.position'][0]}
+                                error={!!errors?.['approved_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -214,9 +214,8 @@ const Form = (props) => {
                                 label='Acknowladge Name'
                                 name='acknowladge_by[name]'
                                 defaultValue={data?.acknowladge_by['name']}
-                                required
-                                helperText={!!errors?.acknowladge_by['name'] && errors?.acknowladge_by['name'][0]}
-                                error={!!errors?.acknowladge_by['name']}
+                                helperText={!!errors?.['acknowladge_by.name'] && errors?.['acknowladge_by.name'][0]}
+                                error={!!errors?.['acknowladge_by.name']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -225,9 +224,8 @@ const Form = (props) => {
                                 label='Acknowladge Position'
                                 name='acknowladge_by[position]'
                                 defaultValue={data?.acknowladge_by['position']}
-                                required
-                                helperText={!!errors?.acknowladge_by['position'] && errors?.acknowladge_by['position'][0]}
-                                error={!!errors?.acknowladge_by['position']}
+                                helperText={!!errors?.['acknowladge_by.position'] && errors?.['acknowladge_by.position'][0]}
+                                error={!!errors?.['acknowladge_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={12}>

@@ -10,6 +10,13 @@ import 'moment/locale/id';
 import useDownloadMealSheetDetail from '@hooks/meal-sheet-detail/useDownloadMealSheetDetail'
 import { LoadingButton } from '@mui/lab'
 
+const CheckStatusComponent = ({ isChecked }) => {
+    if(isChecked){
+        return <Iconify icon='mdi:check-bold' sx={{ color: 'black', fontSize: '0.7rem' }} />
+    }
+    return ''
+}
+
 const PreviewDailyRecord = () => {
     const { id } = useParams()
     const { data: rows, isLoading: loadingData } = useFetchMealSheetDetailById(id)
@@ -87,12 +94,27 @@ const PreviewDailyRecord = () => {
                             <td className="text-center">{v.name}</td>
                             <td className="text-center">{v.position}</td>
                             <td className="text-center">{v.company}</td>
-                            <td className="tg-0pky">{v.breakfast}</td>
-                            <td className="tg-0pky">{v.lunch}</td>
-                            <td className="tg-0pky">{v.dinner}</td>
-                            <td className="tg-0pky">{v.super}</td>
+                            <td className="tg-0pky">
+                                <CheckStatusComponent isChecked={v.breakfast} />
+                            </td>
+                            <td className="tg-0pky">
+                                <CheckStatusComponent isChecked={v.lunch} />
+                            </td>
+                            <td className="tg-0pky">
+                                <CheckStatusComponent isChecked={v.dinner} />
+                            </td>
+                            <td className="tg-0pky">
+                                <CheckStatusComponent isChecked={v.super} />
+                            </td>
                             <td className="tg-0pky">{total}</td>
-                            <td className="tg-0pky">{v.accomodation}</td>
+                            <td className="tg-0pky">
+                                <CheckStatusComponent isChecked={v.accomodation} />
+                            </td>
+                            {/* <td className="tg-0pky">{v.breakfast}</td> */}
+                            {/* <td className="tg-0pky">{v.lunch}</td> */}
+                            {/* <td className="tg-0pky">{v.dinner}</td> */}
+                            {/* <td className="tg-0pky">{v.super}</td> */}
+                            {/* <td className="tg-0pky">{v.accomodation}</td> */}
                         </tr>
                     )
                 })}

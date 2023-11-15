@@ -33,7 +33,7 @@ const index = () => {
                                 return (
                                     <Grid key={v.id} item xs={12} md={v.main === 1 ? 12 : 4}>
                                         <Card>
-                                            <Link style={{ textDecoration: 'none', color: 'black' }} to={`/stock-management/stock-by-location/${v?.id}`}>
+                                            <Link style={{ textDecoration: 'none', color: 'black' }} to={`/stock-management/stock-by-location/${v?.id}/product`}>
                                                 <CardContent>
                                                     <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
                                                         <Grid item xs={12} md={12}>

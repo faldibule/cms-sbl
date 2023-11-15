@@ -92,7 +92,10 @@ import PrintPreviewMealSheetMonthly from './pages/print-preview/meal-sheet-month
 // Stock Management
 import StockManagement from './pages/stock-management'
 import StockByLocation from './pages/stock-management/stock-by-location'
-import StockDetailProduct from './pages/stock-management/stock-by-location/stock-detail-product'
+
+import StockDetailProduct from './pages/stock-management/stock-by-location/product/detail'
+import AddMOR from './pages/stock-management/stock-by-location/mor/Add'
+import EditMORDaily from './pages/stock-management/stock-by-location/mor/Edit'
 
 // File Management
 import FileManagement from './pages/file-management/Edit'
@@ -277,8 +280,12 @@ export default function Router() {
       </Middleware.After>,
       children: [
         { path: '', element: <StockManagement /> },
-        { path: 'stock-by-location/:location_id', element: <StockByLocation /> },
+        { path: 'stock-by-location/:location_id/product', element: <StockByLocation /> },
         { path: 'stock-by-location/:location_id/detail/:item_product_id', element: <StockDetailProduct /> },
+
+        { path: 'stock-by-location/:location_id/mor', element: <StockByLocation /> },
+        { path: 'stock-by-location/:location_id/mor/add', element: <AddMOR /> },
+        { path: 'stock-by-location/:location_id/mor/edit/:date', element: <EditMORDaily /> },
       ],
     },
     {
