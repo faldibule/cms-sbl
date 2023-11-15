@@ -5,7 +5,7 @@ const CustomAutocomplete = ({ label, errors, options, getOptionLabel, selectedVa
         <Autocomplete
             disabled={disabled}
             fullWidth
-            freeSolo
+            // freeSolo
             options={options}
             getOptionLabel={getOptionLabel}
             value={selectedValue || null} 

@@ -110,11 +110,6 @@ const PreviewDailyRecord = () => {
                             <td className="tg-0pky">
                                 <CheckStatusComponent isChecked={v.accomodation} />
                             </td>
-                            {/* <td className="tg-0pky">{v.breakfast}</td> */}
-                            {/* <td className="tg-0pky">{v.lunch}</td> */}
-                            {/* <td className="tg-0pky">{v.dinner}</td> */}
-                            {/* <td className="tg-0pky">{v.super}</td> */}
-                            {/* <td className="tg-0pky">{v.accomodation}</td> */}
                         </tr>
                     )
                 })}
@@ -150,27 +145,41 @@ const PreviewDailyRecord = () => {
                             <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.prepared_by['position']}</p>
                         </div>
                     </td>
-                    <td colSpan="2" style={{ borderTop: 'none', borderRight: 'none', borderLeft: 'none', }}>
-                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
+                    <td colSpan={!!rows?.acknowladge_by ? "2" : "4"} style={{ borderTop: 'none', borderRight: 'none', borderLeft: 'none', }}>
+                        <div style={{ 
+                            minHeight: '100px', 
+                            textAlign: 'center', 
+                            marginTop: '0px', 
+                            marginLeft: !!rows?.acknowladge_by ? '-50px' : null
+                        }}>
                             <p>Checked By,</p>
                             <p style={{ marginTop: '60px', }}>{rows.checked_by['name']}</p>
                             <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.checked_by['position']}</p>
                         </div>
                     </td>
-                    <td colSpan="4" style={{ borderTop: 'none', borderRight: 'none', borderLeft: 'none', }}>
+                    <td colSpan={!!rows?.acknowladge_by ? "2" : "4"} 
+                        style={{ 
+                            borderTop: 'none', 
+                            borderLeft: 'none', 
+                            borderRight: !!rows?.acknowladge_by ? 'none' : null,
+                        }}
+                    >
                         <div style={{ marginLeft: '-10px', minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
                             <p>Approved By,</p>
                             <p style={{ marginTop: '60px', }}>{rows.approved_by['name']}</p>
                             <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.approved_by['position']}</p>
                         </div>
                     </td>
-                    <td colSpan="2" style={{ borderTop: 'none', borderLeft: 'none', }}>
-                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
-                            <p>Acknowledge By,</p>
-                            <p style={{ marginTop: '60px', }}>Name</p>
-                            <p style={{ marginTop: '-5px', marginBottom: '0px', }}>Position</p>
-                        </div>
-                    </td>
+                    {!!rows?.acknowladge_by ?
+                        <td colSpan="4" style={{ borderTop: 'none', borderLeft: 'none', }}>
+                            <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
+                                <p>Acknowledge By,</p>
+                                <p style={{ marginTop: '60px', }}>{rows.acknowladge_by['name']}</p>
+                                <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.acknowladge_by['position']}</p>
+                            </div>
+                        </td>
+                    : null
+                    }
                 </tr>
 
                 {/* Footer */}

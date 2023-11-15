@@ -59,9 +59,6 @@ const index = () => {
     })
     const [openDownload, setOpenDownload] = useState(false)
     const handleCloseDownload = (data = null) => {
-        if(openDownload){
-            handleReset()
-        }
         setOpenDownload(!openDownload)
         if(!!!data) return;
         setStaging(data)

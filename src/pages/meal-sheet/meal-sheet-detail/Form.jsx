@@ -113,6 +113,11 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         formData.append('meal_sheet_daily_id', daily_id)
         formData.append('client_id', clientState.selected?.id)
+        const objectTemp = Object.fromEntries(formData)
+        if(objectTemp['acknowladge_by[name]'] === '' && objectTemp['acknowladge_by[position]'] === '' ){
+            formData.delete('acknowladge_by[name]')
+            formData.delete('acknowladge_by[position]')
+        }
         item.forEach((v, i) => {
             const breakfast = (v.breakfast === 'on') || (v.breakfast === 1)  ? 1 : 0
             const lunch = (v.lunch === 'on') || (v.lunch === 1)  ? 1 : 0
@@ -294,6 +299,26 @@ const Form = (props) => {
                                 required
                                 hhelperText={!!errors?.['approved_by.position'] && errors?.['approved_by.position'][0]}
                                 error={!!errors?.['approved_by.position']}
+                            /> 
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Acknowladge Name'
+                                name='acknowladge_by[name]'
+                                defaultValue={data?.acknowladge_by['name']}
+                                helperText={!!errors?.['acknowladge_by.name'] && errors?.['acknowladge_by.name'][0]}
+                                error={!!errors?.['acknowladge_by.name']}
+                            /> 
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Acknowladge Position'
+                                name='acknowladge_by[position]'
+                                defaultValue={data?.acknowladge_by['position']}
+                                helperText={!!errors?.['acknowladge_by.position'] && errors?.['acknowladge_by.position'][0]}
+                                error={!!errors?.['acknowladge_by.position']}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={12}>

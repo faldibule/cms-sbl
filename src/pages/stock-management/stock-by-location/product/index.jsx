@@ -107,7 +107,7 @@ const index = () => {
                         {value.item_product.name}
                     </TableCell>
                     <TableCell>
-                        {NumberFormat(value.item_product.price, 'Rp')}
+                        {NumberFormat(parseInt(value.item_product.price), 'Rp')}
                     </TableCell>
                     <TableCell>
                         <CustomLinkComponent label='View' url={`/stock-management/stock-by-location/${location_id}/detail/${value.item_product.id}`} />

@@ -225,8 +225,8 @@ const index = () => {
                                                     </Grid>
                                                     <Grid item xs={12} md={6}>
                                                         <CustomGridLabel 
-                                                            label='Brand'
-                                                            value={data.product_stock.item_product.brand}
+                                                            label='Code'
+                                                            value={data.product_stock.item_product.code}
                                                         />
                                                     </Grid>
                                                     <Grid item xs={12} md={6}>
@@ -251,6 +251,12 @@ const index = () => {
                                                         <CustomGridLabel 
                                                             label='Sub Category Name'
                                                             value={data.product_stock.item_product.sub_item_category.category}
+                                                        />
+                                                    </Grid>
+                                                    <Grid item xs={12} md={6}>
+                                                        <CustomGridLabel 
+                                                            label='Brand'
+                                                            value={data.product_stock.item_product.brand}
                                                         />
                                                     </Grid>
                                                     <Grid item xs={12} md={6}>

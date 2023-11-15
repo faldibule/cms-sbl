@@ -214,6 +214,7 @@ const Form = (props) => {
                                 label='Acknowladge Name'
                                 name='acknowladge_by[name]'
                                 defaultValue={data?.acknowladge_by['name']}
+                                required
                                 helperText={!!errors?.['acknowladge_by.name'] && errors?.['acknowladge_by.name'][0]}
                                 error={!!errors?.['acknowladge_by.name']}
                             /> 
@@ -224,6 +225,7 @@ const Form = (props) => {
                                 label='Acknowladge Position'
                                 name='acknowladge_by[position]'
                                 defaultValue={data?.acknowladge_by['position']}
+                                required
                                 helperText={!!errors?.['acknowladge_by.position'] && errors?.['acknowladge_by.position'][0]}
                                 error={!!errors?.['acknowladge_by.position']}
                             /> 
