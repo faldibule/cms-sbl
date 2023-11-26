@@ -40,7 +40,7 @@ const navConfig = [
         path: 'item-product'
       },
       {
-        title: 'Client',
+        title: 'Client Meal Sheet',
         path: 'client'
       },
       {
@@ -75,7 +75,7 @@ const navConfig = [
     path: '/quotation',
   },
   {
-    title: 'Purchase Request',
+    title: 'PR Catering',
     icon: getIcon('bxs:purchase-tag'),
     path: '/purchase-request/input-purchase-request',
   },
@@ -85,7 +85,7 @@ const navConfig = [
     path: '/purchase-order',
     children: [
       {
-        title: 'PO Masuk',
+        title: 'PO Customer',
         path: 'po-masuk'
       },
       {
@@ -93,7 +93,7 @@ const navConfig = [
         path: 'po-catering'
       },
       {
-        title: 'PO Keluar Quotation',
+        title: 'PO Supplier',
         path: 'po-quotation'
       },
       // {

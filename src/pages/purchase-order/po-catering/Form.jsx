@@ -262,7 +262,7 @@ const Form = (props) => {
                                 disabled={isApproved}
                                 options={dataPrList.data}
                                 getOptionLabel={(option) => `${option.pr_number}`}
-                                label='PR Number'
+                                label='PR Catering Number'
                                 inputValue={prState.input}
                                 setInputValue={handleInputPr}
                                 selectedValue={prState.selected}

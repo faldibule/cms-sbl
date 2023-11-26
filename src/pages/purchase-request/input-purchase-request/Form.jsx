@@ -204,7 +204,7 @@ const Form = (props) => {
                             <TextField
                                 type='date'
                                 disabled={isApproved}
-                                label="PR Date"
+                                label="Request Date"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
@@ -220,7 +220,7 @@ const Form = (props) => {
                                 type='date'
                                 disabled={isApproved}
                                 name='shipment_date'
-                                label="Shipment Date"
+                                label="Delivery Date"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
