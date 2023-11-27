@@ -49,6 +49,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                     v={v} 
                     onChangeByIndex={onChangeByIndex}
                     i={i}
+                    priceProps={valueMemo.price}
                 />
             </TableCell>
         </TableRow>

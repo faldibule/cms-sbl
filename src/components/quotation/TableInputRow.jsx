@@ -5,11 +5,11 @@ import DialogInputRow from "./DialogInputRow"
 import { NumberFormat } from "@utils/Format"
 import useValueConverter from "@hooks/useValueConverter"
 
-const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved, markup = 0 }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
     
-    const { valueMemo, tax, total, grand_total } = useValueConverter(v) 
+    const { valueMemo, tax, total, grand_total, markUpMemo } = useValueConverter(v, markup) 
 
     return (
         <TableRow key={i}>
@@ -26,6 +26,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 {v?.quantity || 0}
             </TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(markUpMemo.markupPrice, 'Rp')}</TableCell>
             <TableCell>
                 {v.vat || 11}%
             </TableCell>

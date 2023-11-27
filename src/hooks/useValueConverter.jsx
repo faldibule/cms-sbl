@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-const useValueConverter = (v) => {
+const useValueConverter = (v, markup = 0) => {
     const valueMemo = useMemo(() => {
         return {
             name: v?.item_product?.name || v?.name || v?.item_name || '',
@@ -28,11 +28,19 @@ const useValueConverter = (v) => {
 
     const grand_total = useMemo(() =>  parseInt(total + (isNaN(tax) ? 0 : tax)), [total, tax])
 
+    const markUpMemo = useMemo(() => {
+        return {
+            markupPrice: valueMemo?.price + (valueMemo?.price * markup / 100),
+            markupTotal: total + (total * markup / 100)
+        }
+    }, [valueMemo, total, markup])
+
     return {
         valueMemo,
         total,
         tax,
-        grand_total
+        grand_total,
+        markUpMemo
     }
 }
 

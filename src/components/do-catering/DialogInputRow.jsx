@@ -1,11 +1,20 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Stack, TextField } from "@mui/material"
 import { IntegerFormat, NumberFormat } from "@utils/Format"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
-    const [price, setPrice] = useState(NumberFormat(v.price || parseInt(v?.item_price), 'Rp'))
-    const handlePrice = (v) => setPrice(NumberFormat(v, 'Rp')) 
+const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i, priceProps }) => {
+    const [price, setPrice] = useState(0)
+    const handlePrice = (v) => setPrice(NumberFormat(v, 'Rp'))
 
+    useEffect(() => {
+        let mounted = true
+        if(mounted){
+            handlePrice(priceProps)
+        }
+        
+        return () => mounted = false
+
+    }, [priceProps])
     const onSubmit = (e) => {
         e.preventDefault()
         const formElem = document.querySelector('#formElement') 
