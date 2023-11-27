@@ -105,6 +105,7 @@ const Form = (props) => {
     // Handle Markup
     const [markup, setMarkup] = useState(undefined)
     const handleMarkup = (value) => setMarkup(value)
+    const isMarkupInvalid = useMemo(() => (markup < 0 || markup > 100))
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -199,7 +200,6 @@ const Form = (props) => {
     if(loadingCustomer || loadingUser || loadingItemProduct){
         return <Loading />
     }
-    console.log(customerState)
 
     return (
         <Stack>
@@ -369,8 +369,8 @@ const Form = (props) => {
                                     value={markup}
                                     required
                                     name='markup'
-                                    helperText={!!errors?.markup && errors?.markup[0]}
-                                    error={!!errors?.markup}
+                                    helperText={isMarkupInvalid && 'Markup Value must be in betewen 0 to 100'}
+                                    error={isMarkupInvalid}
                                 />
                             </Grid>
                             
@@ -392,10 +392,11 @@ const Form = (props) => {
                                                     <TableCellHeaderColor>Unit</TableCellHeaderColor>
                                                     <TableCellHeaderColor>Quantity</TableCellHeaderColor>
                                                     <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
                                                     <TableCellHeaderColor>VAT</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Total Tax</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Total Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>New Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Total Markup</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Total New Price</TableCellHeaderColor>
                                                     <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
                                                     <TableCellHeaderColor>T/NT</TableCellHeaderColor>
                                                     <TableCellHeaderColor>Remarks</TableCellHeaderColor>
@@ -416,7 +417,7 @@ const Form = (props) => {
                             </Grid>
                             <Grid item xs={12} md={12}>
                                 <Stack direction='row' spacing={2}>
-                                    <Button onClick={() => navigate('/external-order/quotation')} variant='contained'>
+                                    <Button disabled={isMarkupInvalid} onClick={() => navigate('/external-order/quotation')} variant='contained'>
                                         Submit
                                     </Button>
                                     {/* {isApproved ?

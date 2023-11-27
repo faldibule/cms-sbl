@@ -26,19 +26,36 @@ const useValueConverter = (v, markup = 0) => {
         return total * vat / 100
     }, [total, v?.vat, valueMemo.tax])
 
+    const eachTax = useMemo(() => {
+        let vat = 11
+        if(valueMemo.tax !== 'yes'){
+            return 0
+        }
+        if(!!v.vat){
+            vat = parseInt(v.vat)
+        }
+        return valueMemo.price * vat / 100
+    }, [valueMemo.price, v?.vat, valueMemo.tax])
+
+    const newPrice = useMemo(() => {
+        return valueMemo.price + eachTax
+    }, [valueMemo.price, eachTax])
+
     const grand_total = useMemo(() =>  parseInt(total + (isNaN(tax) ? 0 : tax)), [total, tax])
 
     const markUpMemo = useMemo(() => {
         return {
-            markupPrice: valueMemo?.price + (valueMemo?.price * markup / 100),
-            markupTotal: total + (total * markup / 100)
+            markupPrice: (valueMemo?.price + eachTax) * markup / 100,
+            markupTotal: grand_total * markup / 100
         }
-    }, [valueMemo, total, markup])
+    }, [valueMemo, grand_total, markup])
 
     return {
         valueMemo,
         total,
         tax,
+        newPrice,
+        eachTax,
         grand_total,
         markUpMemo
     }

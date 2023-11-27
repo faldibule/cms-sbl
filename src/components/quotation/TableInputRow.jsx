@@ -9,7 +9,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
     
-    const { valueMemo, tax, total, grand_total, markUpMemo } = useValueConverter(v, markup) 
+    const { valueMemo, tax, total, grand_total, markUpMemo, eachTax, newPrice } = useValueConverter(v, markup) 
 
     return (
         <TableRow key={i}>
@@ -26,13 +26,14 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 {v?.quantity || 0}
             </TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(markUpMemo.markupPrice, 'Rp')}</TableCell>
             <TableCell>
-                {v.vat || 11}%
+                {valueMemo.tax !== 'yes' ? 'No' : NumberFormat(eachTax, 'Rp')}({v.vat || 11}%)
             </TableCell>
-            <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(tax, 'Rp')}</TableCell>
-            <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
+            <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(newPrice, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{markup === 0 ? 0 : NumberFormat(markUpMemo.markupPrice, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(markUpMemo.markupTotal, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
+            <TableCell>{NumberFormat(grand_total + markUpMemo.markupTotal, 'Rp')}</TableCell>
             <TableCell>
                 {
                     !!v.tnt ? v.tnt : !!errors[`item_product.${i}.tnt`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>T/NT required</Typography> : ''
