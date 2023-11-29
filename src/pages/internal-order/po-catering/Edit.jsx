@@ -1,19 +1,17 @@
-import React from 'react'
-import Page from '@components/Page'
-import { Container } from '@mui/material'
-import Form from './Form'
 import Loading from '@components/Loading'
-import { useParams } from 'react-router-dom'
+import Page from '@components/Page'
 import useFetchPOCateringById from '@hooks/po-catering/useFetchPOCateringById'
-
-const temp = {
-  data: undefined,
-  isLoading: false
-}
-
+import { Container } from '@mui/material'
+import { useParams } from 'react-router-dom'
+import Form from './Form'
 const Edit = () => {
     const { id } = useParams()
-    const { data, isLoading } = temp
+    const { data, isLoading } = useFetchPOCateringById(id)
+
+    if(!isLoading && !data){
+      return 'Data PO Catering Tidak Ditemukan'
+    }
+
     return (
       <Page title='Form Edit PO Catering'>
           <Container>

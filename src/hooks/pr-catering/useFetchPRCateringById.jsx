@@ -1,10 +1,10 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchPOCateringById = (id) => {
-    return useQuery(['po-catering', id], async ({ signal }) => {
+const useFetchPRCateringById = (id) => {
+    return useQuery(['pr-catering', id], async ({ signal }) => {
         try {
-            const res = await http.get(`po-catering/${id}`)
+            const res = await http.get(`pr-catering/${id}`)
             return res.data.data
         } catch (err) {
             // console.log(err)
@@ -14,4 +14,4 @@ const useFetchPOCateringById = (id) => {
     })
 }
 
-export default useFetchPOCateringById
+export default useFetchPRCateringById

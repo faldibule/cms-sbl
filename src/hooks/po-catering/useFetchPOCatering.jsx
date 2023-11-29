@@ -5,7 +5,7 @@ import { useQuery } from 'react-query'
 const useFetchPOCatering = (params) => {
     return useQuery(['po-caterings', params], async ({ signal }) => {
         try {
-            const res = await http.get('catering-po', {
+            const res = await http.get('po-catering', {
                 signal,
                 params
             })

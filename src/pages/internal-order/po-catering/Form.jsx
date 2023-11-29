@@ -1,21 +1,20 @@
-import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import Iconify from '@components/Iconify'
-import { useNavigate } from 'react-router-dom'
-import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
-import TableInputRow from '@components/po-catering/TableInputRow'
-import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import useFetchUser from '@hooks/user-list/useFetchUser'
-import useFetchLocation from '@hooks/location/useFetchLocation'
-import useFetchPurchaseRequest from '@hooks/purchase-request/useFetchPurchaseRequest'
-import Loading from '@components/Loading'
-import useSavePOCatering from '@hooks/po-catering/useSavePOCatering'
 import CustomAutocomplete from '@components/CustomAutocomplete'
-import useFetchSupplier from '@hooks/supplier/useFetchSupplier'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
+import Iconify from '@components/Iconify'
+import Loading from '@components/Loading'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import TableInputRow from '@components/po-catering/TableInputRow'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
-import useFetchPurchaseRequestById from '@hooks/purchase-request/useFetchPurchaseRequestById'
-import { dummy_item_product, prDummy } from '@utils/Dummy'
+import useSavePOCatering from '@hooks/po-catering/useSavePOCatering'
+import useFetchPRCatering from '@hooks/pr-catering/useFetchPRCatering'
+import useFetchPRCateringById from '@hooks/pr-catering/useFetchPRCateringById'
+import useFetchUser from '@hooks/user-list/useFetchUser'
+import { LoadingButton } from '@mui/lab'
+import { Box, Button, Card, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { dummy_item_product } from '@utils/Dummy'
+import moment from 'moment'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
@@ -24,38 +23,48 @@ const Form = (props) => {
         return data.status === 'finish'
     }, [data])
 
+    const approvalMemo = useMemo(() => {
+        return {
+            isChecked: !!data?.checked_date,
+            checked_date: data?.checked_date,
+
+            isApproved1: !!data?.approved1_date,
+            approved1_date: data?.approved1_date,
+
+            isApproved2: !!data?.approved2_date,
+            approved2_date: data?.approved2_date
+        }
+    }, [data])
+
     const navigate = useNavigate()
     const [item, setItem] = useState(dummy_item_product)
-    const [form, setForm] = useState({
-        item: '',
-    })
 
     // PR Handle
-    const [prState, setPrState] = useState({
+    const [prCateringState, setPRCateringState] = useState({
         input: '',
         selected: ''
     })
-    const handleSelectedPr = (value) => setPrState({...prState, selected: value})
-    const handleInputPr = (value) => setPrState({...prState, input: value})
-    const { data: dataPrList, isLoading: loadingPrList } = useFetchPurchaseRequest({ paginate: 0 })
-    const { data: dataPRById, isLoading: loadingPrById } = useFetchPurchaseRequestById(prState.selected?.id, { enabled: !!prState.selected?.id })
+    const handleSelectedPRCatering = (value) => setPRCateringState({...prCateringState, selected: value})
+    const handleInputPRCatering = (value) => setPRCateringState({...prCateringState, input: value})
+    const { data: dataPRCateringList, isLoading: loadingPRCateringList } = useFetchPRCatering({ paginate: 0 })
+    const { data: dataPRCateringById, isLoading: loadingPRCateringById } = useFetchPRCateringById(prCateringState.selected?.id, { enabled: !!prCateringState.selected?.id })
 
-    // useEffect(() => {
-    //     let mounted = true
-    //     if(!!!prState.selected?.id) return
-    //     if(!!!dataPRById) return
-    //     if(!mounted) return 
+    useEffect(() => {
+        let mounted = true
+        if(!!!prCateringState.selected?.id) return
+        if(!!!dataPRCateringById) return
+        if(!mounted) return 
 
-    //     if(props.title === 'edit' && prState.selected?.id === data.purchase_request?.id){
-    //         setItem([...data.item_product])
-    //         return
-    //     }
+        if(props.title === 'edit' && prCateringState.selected?.id === data.pr_catering?.id){
+            setItem([...data.item_product])
+            return
+        }
 
-    //     setItem([...dataPRById.item_product])
+        setItem([...dataPRCateringById.item_product])
 
-    //     return () => mounted = false
+        return () => mounted = false
 
-    // }, [prState.selected, dataPRById])
+    }, [prCateringState.selected, dataPRCateringById])
 
     // User Handle
     const [userState, setUserState] = useState({
@@ -128,74 +137,56 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        formData.append('purchase_request_id', prState.selected?.id)
-        formData.append('supplier_id', supplierState.selected?.id)
-        formData.append('location_id', locationState.selected?.id)
+        formData.append('pr_catering_id', prCateringState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
         formData.append('checked_by', userState.checked_by.selected?.id)
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name =  v?.item_product?.name
-            const brand = v?.item_product?.brand
-            const size = v?.item_product?.size
             const price = parseInt(v?.price) || parseInt(v?.item_price)
-            const unit = v.item_product?.unit?.param || v?.unit 
             const item_product_id = v.item_product?.id
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
-            formData.append(`item_product[${i}][item_name]`, name)
-            formData.append(`item_product[${i}][item_brand]`, brand)
             formData.append(`item_product[${i}][description]`, v?.description)
-            formData.append(`item_product[${i}][size]`, size)
-            formData.append(`item_product[${i}][unit]`, unit)
             formData.append(`item_product[${i}][item_price]`, price)
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
-        // save({ formData, id: data?.id })
+        save({ formData, id: data?.id })
     }
 
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!data){
-                // setPrState({
-                //     input: data.purchase_request?.pr_number,
-                //     selected: data.purchase_request
-                // })
-                // setSupplierState({
-                //     input: data.supplier.name,
-                //     selected: data.supplier
-                // })
-                // setLocationState({
-                //     input: `${data.location.location_code} - ${data.location.location}`,
-                //     selected: data.location
-                // })
-                // setDiscount({
-                //     id: data?.discount?.id,
-                //     value: data?.discount?.discount
-                // })
-                // setUserState({
-                //     ...userState,
-                //     prepared_by: {
-                //         input: data?.prepared_by?.name,
-                //         selected: data?.prepared_by,
-                //     },
-                //     checked_by: {
-                //         input: data?.checked_by?.name,
-                //         selected: data?.checked_by,
-                //     },
-                //     approved1_by: {
-                //         input: data?.approved1_by?.name,
-                //         selected: data?.approved1_by,
-                //     },
-                //     approved2_by: {
-                //         input: data?.approved2_by?.name,
-                //         selected: data?.approved2_by,
-                //     }
-                // })
-                // setItem([...data.item_product])
+                setPRCateringState({
+                    input: data.pr_catering?.pr_number,
+                    selected: data.pr_catering
+                })
+                setDiscount({
+                    id: data?.discount?.id,
+                    value: data?.discount?.discount
+                })
+                setUserState({
+                    ...userState,
+                    prepared_by: {
+                        input: data?.prepared_by?.name,
+                        selected: data?.prepared_by,
+                    },
+                    checked_by: {
+                        input: data?.checked_by?.name,
+                        selected: data?.checked_by,
+                    },
+                    approved1_by: {
+                        input: data?.approved1_by?.name,
+                        selected: data?.approved1_by,
+                    },
+                    approved2_by: {
+                        input: data?.approved2_by?.name,
+                        selected: data?.approved2_by,
+                    }
+                })
+                setItem([...data.item_product])
             }
         }
 
@@ -218,7 +209,7 @@ const Form = (props) => {
 
     }, [dataDiscount])
 
-    if(loadingPrList || loadingUser || loadingDiscount){
+    if(loadingPRCateringList || loadingUser || loadingDiscount){
         return <Loading />
     }
 
@@ -243,55 +234,41 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
-                                options={prDummy}
+                                options={dataPRCateringList?.data || []}
                                 getOptionLabel={(option) => `${option.pr_number}`}
                                 label='PR Catering Number'
-                                inputValue={prState.input}
-                                setInputValue={handleInputPr}
-                                selectedValue={prState.selected}
-                                setSelectedValue={handleSelectedPr}
-                                errors={errors?.purchase_request_id}
-                                key='PR'
+                                inputValue={prCateringState.input}
+                                setInputValue={handleInputPRCatering}
+                                selectedValue={prCateringState.selected}
+                                setSelectedValue={handleSelectedPRCatering}
+                                errors={errors?.pr_catering_id}
                             /> 
                         </Grid>
-                        {!!prState.selected?.id ?
+                        {console.log(dataPRCateringById)}
+                        {!!prCateringState.selected?.id ?
                         <>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 disabled
                                 fullWidth
-                                type='date'
                                 label="Request Date"
-                                name='request_date'
-                                defaultValue={'2023-11-11'}
-                                helperText={!!errors?.request_date && errors?.request_date[0]}
-                                error={!!errors?.request_date}
-                                required
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
+                                value={!!dataPRCateringById?.request_date ?moment(dataPRCateringById?.request_date).format('LL') : 'Loading...'}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 disabled
                                 fullWidth
-                                type='date'
                                 label="Delivery Date"
-                                name='delivery_date'
-                                defaultValue={'2023-11-11'}
-                                helperText={!!errors?.delivery_date && errors?.delivery_date[0]}
-                                error={!!errors?.delivery_date}
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
+                                value={!!dataPRCateringById?.delivery_date ?moment(dataPRCateringById?.delivery_date).format('LL') : 'Loading...'}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <TextField 
-                                name='location'
+                                label='Location'
+                                fullWidth
                                 disabled
-                                defaultValue='HO Jakarta'
+                                value={dataPRCateringById?.location?.location || 'Loading....'}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -308,8 +285,6 @@ const Form = (props) => {
                                 select
                             >
                                 {renderDiscountMenuItem()}
-                                {/* <MenuItem value={0}>0%</MenuItem> */}
-                                {/* <MenuItem value={5}>5%</MenuItem> */}
                             </TextField> 
                         </Grid>
                         <Grid item xs={12} md={6}>
@@ -353,9 +328,9 @@ const Form = (props) => {
                                 errors={errors?.prepared_by}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={approvalMemo.isChecked ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || approvalMemo.isChecked}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Checked By'
@@ -366,9 +341,20 @@ const Form = (props) => {
                                 errors={errors?.checked_by}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        {approvalMemo.isChecked ?
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    disabled
+                                    fullWidth
+                                    label="Checked On"
+                                    value={moment(approvalMemo?.checked_date).format('LL') || ''}
+                                />
+                            </Grid>
+                        : null
+                        }
+                        <Grid item xs={12} md={approvalMemo.isApproved1 ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || approvalMemo.isApproved1}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Approved By 1'
@@ -379,9 +365,20 @@ const Form = (props) => {
                                 errors={errors?.approved1_by}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        {approvalMemo.isApproved1 ?
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    disabled
+                                    fullWidth
+                                    label="Approved 1 On"
+                                    value={moment(approvalMemo?.approved1_date).format('LL') || ''}
+                                />
+                            </Grid>
+                        : null
+                        }
+                        <Grid item xs={12} md={approvalMemo.isApproved2 ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || approvalMemo.isApproved2}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Approved By 2'
@@ -392,6 +389,17 @@ const Form = (props) => {
                                 errors={errors?.approved2_by}
                             />
                         </Grid>
+                        {approvalMemo.isApproved2 ?
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    disabled
+                                    fullWidth
+                                    label="Approved 2 On"
+                                    value={moment(approvalMemo?.approved2_date).format('LL') || ''}
+                                />
+                            </Grid>
+                        : null
+                        }
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -418,7 +426,7 @@ const Form = (props) => {
                                                 <TableCellHeaderColor>Price</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Quantity</TableCellHeaderColor>
                                                 <TableCellHeaderColor>VAT</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total Tax</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Total Price</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Remarks</TableCellHeaderColor>
@@ -439,23 +447,17 @@ const Form = (props) => {
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
-                                <Button onClick={() => navigate(`/file/${data?.id}/catering_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
-                                    Next
-                                </Button>
-                                {/* {isApproved ?
-                                    <Button onClick={() => navigate(`/file/${data?.id}/catering_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                {isApproved ?
+                                    // <Button onClick={() => navigate(`/file/${data?.id}/po-catering`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                    //     Next
+                                    // </Button>
+                                    <Button onClick={() => navigate(`/internal-order/po-catering`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
                                         Next
                                     </Button>
                                 :
                                     <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
                                         Next
                                     </LoadingButton>
-                                } */}
-                                {props.title == 'edit' ? ''
-                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                    //     Print
-                                    // </LoadingButton>
-                                : null
                                 }
                             </Stack>
                         </Grid>

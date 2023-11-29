@@ -1,22 +1,18 @@
-import { useCallback, useMemo, useState } from 'react'
-import { Button, Card, CardContent, Checkbox, Container, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import CustomSearchComponent from '@components/CustomSearchComponent';
-import { LoadingButton } from '@mui/lab';
-import Loading from '@components/Loading';
-import DeleteDialog from '@components/DeleteDialog';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct';
-import useDeleteItemProduct from '@hooks/item-product/useDeleteItemProduct';
-import useSaveItemProduct from '@hooks/item-product/useSaveItemProduct';
-import useFetchItemCategory from '@hooks/item-category/useFetchItemCategory';
-import useFetchUnit from '@hooks/unit/useFetchUnit';
 import CustomLinkComponent from '@components/CustomLinkComponent';
-import { Link } from 'react-router-dom';
+import CustomSearchComponent from '@components/CustomSearchComponent';
+import DeleteDialog from '@components/DeleteDialog';
 import Iconify from '@components/Iconify';
 import ImportModal from '@components/ImportModal';
-import { NumberFormat } from '@utils/Format';
+import Loading from '@components/Loading';
+import Page from '@components/Page';
+import useDeleteItemProduct from '@hooks/item-product/useDeleteItemProduct';
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct';
 import useCustomSnackbar from '@hooks/useCustomSnackbar';
+import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { NumberFormat } from '@utils/Format';
+import { useCallback, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const index = () => {
     const [params, setParams] = useState({
@@ -55,7 +51,6 @@ const index = () => {
         setLoading(true)
         setTimeout(() => {
             setStaging({})
-            setCategory('')
             setLoading(false)
         }, 0);
     }

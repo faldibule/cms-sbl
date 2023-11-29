@@ -4,9 +4,10 @@ import DeleteDialog from '@components/DeleteDialog'
 import UpdateStatusDialog from '@components/UpdateStatusDialog'
 import useDeletePOCatering from '@hooks/po-catering/useDeletePOCatering'
 import useUpdateStatusPOCatering from '@hooks/po-catering/useUpdateStatusPOCatering'
+import useApprovalLogic from '@hooks/useApprovalLogic'
 import { Chip, TableCell, TableRow } from '@mui/material'
 import moment from 'moment'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 const TableDataRow = ({ i, value, rows, refetch }) => {
     const [form, setForm] = useState({
@@ -51,62 +52,19 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
     }
     const handleUpdateStatusApproval = async () => {
         let status = ''
-        if(!!!value?.approved2_date){
+        if(!value?.approved2_date){
             status = 'approved2'
         }
-        if(!!!value?.approved1_date){
+        if(!value?.approved1_date){
             status = 'approved1'
         }
-        if(!!!value?.checked_date){
+        if(!value?.checked_date){
             status = 'checked'
         }
         updateStatus({ type: 'update-approval-status', status, id: value.id })
     }
 
-    const statusLabelAndColor = useMemo(()=> {
-        const { checked_date, approved1_date, approved2_date, status } = value
-        let labelAndColor = {
-            label: 'default',
-            color: 'primary'
-        }
-        if(!!!checked_date && !!!approved1_date && !!!approved2_date){
-            labelAndColor = {
-                label: 'Pending',
-                color: 'warning'
-            }
-        }
-        if(!!checked_date){
-            labelAndColor = {
-                label: 'Checked',
-                color: 'primary'
-            }
-        }
-        if(!!approved1_date && !!approved2_date){
-            labelAndColor = {
-                label: 'Checked',
-                color: 'primary'
-            }
-        }
-        if(status === 'reject'){
-            labelAndColor = {
-                label: 'Rejected',
-                color: 'error'
-            }
-        }
-        if(status === 'finish'){
-            labelAndColor = {
-                label: 'Approved',
-                color: 'success'
-            }
-        }
-        if(status === 'draft'){
-            labelAndColor = {
-                label: 'Draft',
-                color: 'warning'
-            }
-        }
-        return labelAndColor
-    }, [value])
+    const { isUserCanApprove, isUserPrepared, statusLabelAndColor } = useApprovalLogic(value)
 
     return (
         <TableRow key={i}>
@@ -118,13 +76,19 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {rows.meta.from+i}.
             </TableCell>
             <TableCell>
-                <CustomLinkComponent label={value.po_number} url={`/purchase-order/po-catering/edit/${value.id}`} />
+                <CustomLinkComponent label={value.po_number} url={`/internal-order/po-catering/edit/${value.id}`} />
             </TableCell>
             <TableCell>
-                {value.location.location}
+                {value.pr_catering.pr_number}
             </TableCell>
             <TableCell>
-                {moment(value.shipment_date).format('LL')}
+                {value.pr_catering.location.location}
+            </TableCell>
+            <TableCell>
+                {moment(value.request_date).format('LL')}
+            </TableCell>
+            <TableCell>
+                {moment(value.delivery_date).format('LL')}
             </TableCell>
             <TableCell>
                 {value.prepared_by.name}
@@ -137,7 +101,7 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
             </TableCell>
             <TableCell>
                 <CustomActionTableComponent 
-                    approve={value.status !== 'finish'}
+                    approve={value.status !== 'finish' && (isUserCanApprove || isUserPrepared)}
                     handleApprove={() => handleCloseUpdateStatus(value)}
                     handleDelete={() => handleClose(value.id)}
                 />

@@ -2,15 +2,16 @@ import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import http from '@variable/Api'
 import { useMutation } from 'react-query'
 
-const useDeleteCostCenter = ({ onSuccess }) => {
+const useDeletePRCatering = ({ onSuccess, onError }) => {
     const { success } = useCustomSnackbar()
     return useMutation({
         mutationFn: async (id) => {
-            const res = await http.delete(`cost-center/${id}`)
-            success('Success Delete Cost Center!')
+            const res = await http.delete(`pr-catering/${id}`)
+            success('Success Delete PR Catering!')
         },
         onSuccess,
+        onError,
     })
 }
 
-export default useDeleteCostCenter
+export default useDeletePRCatering

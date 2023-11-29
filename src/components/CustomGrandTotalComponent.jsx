@@ -10,7 +10,8 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = 0 }) => {
 
           let tax = 0;
           if(v?.tax === 'yes' || v?.item_product?.tax === 'yes'){
-            tax = v.vat ? (price * v.quantity) * parseInt(v.vat) / 100 : 0
+            const vat = v?.vat || 11
+            tax = (price * v.quantity) * parseInt(vat) / 100
           }
           const total = parseInt((price * (v?.quantity || 0)) + tax)
           return sum + total

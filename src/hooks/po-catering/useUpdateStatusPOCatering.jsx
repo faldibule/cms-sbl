@@ -7,14 +7,14 @@ const useUpdateStatusPOCatering = ({ onSuccess }) => {
     return useMutation({
         mutationFn: async ({ type, status, id, note = null }) => {
             if(type === 'update-status'){
-                const res = await http.patch(`catering-po/${id}/update-status`, {}, {
+                const res = await http.patch(`po-catering/${id}/update-status`, {}, {
                     params: {
                        status,
                        note,
                     }
                 })
             }else{
-                const res = await http.patch(`catering-po/${id}/update-approval-status`, {}, {
+                const res = await http.patch(`po-catering/${id}/update-approval-status`, {}, {
                     params: {
                        status,
                     }
