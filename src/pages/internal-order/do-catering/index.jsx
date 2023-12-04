@@ -1,19 +1,12 @@
-import { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import Iconify from '@components/Iconify';
 import CustomSearchComponent from '@components/CustomSearchComponent';
 import Loading from '@components/Loading';
+import Page from '@components/Page';
 import TableDataRow from '@components/do-catering/TableDataRow';
 import useFetchDOCatering from '@hooks/do-catering/useFetchDOCatering';
-import CustomLinkComponent from '@components/CustomLinkComponent';
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
-const temp = {
-    rows: undefined,
-    refetch: () => {},
-    isFetchedAfterMount: true
-}
+import { Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const index = () => {
     const navigate = useNavigate()
     const [params, setParams] = useState({
@@ -22,7 +15,7 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = temp
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchDOCatering(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -107,9 +100,6 @@ const index = () => {
                             <Typography variant='h4' mb={3}>
                                 DO Catering
                             </Typography>
-                            <Button onClick={() => navigate('/internal-order/do-catering/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
-                                Input
-                            </Button>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={12}>
@@ -134,35 +124,15 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>DO Number</TableCell>
-                                                <TableCell>PO Number</TableCell>
-                                                <TableCell>Location</TableCell>
+                                                <TableCell>DO Catering Number</TableCell>
+                                                <TableCell>PO Supplier Catering Number</TableCell>
                                                 <TableCell>Request Date</TableCell>
-                                                <TableCell>User Maker</TableCell>
-                                                <TableCell>Reject Reason</TableCell>
                                                 <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                        <TableCell>1</TableCell>
-                                            <TableCell>
-                                                <CustomLinkComponent label='DO00001' url='/internal-order/do-catering/edit/123' />
-                                            </TableCell>
-                                            <TableCell>PO00001</TableCell>
-                                            <TableCell>Jakarta</TableCell>
-                                            <TableCell>2023/11/11</TableCell>
-                                            <TableCell>Syaiful</TableCell>
-                                            <TableCell>-</TableCell>
-                                            <TableCell>Checked</TableCell>
-                                            <TableCell>
-                                                <CustomActionTableComponent
-                                                    approve={true}
-                                                    handleApprove={() => {}}
-                                                    handleDelete={() => {}}
-                                                />
-                                            </TableCell>
-                                            {/* {renderData()} */}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

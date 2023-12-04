@@ -6,7 +6,7 @@ const useDeleteDOCatering = ({ onSuccess }) => {
     const { success } = useCustomSnackbar()
     return useMutation({
         mutationFn: async (id) => {
-            const res = await http.delete(`catering-do/${id}`)
+            const res = await http.delete(`do-catering/${id}`)
             success('Success Delete DO Catering!')
         },
         onSuccess,

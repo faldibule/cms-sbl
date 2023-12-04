@@ -10,8 +10,7 @@ import useFetchPRCatering from '@hooks/pr-catering/useFetchPRCatering'
 import useFetchPRCateringById from '@hooks/pr-catering/useFetchPRCateringById'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import { dummy_item_product } from '@utils/Dummy'
+import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import moment from 'moment'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -37,7 +36,7 @@ const Form = (props) => {
     }, [data])
 
     const navigate = useNavigate()
-    const [item, setItem] = useState(dummy_item_product)
+    const [item, setItem] = useState([])
 
     // PR Handle
     const [prCateringState, setPRCateringState] = useState({
@@ -244,7 +243,6 @@ const Form = (props) => {
                                 errors={errors?.pr_catering_id}
                             /> 
                         </Grid>
-                        {console.log(dataPRCateringById)}
                         {!!prCateringState.selected?.id ?
                         <>
                         <Grid item xs={12} md={6}>

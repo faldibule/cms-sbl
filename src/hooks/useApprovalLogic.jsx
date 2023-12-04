@@ -74,6 +74,7 @@ const useApprovalLogic = (value) => {
     }, [value, user])
 
     const isUserPrepared = useMemo(() => {
+        if(!value?.prepared_by?.id && (value?.status === 'draft' || value?.status === 'reject')) return true
         return user?.id === value.prepared_by?.id && (value?.status === 'draft' || value?.status === 'reject')
     }, [value, user])
 

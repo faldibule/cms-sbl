@@ -1,7 +1,7 @@
 import { IconButton, Stack, Tooltip } from "@mui/material"
 import Iconify from "./Iconify"
 
-const CustomActionTableComponent = ({ approve = false, edit = false, refresh = false, download = false, handleApprove = () => {}, handleEdit = () => {}, handleDelete = () => {}, handleRefresh = () => {}, handleDownload = () => {} }) => {
+const CustomActionTableComponent = ({ approve = false, edit = false, refresh = false, download = false, canDelete = true, handleApprove = () => {}, handleEdit = () => {}, handleDelete = () => {}, handleRefresh = () => {}, handleDownload = () => {} }) => {
     return (
         <Stack direction='row' justifyContent='center' height={38}>
             {approve ?
@@ -36,11 +36,14 @@ const CustomActionTableComponent = ({ approve = false, edit = false, refresh = f
                 </Tooltip>
             : null
             }
-            <Tooltip title='Delete'>
-                <IconButton onClick={handleDelete}>
-                    <Iconify icon='material-symbols:delete' sx={{ color: 'red', fontSize: 23 }} />
-                </IconButton>
-            </Tooltip>
+            {canDelete ?
+                <Tooltip title='Delete'>
+                    <IconButton onClick={handleDelete}>
+                        <Iconify icon='material-symbols:delete' sx={{ color: 'red', fontSize: 23 }} />
+                    </IconButton>
+                </Tooltip>
+            : null
+            }
         </Stack>
     )
 }

@@ -1,9 +1,9 @@
 import Iconify from "@components/Iconify"
-import { Stack, TableCell, TableRow, Typography } from "@mui/material"
-import { useMemo, useState } from "react"
-import DialogInputRow from "./DialogInputRow"
-import { NumberFormat } from "@utils/Format"
 import useValueConverter from "@hooks/useValueConverter"
+import { Stack, TableCell, TableRow, Typography } from "@mui/material"
+import { NumberFormat } from "@utils/Format"
+import { useState } from "react"
+import DialogInputRow from "./DialogInputRow"
 
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved = false }) => {
     const [open, setOpen] = useState(false)
@@ -32,9 +32,9 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(tax, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(total, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-            <TableCell>
+            <TableCell sx={{ minWidth: 100 }} align="left">
                 {
-                    !!v.tnt ? v.tnt : !!errors[`item_product.${i}.tnt`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>T/NT required</Typography> : ''
+                    !!v.remark ? v.remark : !!errors[`item_product.${i}.remark`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>Remark required</Typography> : ''
                 }
             </TableCell>
             <TableCell align='center'>

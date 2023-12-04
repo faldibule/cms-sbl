@@ -2,13 +2,12 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent'
 import CustomLinkComponent from '@components/CustomLinkComponent'
 import DeleteDialog from '@components/DeleteDialog'
 import UpdateStatusDialog from '@components/UpdateStatusDialog'
-import useDeletePOCatering from '@hooks/po-catering/useDeletePOCatering'
-import useUpdateStatusPOCatering from '@hooks/po-catering/useUpdateStatusPOCatering'
-import useDeletePOQuotation from '@hooks/po-quotation/useDeletePOQuotation'
-import useUpdateStatusPOQuotation from '@hooks/po-quotation/useUpdateStatusPOCatering'
+import useDeletePOSupplierCatering from '@hooks/po-supplier-catering/useDeletePOSupplierCatering'
+import useUpdateStatusPOSupplierCatering from '@hooks/po-supplier-catering/useUpdateStatusPOSupplierCatering'
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import { Chip, TableCell, TableRow } from '@mui/material'
 import moment from 'moment'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 const TableDataRow = ({ i, value, rows, refetch }) => {
     const [form, setForm] = useState({
@@ -21,21 +20,27 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         setOpen(!open)
         if(!!!id) return;
     }
-    const { mutate: deletePOQuotation, isLoading: loadingDelete } = useDeletePOQuotation({
+
+    const { failed } = useCustomSnackbar()
+    const { mutate: deletePOSupplierCatering, isLoading: loadingDelete, error } = useDeletePOSupplierCatering({
         onSuccess: () => {
             refetch()
             handleClose()
+        },
+        onError: (err) => {
+            handleClose()
+            failed('Unable to delete this PO Supplier Catering!')
         }
     })
     const handleDelete = async () => {
-        deletePOQuotation(value.id)
+        deletePOSupplierCatering(value.id)
     }
 
     const [openUpdateStatus, setOpenUpdateStatus] = useState(false)
     const handleCloseUpdateStatus = (value = null) => {
         setOpenUpdateStatus(!openUpdateStatus)
     }
-    const { mutate: updateStatus, isLoading: loadingUpdateStatus } = useUpdateStatusPOQuotation({
+    const { mutate: updateStatus, isLoading: loadingUpdateStatus } = useUpdateStatusPOSupplierCatering({
         onSuccess: () =>{
             handleCloseUpdateStatus()
             setForm({
@@ -66,38 +71,14 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
     }
 
     const statusLabelAndColor = useMemo(()=> {
-        const { checked_date, approved1_date, approved2_date, status } = value
+        const { status } = value
         let labelAndColor = {
             label: 'default',
             color: 'primary'
         }
-        if(!!!checked_date && !!!approved1_date && !!!approved2_date){
+        if(status === 'submit'){
             labelAndColor = {
-                label: 'Pending',
-                color: 'warning'
-            }
-        }
-        if(!!checked_date){
-            labelAndColor = {
-                label: 'Checked',
-                color: 'primary'
-            }
-        }
-        if(!!approved1_date && !!approved2_date){
-            labelAndColor = {
-                label: 'Checked',
-                color: 'primary'
-            }
-        }
-        if(status === 'reject'){
-            labelAndColor = {
-                label: 'Rejected',
-                color: 'error'
-            }
-        }
-        if(status === 'finish'){
-            labelAndColor = {
-                label: 'Approved',
+                label: 'Submited',
                 color: 'success'
             }
         }
@@ -120,27 +101,29 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {rows.meta.from+i}.
             </TableCell>
             <TableCell>
-                <CustomLinkComponent label={value.po_number} url={`/purchase-order/po-quotation/edit/${value.id}`} />
+                <CustomLinkComponent label={value.po_number} url={`/internal-order/po-supplier-catering/edit/${value.id}`} />
             </TableCell>
             <TableCell>
-                {value.location.location}
+                {value.po_catering.po_number}
             </TableCell>
             <TableCell>
-                {moment(value.shipment_date).format('LL')}
+                {value.supplier.name}
             </TableCell>
             <TableCell>
-                {value.prepared_by.name}
+                {value.pr_catering.location.location}
             </TableCell>
             <TableCell>
-                {value?.note || '-'}
+                {moment(value.pr_catering.request_date).format('LL')}
             </TableCell>
             <TableCell>
                 <Chip label={statusLabelAndColor.label} color={statusLabelAndColor.color} />
             </TableCell>
             <TableCell>
                 <CustomActionTableComponent 
-                    approve={value.status !== 'finish'}
+                    approve={value.status !== 'submit'}
                     handleApprove={() => handleCloseUpdateStatus(value)}
+
+                    canDelete={value.status !== 'submit'}
                     handleDelete={() => handleClose(value.id)}
                 />
                 <DeleteDialog 

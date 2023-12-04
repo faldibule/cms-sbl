@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, MenuItem, Stack, TextField } from "@mui/material"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Stack, TextField } from "@mui/material"
 import { IntegerFormat, NumberFormat } from "@utils/Format"
 import { useEffect, useState } from "react"
 
@@ -63,18 +63,6 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i, priceProps }
                             label='VAT'
                             defaultValue={v?.vat || 11}
                         /> 
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
-                            name='tnt'
-                            label='T/NT'
-                            defaultValue={v?.tnt}
-                            select
-                        > 
-                            <MenuItem value='T'>T</MenuItem>
-                            <MenuItem value='NT'>NT</MenuItem>
-                        </TextField>
                     </Grid>
                 </Grid>
             </DialogContent>

@@ -1,9 +1,9 @@
 import Iconify from "@components/Iconify"
-import { Stack, TableCell, TableRow, Typography } from "@mui/material"
-import { useMemo, useState } from "react"
-import DialogInputRow from "./DialogInputRow"
-import { NumberFormat } from "@utils/Format"
 import useValueConverter from "@hooks/useValueConverter"
+import { Stack, TableCell, TableRow, Typography } from "@mui/material"
+import { NumberFormat } from "@utils/Format"
+import { useState } from "react"
+import DialogInputRow from "./DialogInputRow"
 
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
     const [open, setOpen] = useState(false)
@@ -38,9 +38,9 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 {isApproved ?
                     '-'
                 :
-                    <Stack direction='row' spacing={2}>
+                    <Stack direction='row' width='100%' justifyContent='centerj'>
                         <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
-                        <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
+                        {/* <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} /> */}
                     </Stack>
                 }
                 <DialogInputRow 

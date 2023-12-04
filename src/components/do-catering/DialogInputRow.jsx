@@ -48,24 +48,6 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i, priceProps }
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
-                            label='Price'
-                            name='price'
-                            value={price}
-                            onChange={(e) => handlePrice(e.target.value)}
-                        />  
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
-                            name='vat'
-                            type='number'
-                            label='VAT'
-                            defaultValue={v?.vat || 11}
-                        /> 
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
                             label='Remark'
                             name='remark'
                             defaultValue={v?.remark}

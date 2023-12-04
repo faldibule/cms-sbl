@@ -2,10 +2,10 @@ import http from '@variable/Api'
 import React from 'react'
 import { useQuery } from 'react-query'
 
-const useFetchDOCatering = (params) => {
-    return useQuery(['do-caterings', params], async ({ signal }) => {
+const useFetchPOSupplierCatering = (params) => {
+    return useQuery(['po-supplier-caterings', params], async ({ signal }) => {
         try {
-            const res = await http.get('do-catering', {
+            const res = await http.get('po-supplier-catering', {
                 signal,
                 params
             })
@@ -16,4 +16,4 @@ const useFetchDOCatering = (params) => {
     })
 }
 
-export default useFetchDOCatering
+export default useFetchPOSupplierCatering

@@ -5,9 +5,10 @@ import UpdateStatusDialog from '@components/UpdateStatusDialog'
 import useDeletePOCatering from '@hooks/po-catering/useDeletePOCatering'
 import useUpdateStatusPOCatering from '@hooks/po-catering/useUpdateStatusPOCatering'
 import useApprovalLogic from '@hooks/useApprovalLogic'
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import { Chip, TableCell, TableRow } from '@mui/material'
 import moment from 'moment'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 const TableDataRow = ({ i, value, rows, refetch }) => {
     const [form, setForm] = useState({
@@ -20,10 +21,16 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         setOpen(!open)
         if(!!!id) return;
     }
+
+    const { failed } = useCustomSnackbar()
     const { mutate: deletePOCatering, isLoading: loadingDelete } = useDeletePOCatering({
         onSuccess: () => {
             refetch()
             handleClose()
+        },
+        onError: (err) => {
+            handleClose()
+            failed('Unable to delete this PO Catering!')
         }
     })
     const handleDelete = async () => {
