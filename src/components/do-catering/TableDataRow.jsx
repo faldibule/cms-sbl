@@ -68,6 +68,27 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         return labelAndColor
     }, [value])
 
+    const statusLabelAndColorPOSupplierCatering = useMemo(()=> {
+        const { status } = value.po_supplier_catering
+        let labelAndColor = {
+            label: 'default',
+            color: 'primary'
+        }
+        if(status === 'submit'){
+            labelAndColor = {
+                label: 'Submited',
+                color: 'success'
+            }
+        }
+        if(status === 'draft'){
+            labelAndColor = {
+                label: 'Draft',
+                color: 'warning'
+            }
+        }
+        return labelAndColor
+    }, [value])
+
     return (
         <TableRow key={i}>
             <TableCell
@@ -85,6 +106,12 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
             </TableCell>
             <TableCell>
                 {moment(value.pr_catering.request_date).format('LL')}
+            </TableCell>
+            <TableCell>
+                <CustomLinkComponent label='View' url={`/file/${value.id}/do_catering`} />
+            </TableCell>
+            <TableCell>
+                <Chip label={statusLabelAndColorPOSupplierCatering.label} color={statusLabelAndColorPOSupplierCatering.color} />
             </TableCell>
             <TableCell>
                 <Chip label={statusLabelAndColor.label} color={statusLabelAndColor.color} />

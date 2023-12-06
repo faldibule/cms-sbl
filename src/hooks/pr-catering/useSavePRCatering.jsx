@@ -21,8 +21,7 @@ const useSavePRCatering = ({ onSuccess }) => {
                 success('Success Add PR Catering!')
             }
             const id_temp = res.data.data.id
-            // navigate(`/file/${id_temp}/pr-catering`)
-            navigate(`/internal-order/pr-catering`)
+            navigate(`/file/${id_temp}/pr_catering`)
         },
         onSuccess,
     })

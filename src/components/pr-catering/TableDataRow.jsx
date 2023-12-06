@@ -53,6 +53,9 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {value.prepared_by.name}
             </TableCell>
             <TableCell>
+                <CustomLinkComponent label='View' url={`/file/${value.id}/pr_catering`} />
+            </TableCell>
+            <TableCell>
                 <CustomActionTableComponent 
                     handleDelete={() => handleClose(value.id)}
                 />

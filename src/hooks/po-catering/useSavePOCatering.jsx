@@ -21,8 +21,7 @@ const useSavePOCatering = ({ onSuccess }) => {
                 success('Success Add PO Catering!')
             }
             const id_temp = res.data.data.id
-            // navigate(`/file/${id_temp}/po-catering`)
-            navigate(`/internal-order/po-catering`)
+            navigate(`/file/${id_temp}/po_catering`)
         },
         onSuccess,
     })

@@ -343,10 +343,7 @@ const Form = (props) => {
                             <Grid item xs={12} md={12}>
                                 <Stack direction='row' justifyContent='end' spacing={2}>
                                     {isApproved ?
-                                        // <Button onClick={() => navigate(`/file/${data?.id}/outgoing_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
-                                        //     Next
-                                        // </Button>
-                                        <Button onClick={() => navigate(`/internal-order/po-supplier-catering`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                        <Button onClick={() => navigate(`/file/${data?.id}/po_supplier_catering`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
                                             Next
                                         </Button>
                                     :

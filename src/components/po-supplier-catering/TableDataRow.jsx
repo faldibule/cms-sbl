@@ -116,6 +116,9 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {moment(value.pr_catering.request_date).format('LL')}
             </TableCell>
             <TableCell>
+                <CustomLinkComponent label='View' url={`/file/${value.id}/po_supplier_catering`} />
+            </TableCell>
+            <TableCell>
                 <Chip label={statusLabelAndColor.label} color={statusLabelAndColor.color} />
             </TableCell>
             <TableCell>

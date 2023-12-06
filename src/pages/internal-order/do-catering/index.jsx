@@ -127,7 +127,9 @@ const index = () => {
                                                 <TableCell>DO Catering Number</TableCell>
                                                 <TableCell>PO Supplier Catering Number</TableCell>
                                                 <TableCell>Request Date</TableCell>
-                                                <TableCell>Status</TableCell>
+                                                <TableCell>Evidence</TableCell>
+                                                <TableCell>Status PO Supplier</TableCell>
+                                                <TableCell>Status DO</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>

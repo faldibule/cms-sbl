@@ -13,7 +13,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
 
     return (
         <TableRow key={i}>
-            <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
+            <TableCell sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{valueMemo.name}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{valueMemo.brand}</TableCell>
             <TableCell sx={{ minWidth: 150 }} align="left">{valueMemo.description}</TableCell>

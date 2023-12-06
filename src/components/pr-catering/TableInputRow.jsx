@@ -1,9 +1,9 @@
 import Iconify from "@components/Iconify"
-import { Stack, TableCell, TableRow, Typography } from "@mui/material"
-import { useMemo, useState } from "react"
-import DialogInputRow from "./DialogInputRow"
-import { NumberFormat } from "@utils/Format"
 import useValueConverter from "@hooks/useValueConverter"
+import { Stack, TableCell, TableRow, Typography } from "@mui/material"
+import { NumberFormat } from "@utils/Format"
+import { useState } from "react"
+import DialogInputRow from "./DialogInputRow"
 
 const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
     const [open, setOpen] = useState(false)
@@ -13,7 +13,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
 
     return (
         <TableRow hover key={i}>
-            <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
+            <TableCell sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>
                 {valueMemo.name}
                 {

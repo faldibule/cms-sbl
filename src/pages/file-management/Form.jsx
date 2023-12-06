@@ -3,15 +3,15 @@ import useDeleteFile from '@hooks/file-management/useDeleteFile'
 import useSaveFile from '@hooks/file-management/useSaveFile'
 import useShowFile from '@hooks/file-management/useShowFile'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Divider, Grid, IconButton, InputAdornment, Stack, TextField, Tooltip, Typography } from '@mui/material'
-import React, { Fragment, useState } from 'react'
+import { Box, Button, Card, Divider, Grid, Stack, Tooltip, Typography } from '@mui/material'
+import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 const loadingButtonStyle = {
     fontSize: '0.7rem', 
     fontWeight: 'bold',
 }
-const DocumentCardComponent = ({ value, refetch }) => {
+const DocumentCardComponent = ({ value, refetch, isDisabled }) => {
 
     const { mutate: deleteFile, isLoading: loadingDelete } = useDeleteFile({
         onSuccess: () => {
@@ -49,7 +49,7 @@ const DocumentCardComponent = ({ value, refetch }) => {
                     </LoadingButton>
                 </Tooltip>
                 <Tooltip title='delete'>
-                    <LoadingButton sx={{ ...loadingButtonStyle, color: 'red' }} loading={loadingDelete} onClick={() => handleDeleteFile(value.id)}>
+                    <LoadingButton disabled={isDisabled} sx={{ ...loadingButtonStyle, color: 'red' }} loading={loadingDelete} onClick={() => handleDeleteFile(value.id)}>
                         Delete
                     </LoadingButton>
                 </Tooltip>
@@ -60,6 +60,44 @@ const DocumentCardComponent = ({ value, refetch }) => {
 
 const Form = (props) => {
     const { id, reference_type } = useParams()
+
+    const { dataParent } = props
+    const isDisabled = useMemo(() => {
+        if(reference_type === 'pr_catering'){
+            return false
+        }
+        if(reference_type === 'po_catering'){
+            return dataParent.status === 'finish'
+        }
+        if(reference_type === 'po_supplier_catering'){
+            return dataParent.status === 'submit'
+        }
+        if(reference_type === 'do_catering'){
+            return dataParent?.po_supplier_catering?.status === 'draft' || dataParent?.status === 'submit'
+        }
+
+        return false
+
+    }, [dataParent])
+    const handleNavigate = useMemo(() => {
+        let finish = ''
+        if(reference_type === 'pr_catering'){
+            finish = `/internal-order/pr-catering`
+        }
+        if(reference_type === 'po_catering'){
+            finish = `/internal-order/po-catering`
+        }
+        if(reference_type === 'po_supplier_catering'){
+            finish = `/internal-order/po-supplier-catering`
+        }
+        if(reference_type === 'do_catering'){
+            finish = `/internal-order/do-catering`
+        }
+
+        return { finish }
+
+    }, [dataParent])
+
     const navigate = useNavigate()
 
     const { mutate: save, isLoading, error } = useSaveFile({
@@ -96,12 +134,12 @@ const Form = (props) => {
                                 {props?.data?.map((value, i) => {
                                     return (
                                         <Grid item xs={12} md={4} key={i}>
-                                            <DocumentCardComponent refetch={props.refetch} value={value} />
+                                            <DocumentCardComponent isDisabled={isDisabled} refetch={props.refetch} value={value} />
                                         </Grid>
                                     )
                                 })}
                             </Grid>
-                            <LoadingButton loading={isLoading} sx={{ mt: 4 }} size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
+                            <LoadingButton disabled={isDisabled} loading={isLoading} sx={{ mt: 4 }} size="large" variant="outlined" component="label" fullWidth startIcon={<Iconify icon='ic:baseline-upload' />}>
                                 Add Supporting Document *
                                 <input name="document" type="file" onChange={handleFile} hidden />
                             </LoadingButton>
@@ -109,7 +147,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='space-between'>
                                 <Button onClick={() => navigate(-1)} startIcon={<Iconify icon='pajamas:go-back' />}>Back</Button>
-                                <Button onClick={() => navigate(-2)} variant='contained'>Finish</Button>
+                                <Button onClick={() => navigate(handleNavigate.finish)} variant='contained'>Finish</Button>
                             </Stack>
                         </Grid>
                     </Grid>

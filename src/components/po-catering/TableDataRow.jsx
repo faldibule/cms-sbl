@@ -101,6 +101,9 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {value.prepared_by.name}
             </TableCell>
             <TableCell>
+                <CustomLinkComponent label='View' url={`/file/${value.id}/po_catering`} />
+            </TableCell>
+            <TableCell>
                 {value?.note || '-'}
             </TableCell>
             <TableCell>
