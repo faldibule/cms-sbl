@@ -1,14 +1,18 @@
-import React from 'react'
-import Page from '@components/Page'
-import { Container } from '@mui/material'
-import Form from './Form'
-import { useParams } from 'react-router-dom'
 import Loading from '@components/Loading'
+import Page from '@components/Page'
+import useFetchPRCustomerById from '@hooks/pr-customer/useFetchPRCustomerById'
+import { Container } from '@mui/material'
+import { useParams } from 'react-router-dom'
+import Form from './Form'
 
 const Add = () => {
   const { id } = useParams()
-  const isLoading = false
-  const data = {}
+  const { data, isLoading } = useFetchPRCustomerById(id)
+
+  if(!isLoading && !data){
+    return 'Data PR Customer Tidak Ditemukan'
+  }
+
   return (
     <Page title='Form Edit PR Customer'>
         <Container>

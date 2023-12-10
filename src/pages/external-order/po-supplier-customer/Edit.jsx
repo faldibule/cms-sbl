@@ -1,18 +1,18 @@
-import React from 'react'
-import Page from '@components/Page'
-import { Container } from '@mui/material'
-import Form from './Form'
 import Loading from '@components/Loading'
-import useFetchPOQuotationById from '@hooks/po-quotation/useFetchPOQuotationById'
+import Page from '@components/Page'
+import useFetchPOSupplierCustomerById from '@hooks/po-supplier-customer/useFetchPOSupplierCustomerById'
+import { Container } from '@mui/material'
 import { useParams } from 'react-router-dom'
+import Form from './Form'
 
-const temp = {
-  data: undefined,
-  isLoading: false
-}
 const Edit = () => {
     const { id } = useParams()
-    const { data, isLoading } = temp
+    const { data, isLoading } = useFetchPOSupplierCustomerById(id)
+
+    if(!isLoading && !data){
+      return 'Data PO Supplier Customer Tidak Ditemukan'
+    }
+
     return (
       <Page title='Form Edit PO Supplier Customer'>
           <Container>

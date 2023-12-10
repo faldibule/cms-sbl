@@ -4,9 +4,13 @@ import DeleteDialog from '@components/DeleteDialog'
 import UpdateStatusDialog from '@components/UpdateStatusDialog'
 import useDeleteQuotation from '@hooks/quotation/useDeleteQuotation'
 import useUpdateStatusQuotation from '@hooks/quotation/useUpdateStatusQuotation'
+import useApprovalLogic from '@hooks/useApprovalLogic'
+import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import { Chip, TableCell, TableRow } from '@mui/material'
+import { authentication } from '@recoil/Authentication'
 import moment from 'moment'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useRecoilValue } from 'recoil'
 
 const TableDataRow = ({ i, value, rows, refetch }) => {
     const [form, setForm] = useState({
@@ -19,10 +23,15 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         setOpen(!open)
         if(!!!id) return;
     }
+    const { failed } = useCustomSnackbar()
     const { mutate: deleteQuotation, isLoading: loadingDelete } = useDeleteQuotation({
         onSuccess: () => {
             refetch()
             handleClose()
+        },
+        onError: () => {
+            handleClose()
+            failed('Unable to delete this Quotation!')
         }
     })
     const handleDelete = async () => {
@@ -63,25 +72,21 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         updateStatus({ type: 'update-approval-status', status, id: value.id })
     }
 
+    const { user } = useRecoilValue(authentication)
+
     const statusLabelAndColor = useMemo(()=> {
-        const { checked_date, approved1_date, approved2_date, status } = value
+        const { checked_date, status } = value
         let labelAndColor = {
             label: 'default',
             color: 'primary'
         }
-        if(!!!checked_date && !!!approved1_date && !!!approved2_date){
+        if(!checked_date){
             labelAndColor = {
                 label: 'Pending',
                 color: 'warning'
             }
         }
         if(!!checked_date){
-            labelAndColor = {
-                label: 'Checked',
-                color: 'primary'
-            }
-        }
-        if(!!approved1_date && !!approved2_date){
             labelAndColor = {
                 label: 'Checked',
                 color: 'primary'
@@ -95,7 +100,7 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         }
         if(status === 'finish'){
             labelAndColor = {
-                label: 'Approved',
+                label: 'Checked',
                 color: 'success'
             }
         }
@@ -107,6 +112,24 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
         }
         return labelAndColor
     }, [value])
+
+    const isUserCanApprove = useMemo(() => {
+        const user_id = user?.id
+        const user_checker = value.checked_by
+        const isUserChecked = user_id === user_checker.id
+        
+        if(!value?.checked_date && isUserChecked && value?.status != 'draft' && value?.status != 'reject'){
+            return true
+        }
+        return false
+
+    }, [value, user])
+
+    const isUserPrepared = useMemo(() => {
+        if(!value?.prepared_by?.id && (value?.status === 'draft' || value?.status === 'reject')) return true
+        return user?.id === value.prepared_by?.id && (value?.status === 'draft' || value?.status === 'reject')
+    }, [value, user])
+
     return (
         <TableRow key={i}>
             <TableCell
@@ -117,16 +140,22 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {rows.meta.from+i}.
             </TableCell>
             <TableCell>
-                <CustomLinkComponent label={value.quotation_number} url={`/quotation/edit/${value.id}`} />
+                <CustomLinkComponent label={value.quotation_number} url={`/external-order/quotation/edit/${value.id}`} />
             </TableCell>
             <TableCell>
-                {value.customer.name}
+                {value.pr_customer.pr_number}
+            </TableCell>
+            <TableCell sx={{ minWidth: 150 }}>
+                {value.customer.code}-{value.customer.name}
             </TableCell>
             <TableCell>
                 {moment(value.shipment_date).format('LL')}
             </TableCell>
             <TableCell>
                 {value.prepared_by.name}
+            </TableCell>
+            <TableCell>
+                <CustomLinkComponent label='View' url={`/file/${value.id}/quotation`} />
             </TableCell>
             <TableCell>
                 {value?.note || '-'}
@@ -136,9 +165,9 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
             </TableCell>
             <TableCell>
                 <CustomActionTableComponent 
-                    approve={value.status !== 'finish'}
-                    // approve={true}
+                    approve={value.status !== 'finish' && (isUserCanApprove || isUserPrepared)}
                     handleApprove={() => handleCloseUpdateStatus(value)}
+                    
                     handleDelete={() => handleClose(value.id)}
                 />
                 <DeleteDialog 

@@ -8,18 +8,20 @@ const useSaveQuotation = ({ onSuccess }) => {
     const navigate = useNavigate()
     return useMutation({
         mutationFn: async ({ formData, id }) => {
+            let res = ''
             if(!!id){
-                const res = await http.patch(`quotation/${id}`, {}, {
+                res = await http.patch(`quotation/${id}`, {}, {
                     params: {
                         ...Object.fromEntries(formData)
                     }
                 })
                 success('Success Edit Quotation')
             }else{
-                const res = await http.post('quotation', formData)
+                res = await http.post('quotation', formData)
                 success('Success Add Quotation')
             }
-            navigate('/quotation')
+            const id_temp = res.data.data.id
+            navigate(`/file/${id_temp}/quotation`)
         },
         onSuccess,
     })

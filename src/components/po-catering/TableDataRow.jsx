@@ -113,6 +113,7 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 <CustomActionTableComponent 
                     approve={value.status !== 'finish' && (isUserCanApprove || isUserPrepared)}
                     handleApprove={() => handleCloseUpdateStatus(value)}
+                    
                     handleDelete={() => handleClose(value.id)}
                 />
                 <DeleteDialog 

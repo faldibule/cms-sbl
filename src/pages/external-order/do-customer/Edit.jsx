@@ -1,17 +1,18 @@
-import React from 'react'
-import Page from '@components/Page'
-import { Container } from '@mui/material'
-import Form from './Form'
 import Loading from '@components/Loading'
+import Page from '@components/Page'
+import useFetchDOCustomerById from '@hooks/do-customer/useFetchDOCustomerById'
+import { Container } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import useFetchDOCateringById from '@hooks/do-catering/useFetchDOCateringById'
-const temp = {
-  data: undefined,
-  isLoading: false
-}
+import Form from './Form'
+
 const Edit = () => {
     const { id } = useParams()
-    const { data, isLoading } = temp
+    const { data, isLoading } = useFetchDOCustomerById(id)
+
+    if(!isLoading && !data){
+      return 'Data DO Customer Tidak Ditemukan'
+    }
+
     return (
       <Page title='Form Edit DO Customer'>
           <Container>

@@ -1,19 +1,13 @@
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import CustomLinkComponent from '@components/CustomLinkComponent';
 import CustomSearchComponent from '@components/CustomSearchComponent';
 import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
 import Page from '@components/Page';
-import TableDataRow from '@components/pr-catering/TableDataRow';
-import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import TableDataRow from '@components/pr-customer/TableDataRow';
+import useFetchPRCustomer from '@hooks/pr-customer/useFetchPRCustomer';
+import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const temp = {
-    rows: undefined,
-    refetch: () => {},
-    isFetchedAfterMount: true
-}
 const index = () => {
     const navigate = useNavigate()
     const [params, setParams] = useState({
@@ -22,7 +16,7 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = temp
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchPRCustomer(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -136,29 +130,19 @@ const index = () => {
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>PR Number</TableCell>
                                                 <TableCell>Location</TableCell>
-                                                <TableCell>Shipment Date</TableCell>
+                                                <TableCell>Request Date</TableCell>
+                                                <TableCell>Delivery Date</TableCell>
                                                 <TableCell>Prepared By</TableCell>
+                                                <TableCell>Evidence</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            <TableCell>1</TableCell>
-                                            <TableCell>
-                                                <CustomLinkComponent label='PR00001' url='/external-order/pr-customer/edit/123' />
-                                            </TableCell>
-                                            <TableCell>Jakarta</TableCell>
-                                            <TableCell>2023/11/11</TableCell>
-                                            <TableCell>Syaiful</TableCell>
-                                            <TableCell>
-                                                <CustomActionTableComponent
-                                                    handleDelete={() => {}}
-                                                />
-                                            </TableCell>
-                                            {/* {renderData()} */}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                {/* {rows !== undefined && rows.data.length > 0 && (
+                                {rows !== undefined && rows.data.length > 0 && (
                                     <TablePagination
                                         component="div"
                                         count={rows.meta.total}
@@ -174,7 +158,7 @@ const index = () => {
                                         showFirstButton
                                         showLastButton
                                     />
-                                )} */}
+                                )}
                             </CardContent>
                         </Card>
                     </Grid>

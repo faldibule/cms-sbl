@@ -1,22 +1,13 @@
-import { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import Iconify from '@components/Iconify';
 import CustomSearchComponent from '@components/CustomSearchComponent';
-import useFetchQuotation from '@hooks/quotation/useFetchQuotation';
-import DeleteDialog from '@components/DeleteDialog';
+import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
-import ApproveDialog from '@components/UpdateStatusDialog';
+import Page from '@components/Page';
 import TableDataRow from '@components/quotation/TableDataRow';
-import CustomLinkComponent from '@components/CustomLinkComponent';
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
+import useFetchQuotation from '@hooks/quotation/useFetchQuotation';
+import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const temp = {
-    rows: undefined,
-    refetch: () => {},
-    isFetchedAfterMount: true
-}
 const index = () => {
     const navigate = useNavigate()
     const [params, setParams] = useState({
@@ -25,7 +16,7 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = temp
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchQuotation(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -138,31 +129,18 @@ const index = () => {
                                             >
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>Quotation Number</TableCell>
+                                                <TableCell>PR Customer Number</TableCell>
                                                 <TableCell>Customer Name</TableCell>
-                                                <TableCell>Shipment Date</TableCell>
+                                                <TableCell>Request Date</TableCell>
                                                 <TableCell>Prepared By</TableCell>
+                                                <TableCell>Evidence</TableCell>
                                                 <TableCell>Reject Reasson</TableCell>
                                                 <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            <TableCell>1</TableCell>
-                                            <TableCell>
-                                                <CustomLinkComponent label='Q00001' url='/external-order/quotation/edit/123' />
-                                            </TableCell>
-                                            <TableCell>PT.ABC</TableCell>
-                                            <TableCell>2023/11/11</TableCell>
-                                            <TableCell>Syaiful</TableCell>
-                                            <TableCell>-</TableCell>
-                                            <TableCell>Checked</TableCell>
-                                            <TableCell>
-                                                <CustomActionTableComponent
-                                                    approve={true}
-                                                    handleDelete={() => {}}
-                                                />
-                                            </TableCell>
-                                            {/* {renderData()} */}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

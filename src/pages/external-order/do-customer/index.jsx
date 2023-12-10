@@ -1,17 +1,13 @@
-import { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import Iconify from '@components/Iconify';
 import CustomSearchComponent from '@components/CustomSearchComponent';
+import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
-import CustomLinkComponent from '@components/CustomLinkComponent';
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
-const temp = {
-    rows: undefined,
-    refetch: () => {},
-    isFetchedAfterMount: true
-}
+import Page from '@components/Page';
+import TableDataRow from '@components/do-customer/TableDataRow';
+import useFetchDOCustomer from '@hooks/do-customer/useFetchDOCustomer';
+import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 const index = () => {
     const navigate = useNavigate()
     const [params, setParams] = useState({
@@ -20,7 +16,7 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = temp
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchDOCustomer(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -132,37 +128,19 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>DO Number</TableCell>
-                                                <TableCell>PO Number</TableCell>
+                                                <TableCell>DO Customer Number</TableCell>
+                                                <TableCell>PO Customer Number</TableCell>
                                                 <TableCell>Location</TableCell>
                                                 <TableCell>Request Date</TableCell>
                                                 <TableCell>User Maker</TableCell>
+                                                <TableCell>Evidence</TableCell>
                                                 <TableCell>Reject Reason</TableCell>
                                                 <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            <TableRow>
-                                                <TableCell>1</TableCell>
-                                                <TableCell>
-                                                    <CustomLinkComponent label='DO00001' url='/external-order/do-customer/edit/123' />
-                                                </TableCell>
-                                                <TableCell>PO00001</TableCell>
-                                                <TableCell>Jakarta</TableCell>
-                                                <TableCell>2023/11/11</TableCell>
-                                                <TableCell>Syaiful</TableCell>
-                                                <TableCell>-</TableCell>
-                                                <TableCell>Checked</TableCell>
-                                                <TableCell>
-                                                    <CustomActionTableComponent
-                                                        approve={true}
-                                                        handleApprove={() => {}}
-                                                        handleDelete={() => {}}
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                            {/* {renderData()} */}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

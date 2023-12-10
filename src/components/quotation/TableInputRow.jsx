@@ -10,10 +10,9 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     const handleClose = () => setOpen(!open)
     
     const { valueMemo, tax, total, grand_total, markUpMemo, eachTax, newPrice } = useValueConverter(v, markup) 
-
     return (
         <TableRow key={i}>
-            <TableCell onClick={handleClose} sx={{ cursor: 'pointer' }}>{i + 1}</TableCell>
+            <TableCell>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>
                 {valueMemo.name}
                 {

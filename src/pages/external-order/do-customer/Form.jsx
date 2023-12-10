@@ -1,21 +1,20 @@
-import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import Iconify from '@components/Iconify'
-import { useNavigate } from 'react-router-dom'
-import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
-import TableInputRow from '@components/do-catering/TableInputRow'
-import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import useFetchUser from '@hooks/user-list/useFetchUser'
-import useFetchLocation from '@hooks/location/useFetchLocation'
-import useFetchPurchaseRequest from '@hooks/purchase-request/useFetchPurchaseRequest'
-import Loading from '@components/Loading'
 import CustomAutocomplete from '@components/CustomAutocomplete'
-import useFetchSupplier from '@hooks/supplier/useFetchSupplier'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
+import Iconify from '@components/Iconify'
+import Loading from '@components/Loading'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import TableInputRow from '@components/do-catering/TableInputRow'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
-import useFetchPurchaseRequestById from '@hooks/purchase-request/useFetchPurchaseRequestById'
-import useSaveDOCatering from '@hooks/do-catering/useSaveDOCatering'
-import { POCustomerDummy, POSupplierCateringDummy, dummy_item_product } from '@utils/Dummy'
+import useSaveDOCustomer from '@hooks/do-customer/useSaveDOCustomer'
+import useFetchPOCustomer from '@hooks/po-customer/useFetchPOCustomer'
+import useFetchPOCustomerById from '@hooks/po-customer/useFetchPOCustomerById'
+import useFetchUser from '@hooks/user-list/useFetchUser'
+import { LoadingButton } from '@mui/lab'
+import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { dummy_item_product } from '@utils/Dummy'
+import moment from 'moment'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
@@ -23,9 +22,15 @@ const Form = (props) => {
         if(!!!data) return false
         return data.status === 'finish'
     }, [data])
+    const approvalMemo = useMemo(() => {
+        return {
+            isApproved: !!data?.approved_date,
+            approved_date: data?.approved_date,
+        }
+    }, [data])
 
     const navigate = useNavigate()
-    const [item, setItem] = useState(dummy_item_product)
+    const [item, setItem] = useState([])
 
     // PO Customer Handle
     const [poCustomerState, setPOCustomerState] = useState({
@@ -34,43 +39,31 @@ const Form = (props) => {
     })
     const handleSelectedPOCustomer = (value) => setPOCustomerState({...poCustomerState, selected: value})
     const handleInputPOCustomer = (value) => setPOCustomerState({...poCustomerState, input: value})
-    // const { data: dataPOCustomerList, isLoading: loadingPOCustomerList } = useFetchPurchaseRequest({ paginate: 0 })
-    // const { data: dataPOCustomerById, isLoading: loadingPOCustomerById } = useFetchPurchaseRequestById(poSupplierCustomer.selected?.id, { enabled: !!poSupplierCustomer.selected?.id })
-    // useEffect(() => {
-    //         let mounted = true
-    //         if(!!!poCustomer.selected?.id) return
-    //         if(!!!dataPOCustomerById) return
-    //         if(!mounted) return 
+    const { data: dataPOCustomerList, isLoading: loadingPOCustomerList } = useFetchPOCustomer({ paginate: 0 })
+    const { data: dataPOCustomerById, isLoading: loadingPOCustomerById } = useFetchPOCustomerById(poCustomerState.selected?.id, { enabled: !!poCustomerState.selected?.id })
+    useEffect(() => {
+            let mounted = true
+            if(!!!poCustomerState.selected?.id) return
+            if(!!!dataPOCustomerById) return
+            if(!mounted) return 
 
-    //         if(props.title === 'edit' && poCustomer.selected?.id === data.purchase_request?.id){
-    //             setItem([...data.item_product])
-    //             return
-    //         }
+            if(props.title === 'edit' && poCustomerState.selected?.id === data.po_customer?.id){
+                setItem([...data.item_product])
+                return
+            }
 
-    //         setItem([...dataPOCustomerById.item_product])
+            setItem([...dataPOCustomerById.item_product])
 
-    //         return () => mounted = false
+            return () => mounted = false
 
-    //     }, [poCustomer.selected, dataPOCustomerById])
+    }, [poCustomerState.selected, dataPOCustomerById])
 
     // User Handle
     const [userState, setUserState] = useState({
-        prepared_by: {
+        approved_by: {
             input: '',
             selected: null
-        },
-        checked_by: {
-            input: '',
-            selected: null
-        },
-        approved1_by: {
-            input: '',
-            selected: null
-        },
-        approved2_by: {
-            input: '',
-            selected: null
-        },
+        }
     })
     const handleUser = (name, type) => {
         return (value) => {
@@ -84,20 +77,6 @@ const Form = (props) => {
         }
     }
     const { data: dataUser, isLoading: loadingUser } = useFetchUser({ paginate: 0 })
-
-    // Discount Handle
-    const { data: dataDiscount, isLoading: loadingDiscount } = useFetchDiscount({ paginate: 0 })
-    const [discount, setDiscount] = useState({
-        id: '',
-        value: 0
-    })
-    const handleDiscount = (id) => {
-        const discountById = dataDiscount?.data?.find(v => v.id === id)
-        setDiscount({
-            id: discountById.id,
-            value: discountById.discount
-        })
-    }
 
     const onChangeByIndex = (index, object) => {
         const temp = item.map((v, i) => {
@@ -116,7 +95,7 @@ const Form = (props) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
 
-    const { mutate: save, isLoading: loadingSave, error  } = useSaveDOCatering({
+    const { mutate: save, isLoading: loadingSave, error  } = useSaveDOCustomer({
         onSuccess: () => {}
     })
     const errors = error?.response?.data?.errors
@@ -124,13 +103,8 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        formData.append('purchase_request_id', prState.selected?.id)
-        formData.append('supplier_id', supplierState.selected?.id)
-        formData.append('location_id', locationState.selected?.id)
-        formData.append('prepared_by', userState.prepared_by.selected?.id)
-        formData.append('checked_by', userState.checked_by.selected?.id)
-        formData.append('approved1_by', userState.approved1_by.selected?.id)
-        formData.append('approved2_by', userState.approved2_by.selected?.id)
+        formData.append('po_customer_id', poCustomerState.selected?.id)
+        formData.append('approved_by', userState.approved_by.selected?.id)
         item.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const item_product_id = v.item_product?.id
@@ -141,49 +115,25 @@ const Form = (props) => {
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
-        // save({ formData, id: data?.id })
+        save({ formData, id: data?.id })
     }
 
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!data){
-                // setPrState({
-                //     input: data.purchase_request?.pr_number,
-                //     selected: data.purchase_request
-                // })
-                // setSupplierState({
-                //     input: data.supplier.name,
-                //     selected: data.supplier
-                // })
-                // setLocationState({
-                //     input: `${data.location.location_code} - ${data.location.location}`,
-                //     selected: data.location
-                // })
-                // setDiscount({
-                //     id: data?.discount?.id,
-                //     value: data?.discount?.discount
-                // })
-                // setUserState({
-                //     ...userState,
-                //     prepared_by: {
-                //         input: data?.prepared_by?.name,
-                //         selected: data?.prepared_by,
-                //     },
-                //     checked_by: {
-                //         input: data?.checked_by?.name,
-                //         selected: data?.checked_by,
-                //     },
-                //     approved1_by: {
-                //         input: data?.approved1_by?.name,
-                //         selected: data?.approved1_by,
-                //     },
-                //     approved2_by: {
-                //         input: data?.approved2_by?.name,
-                //         selected: data?.approved2_by,
-                //     }
-                // })
-                // setItem([...data.item_product])
+                setPOCustomerState({
+                    input: data?.po_customer.po_number,
+                    selected: data?.po_customer
+                })
+                setUserState({
+                    ...userState,
+                    approved_by: {
+                        input: data?.approved_by?.name,
+                        selected: data?.approved_by,
+                    },
+                })
+                setItem([...data.item_product])
             }
         }
 
@@ -191,22 +141,7 @@ const Form = (props) => {
 
     }, [props.id])
 
-    const renderDiscountMenuItem = useCallback(() => {
-        if(loadingDiscount) return null
-        if(dataDiscount.data.length === 0 ){
-            return (
-                <MenuItem value='' disabled>Kosong</MenuItem>
-            )
-        }
-        return dataDiscount.data.map((v) => {
-            return (
-                <MenuItem key={v.id} value={v.id}>{v.discount}%</MenuItem>
-            )
-        })
-
-    }, [dataDiscount])
-
-    if(loadingUser || loadingDiscount){
+    if(loadingUser || loadingPOCustomerList){
         return <Loading />
     }
 
@@ -231,163 +166,74 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
-                                options={POCustomerDummy}
-                                getOptionLabel={(option) => `${option.po_customer_number}`}
+                                options={dataPOCustomerList?.data || []}
+                                getOptionLabel={(option) => `${option.po_number}`}
                                 label='PO Customer Number'
                                 inputValue={poCustomerState.input}
                                 setInputValue={handleInputPOCustomer}
                                 selectedValue={poCustomerState.selected}
                                 setSelectedValue={handleSelectedPOCustomer}
-                                errors={errors?.po_customer}
+                                errors={errors?.po_customer_id}
                             /> 
                         </Grid>
                         {!!poCustomerState.selected?.id ?
                         <>
                         <Grid item xs={12} md={12}>
                             <TextField 
-                                label='Supplier'
-                                name='supplier'
                                 disabled
-                                defaultValue='PT.Terakom'
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                disabled
-                                fullWidth
-                                type='date'
-                                label="Request Date"
-                                name='request_date'
-                                defaultValue={'2023-11-11'}
-                                helperText={!!errors?.request_date && errors?.request_date[0]}
-                                error={!!errors?.request_date}
-                                required
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                disabled
-                                fullWidth
-                                type='date'
-                                label="Delivery Date"
-                                name='delivery_date'
-                                defaultValue={'2023-11-11'}
-                                helperText={!!errors?.delivery_date && errors?.delivery_date[0]}
-                                error={!!errors?.delivery_date}
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                            <TextField 
                                 label='Location'
-                                name='location'
+                                fullWidth
+                                value={dataPOCustomerById?.pr_customer?.location?.location || 'Loading....'}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
                                 disabled
-                                defaultValue='HO Jakarta'
                                 fullWidth
+                                label="Request Date"
+                                value={!!dataPOCustomerById?.pr_customer?.request_date ? moment(dataPOCustomerById?.pr_customer?.request_date).format('LL') : 'Loading...'}
                             />
                         </Grid>
-                        <Grid item xs={12} md={12}>
+                        <Grid item xs={12} md={6}>
                             <TextField
-                                disabled={isApproved}
+                                disabled
                                 fullWidth
+                                label="Delivery Date"
+                                value={!!dataPOCustomerById?.pr_customer?.delivery_date ? moment(dataPOCustomerById?.pr_customer?.delivery_date).format('LL') : 'Loading...'}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField 
+                                disabled
                                 label='Discount'
-                                name='discount_id'
-                                value={discount.id}
-                                onChange={(e) => handleDiscount(e.target.value)}
-                                required
-                                helperText={!!errors?.discount_id && errors?.discount_id[0]}
-                                error={!!errors?.discount_id}
-                                select
-                            >
-                                {renderDiscountMenuItem()}
-                            </TextField> 
+                                fullWidth
+                                value={!!dataPOCustomerById ? `${dataPOCustomerById?.discount.discount}%` : 'Loading....'}
+                            />
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                disabled={isApproved}
-                                fullWidth 
-                                label='Term & Conditions'
-                                multiline
-                                rows={3}
-                                name='term_condition'
-                                required
-                                defaultValue={data?.term_condition}
-                                helperText={!!errors?.term_condition && errors?.term_condition[0]}
-                                error={!!errors?.term_condition}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                disabled={isApproved}
-                                fullWidth 
-                                label='Term of Payment'
-                                multiline
-                                rows={3}
-                                name='term_payment'
-                                defaultValue={data?.term_payment}
-                                required
-                                helperText={!!errors?.term_payment && errors?.term_payment[0]}
-                                error={!!errors?.term_payment}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={approvalMemo.isApproved ? 3 : 6}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
-                                label='Prepared By'
-                                inputValue={userState.prepared_by.input}
-                                setInputValue={handleUser('prepared_by', 'input')}
-                                selectedValue={userState.prepared_by.selected}
-                                setSelectedValue={handleUser('prepared_by', 'selected')}
-                                errors={errors?.prepared_by}
+                                label='Approved By'
+                                inputValue={userState.approved_by.input}
+                                setInputValue={handleUser('approved_by', 'input')}
+                                selectedValue={userState.approved_by.selected}
+                                setSelectedValue={handleUser('approved_by', 'selected')}
+                                errors={errors?.approved_by}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <CustomAutocomplete 
-                                disabled={isApproved}
-                                getOptionLabel={(opt) => `${opt.name}`}
-                                options={dataUser.data}
-                                label='Checked By'
-                                inputValue={userState.checked_by.input}
-                                setInputValue={handleUser('checked_by', 'input')}
-                                selectedValue={userState.checked_by.selected}
-                                setSelectedValue={handleUser('checked_by', 'selected')}
-                                errors={errors?.checked_by}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <CustomAutocomplete 
-                                disabled={isApproved}
-                                getOptionLabel={(opt) => `${opt.name}`}
-                                options={dataUser.data}
-                                label='Approved By 1'
-                                inputValue={userState.approved1_by.input}
-                                setInputValue={handleUser('approved1_by', 'input')}
-                                selectedValue={userState.approved1_by.selected}
-                                setSelectedValue={handleUser('approved1_by', 'selected')}
-                                errors={errors?.approved1_by}
-                            />
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <CustomAutocomplete 
-                                disabled={isApproved}
-                                getOptionLabel={(opt) => `${opt.name}`}
-                                options={dataUser.data}
-                                label='Approved By 2'
-                                inputValue={userState.approved2_by.input}
-                                setInputValue={handleUser('approved2_by', 'input')}
-                                selectedValue={userState.approved2_by.selected}
-                                setSelectedValue={handleUser('approved2_by', 'selected')}
-                                errors={errors?.approved2_by}
-                            />
-                        </Grid>
+                        {approvalMemo.isApproved ?
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    disabled
+                                    fullWidth
+                                    label="Approved On"
+                                    value={moment(approvalMemo?.approved_by).format('LL') || ''}
+                                />
+                            </Grid>
+                        : null
+                        }
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -431,28 +277,20 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent discount={discount.value} item={item} />
+                            <CustomGrandTotalComponent discount={dataPOCustomerById?.discount.discount || 0} item={item} />
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
-                                <Button onClick={() => navigate(`/file/${data?.id}/catering_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
-                                    Next
-                                </Button>
-                                {/* {isApproved ?
-                                    <Button onClick={() => navigate(`/file/${data?.id}/catering_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                {isApproved ?
+                                    <Button onClick={() => navigate(`/file/${data?.id}/do_customer`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
                                         Next
                                     </Button>
                                 :
                                     <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
                                         Next
                                     </LoadingButton>
-                                } */}
-                                {props.title == 'edit' ? ''
-                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                    //     Print
-                                    // </LoadingButton>
-                                : null
                                 }
+                               
                             </Stack>
                         </Grid>
                         

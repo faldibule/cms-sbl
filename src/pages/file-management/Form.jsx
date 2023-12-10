@@ -63,6 +63,8 @@ const Form = (props) => {
 
     const { dataParent } = props
     const isDisabled = useMemo(() => {
+
+        // Internal Order
         if(reference_type === 'pr_catering'){
             return false
         }
@@ -76,11 +78,29 @@ const Form = (props) => {
             return dataParent?.po_supplier_catering?.status === 'draft' || dataParent?.status === 'submit'
         }
 
+        // External Order
+        if(reference_type === 'pr_customer'){
+            return false
+        }
+        if(reference_type === 'quotation'){
+            return dataParent.status === 'finish'
+        }
+        if(reference_type === 'po_customer'){
+            return dataParent.status === 'submit'
+        }
+        if(reference_type === 'po_supplier_customer'){
+            return dataParent.status === 'submit'
+        }
+        if(reference_type === 'do_customer'){
+            return dataParent.status === 'finish'
+        }
+
         return false
 
     }, [dataParent])
     const handleNavigate = useMemo(() => {
         let finish = ''
+        // Internal Order
         if(reference_type === 'pr_catering'){
             finish = `/internal-order/pr-catering`
         }
@@ -92,6 +112,23 @@ const Form = (props) => {
         }
         if(reference_type === 'do_catering'){
             finish = `/internal-order/do-catering`
+        }
+
+        // External Order
+        if(reference_type === 'pr_customer'){
+            finish = `/external-order/pr-customer`
+        }
+        if(reference_type === 'quotation'){
+            finish = `/external-order/quotation`
+        }
+        if(reference_type === 'po_customer'){
+            finish = `/external-order/po-customer`
+        }
+        if(reference_type === 'po_supplier_customer'){
+            finish = `/external-order/po-supplier-customer`
+        }
+        if(reference_type === 'do_customer'){
+            finish = `/external-order/do-customer`
         }
 
         return { finish }

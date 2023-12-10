@@ -1,15 +1,17 @@
-import React from 'react'
-import Page from '@components/Page'
-import { Container } from '@mui/material'
-import Form from './Form'
-import useFetchQuotationById from '@hooks/quotation/useFetchQuotationById'
-import { useParams } from 'react-router-dom'
 import Loading from '@components/Loading'
+import Page from '@components/Page'
+import useFetchQuotationById from '@hooks/quotation/useFetchQuotationById'
+import { Container } from '@mui/material'
+import { useParams } from 'react-router-dom'
+import Form from './Form'
 
 const Edit = () => {
   const { id } = useParams()
-  const isLoading = false
-  const data = {}
+  const { data, isLoading } = useFetchQuotationById(id)
+
+  if(!isLoading && !data){
+    return 'Data Quotation Tidak Ditemukan'
+  }
   return (
     <Page title='Form Edit Quotation'>
         <Container>

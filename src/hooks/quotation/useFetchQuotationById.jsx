@@ -2,7 +2,7 @@ import http from '@variable/Api'
 import React from 'react'
 import { useQuery } from 'react-query'
 
-const useFetchQuotationById = (id) => {
+const useFetchQuotationById = (id, config) => {
     return useQuery(['quotation', id], async ({ signal }) => {
         try {
             const res = await http.get(`quotation/${id}`)
@@ -11,7 +11,8 @@ const useFetchQuotationById = (id) => {
             // console.log(err)
         }
     }, {
-        cacheTime: 0
+        cacheTime: 0,
+        ...config,
     })
 }
 

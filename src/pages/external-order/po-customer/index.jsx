@@ -1,22 +1,14 @@
-import { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import { Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import Iconify from '@components/Iconify';
-import moment from 'moment/moment';
 import CustomSearchComponent from '@components/CustomSearchComponent';
-import CustomStatusLabelComponent from '@components/CustomStatusLabelComponent';
-import CustomLinkComponent from '@components/CustomLinkComponent';
-import useFetchPOCatering from '@hooks/po-catering/useFetchPOCatering';
+import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
-import TableDataRow from '@components/po-catering/TableDataRow';
-import CustomActionTableComponent from '@components/CustomActionTableComponent';
+import Page from '@components/Page';
+import TableDataRow from '@components/po-customer/TableDataRow';
+import useFetchPOCustomer from '@hooks/po-customer/useFetchPOCustomer';
+import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const temp = {
-    rows: undefined,
-    refetch: () => {},
-    isFetchedAfterMount: true
-}
+
 const index = () => {
     const navigate = useNavigate()
     const [params, setParams] = useState({
@@ -25,8 +17,7 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    // const { data: rows, refetch, isFetchedAfterMount } = useFetchPOCatering(params)
-    const { data: rows, refetch, isFetchedAfterMount } = temp
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchPOCustomer(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -139,32 +130,17 @@ const index = () => {
                                             >
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>PO Number</TableCell>
+                                                <TableCell>Quotation Number</TableCell>
                                                 <TableCell>Location</TableCell>
                                                 <TableCell>Request Date</TableCell>
                                                 <TableCell>User Maker</TableCell>
-                                                <TableCell>Reject Reason</TableCell>
+                                                <TableCell>Evidence</TableCell>
                                                 <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            <TableCell>1</TableCell>
-                                            <TableCell>
-                                                <CustomLinkComponent label='PO00001' url='/external-order/po-customer/edit/123' />
-                                            </TableCell>
-                                            <TableCell>Jakarta</TableCell>
-                                            <TableCell>2023/11/11</TableCell>
-                                            <TableCell>Syaiful</TableCell>
-                                            <TableCell>-</TableCell>
-                                            <TableCell>Checked</TableCell>
-                                            <TableCell>
-                                                <CustomActionTableComponent
-                                                    approve={true}
-                                                    handleApprove={() => {}}
-                                                    handleDelete={() => {}}
-                                                />
-                                            </TableCell>
-                                            {/* {renderData()} */}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

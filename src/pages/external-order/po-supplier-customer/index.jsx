@@ -4,15 +4,12 @@ import CustomSearchComponent from '@components/CustomSearchComponent';
 import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
 import Page from '@components/Page';
-import TableDataRow from '@components/po-supplier-catering/TableDataRow';
+import TableDataRow from '@components/po-supplier-customer/TableDataRow';
+import useFetchPOSupplierCustomer from '@hooks/po-supplier-customer/useFetchPOSupplierCustomer';
 import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-const temp = {
-    rows: undefined,
-    refetch: () => {},
-    isFetchedAfterMount: true
-}
+
 const index = () => {
     const navigate = useNavigate()
     const [params, setParams] = useState({
@@ -21,7 +18,7 @@ const index = () => {
         search: '',
         paginate: 1,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = temp
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchPOSupplierCustomer(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -133,27 +130,18 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>PO Number</TableCell>
+                                                <TableCell>PO Supplier Customer Number</TableCell>
+                                                <TableCell>PO Customer Number</TableCell>
                                                 <TableCell>Supplier Name</TableCell>
-                                                <TableCell>Shipment Date</TableCell>
+                                                <TableCell>Location</TableCell>
                                                 <TableCell>User Maker</TableCell>
+                                                <TableCell>Evidence</TableCell>
+                                                <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            <TableCell>1</TableCell>
-                                            <TableCell>
-                                                <CustomLinkComponent label='POS0001' url='/external-order/po-supplier-customer/edit/123' />
-                                            </TableCell>
-                                            <TableCell>PT. Terakom</TableCell>
-                                            <TableCell>2023/11/11</TableCell>
-                                            <TableCell>Syaiful</TableCell>
-                                            <TableCell>
-                                                <CustomActionTableComponent
-                                                    handleDelete={() => {}}
-                                                />
-                                            </TableCell>
-                                            {/* {renderData()} */}
+                                            {renderData()}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

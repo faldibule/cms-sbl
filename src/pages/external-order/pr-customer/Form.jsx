@@ -4,11 +4,12 @@ import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import TableInputRow from '@components/pr-catering/TableInputRow'
+import TableInputRow from '@components/pr-customer/TableInputRow'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import useFetchLocation from '@hooks/location/useFetchLocation'
-import useSavePurchaseRequest from '@hooks/purchase-request/useSavePurchaseRequest'
+import useSavePRcustomer from '@hooks/pr-customer/useSavePRcustomer'
 import useFetchUser from '@hooks/user-list/useFetchUser'
+import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, InputAdornment, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -25,18 +26,6 @@ const Form = (props) => {
 
     const [userState, setUserState] = useState({
         prepared_by: {
-            input: '',
-            selected: null
-        },
-        checked_by: {
-            input: '',
-            selected: null
-        },
-        approved1_by: {
-            input: '',
-            selected: null
-        },
-        approved2_by: {
             input: '',
             selected: null
         },
@@ -94,7 +83,7 @@ const Form = (props) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
 
-    const { mutate: save, isLoading: loadingSave, error  } = useSavePurchaseRequest({
+    const { mutate: save, isLoading: loadingSave, error  } = useSavePRcustomer({
         onSuccess: () => {}
     })
     const errors = error?.response?.data?.errors
@@ -104,59 +93,36 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         formData.append('location_id', locationState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
-        formData.append('checked_by', userState.checked_by.selected?.id)
-        formData.append('approved1_by', userState.approved1_by.selected?.id)
-        formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name =  v?.name || v?.item_product?.name
-            const brand = v?.brand || v?.item_product?.brand
-            const size = v?.size || v?.item_product?.size
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
-            const unit = v.item_product?.unit?.param || v?.unit?.param 
             const item_product_id = v?.item_product?.id || v?.id
 
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
-            formData.append(`item_product[${i}][item_name]`, name)
-            formData.append(`item_product[${i}][item_brand]`, brand)
             formData.append(`item_product[${i}][description]`, v?.description)
-            formData.append(`item_product[${i}][size]`, size)
-            formData.append(`item_product[${i}][unit]`, unit)
             formData.append(`item_product[${i}][item_price]`, price)
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
-        // save({ formData, id: data?.id })
+        save({ formData, id: data?.id })
     }
 
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!props.data){
-                // setLocationState({
-                //     input: `${data.location.location_code} - ${data.location.location}`,
-                //     selected: data.location
-                // })
-                // setUserState({
-                //     ...userState,
-                //     prepared_by: {
-                //         input: data?.prepared_by?.name,
-                //         selected: data?.prepared_by,
-                //     },
-                //     checked_by: {
-                //         input: data?.checked_by?.name,
-                //         selected: data?.checked_by,
-                //     },
-                //     approved1_by: {
-                //         input: data?.approved1_by?.name,
-                //         selected: data?.approved1_by,
-                //     },
-                //     approved2_by: {
-                //         input: data?.approved2_by?.name,
-                //         selected: data?.approved2_by,
-                //     }
-                // })
-                // setItem([...data?.item_product])
+                setLocationState({
+                    input: `${data.location.location_code} - ${data.location.location}`,
+                    selected: data.location
+                })
+                setUserState({
+                    ...userState,
+                    prepared_by: {
+                        input: data?.prepared_by?.name,
+                        selected: data?.prepared_by,
+                    }
+                })
+                setItem([...data?.item_product])
             }
         }
 
@@ -208,25 +174,25 @@ const Form = (props) => {
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
-                                name='pr_date'
-                                helperText={!!errors?.pr_date && errors?.pr_date[0]}
-                                error={!!errors?.pr_date}
-                                defaultValue={data?.pr_date}
+                                name='request_date'
+                                helperText={!!errors?.request_date && errors?.request_date[0]}
+                                error={!!errors?.request_date}
+                                defaultValue={data?.request_date}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 type='date'
                                 disabled={isApproved}
-                                name='shipment_date'
+                                name='delivery_date'
                                 label="Delivery Date"
                                 fullWidth
                                 InputProps={{
                                     startAdornment: <InputAdornment position="start"></InputAdornment>,
                                 }}
-                                helperText={!!errors?.shipment_date && errors?.shipment_date[0]}
-                                error={!!errors?.shipment_date}
-                                defaultValue={data?.shipment_date}
+                                helperText={!!errors?.delivery_date && errors?.delivery_date[0]}
+                                error={!!errors?.delivery_date}
+                                defaultValue={data?.delivery_date}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -317,24 +283,9 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
-                                <Button onClick={() => navigate(`/file/${data?.id}/purchase_request`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
                                     Next
-                                </Button>
-                                {/* {isApproved ?
-                                    <Button onClick={() => navigate(`/file/${data?.id}/purchase_request`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
-                                        Next
-                                    </Button>
-                                :
-                                    <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
-                                        Next
-                                    </LoadingButton>
-                                } */}
-                                {props.title == 'edit' ? ''
-                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                    //     Print
-                                    // </LoadingButton>
-                                : null
-                                }
+                                </LoadingButton>
                             </Stack>
                         </Grid>
                     </Grid>
@@ -343,7 +294,7 @@ const Form = (props) => {
             <ImportModal 
                 handleClose={handleModalImport}
                 open={modalImport}
-                title='Product Purchase Request'
+                title='Product PR Customer'
                 url={'read-excel/product-price'}
                 onSuccessImport={onSuccessImport}
             />

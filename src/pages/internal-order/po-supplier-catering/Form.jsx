@@ -232,7 +232,7 @@ const Form = (props) => {
                                     disabled
                                     fullWidth
                                     label="Request Date"
-                                    value={!!dataPOCateringById?.pr_catering?.request_date ?moment(dataPOCateringById?.pr_catering?.request_date).format('LL') : 'Loading...'}
+                                    value={!!dataPOCateringById?.pr_catering?.request_date ? moment(dataPOCateringById?.pr_catering?.request_date).format('LL') : 'Loading...'}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -240,7 +240,7 @@ const Form = (props) => {
                                     disabled
                                     fullWidth
                                     label="Delivery Date"
-                                    value={!!dataPOCateringById?.pr_catering?.delivery_date ?moment(dataPOCateringById?.pr_catering?.delivery_date).format('LL') : 'Loading...'}
+                                    value={!!dataPOCateringById?.pr_catering?.delivery_date ? moment(dataPOCateringById?.pr_catering?.delivery_date).format('LL') : 'Loading...'}
                                 />
                             </Grid>
                             <Grid item xs={12} md={12}>

@@ -1,31 +1,29 @@
-import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Checkbox, Grid, IconButton, InputAdornment, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import Iconify from '@components/Iconify'
-import { useNavigate } from 'react-router-dom'
-import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
-import TableInputRow from '@components/po-catering/TableInputRow'
-import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import useFetchUser from '@hooks/user-list/useFetchUser'
-import useFetchLocation from '@hooks/location/useFetchLocation'
-import useFetchPurchaseRequest from '@hooks/purchase-request/useFetchPurchaseRequest'
-import Loading from '@components/Loading'
-import useSavePOCatering from '@hooks/po-catering/useSavePOCatering'
 import CustomAutocomplete from '@components/CustomAutocomplete'
-import useFetchSupplier from '@hooks/supplier/useFetchSupplier'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
+import Iconify from '@components/Iconify'
+import Loading from '@components/Loading'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import TableInputRow from '@components/po-catering/TableInputRow'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
-import useFetchPurchaseRequestById from '@hooks/purchase-request/useFetchPurchaseRequestById'
-import { QuotationDummy, dummy_item_product, prDummy } from '@utils/Dummy'
+import useSavePOCustomer from '@hooks/po-customer/useSavePOCustomer'
+import useFetchQuotation from '@hooks/quotation/useFetchQuotation'
+import useFetchQuotationById from '@hooks/quotation/useFetchQuotationById'
+import useFetchUser from '@hooks/user-list/useFetchUser'
+import { LoadingButton } from '@mui/lab'
+import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import moment from 'moment'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
     const isApproved = useMemo(() => {
         if(!!!data) return false
-        return data.status === 'finish'
+        return data.status === 'submit'
     }, [data])
 
     const navigate = useNavigate()
-    const [item, setItem] = useState(dummy_item_product)
+    const [item, setItem] = useState([])
     const [form, setForm] = useState({
         item: '',
     })
@@ -37,41 +35,29 @@ const Form = (props) => {
     })
     const handleSelectedQuotation = (value) => setQuotationState({...quotationState, selected: value})
     const handleInputQuotation = (value) => setQuotationState({...quotationState, input: value})
-    // const { data: dataQuotationList, isLoading: loadingQuotationList } = useFetchPurchaseRequest({ paginate: 0 })
-    // const { data: dataQuotationById, isLoading: loadingQuotationById } = useFetchPurchaseRequestById(quotationState.selected?.id, { enabled: !!quotationState.selected?.id })
+    const { data: dataQuotationList, isLoading: loadingQuotationList } = useFetchQuotation({ paginate: 0 })
+    const { data: dataQuotationById, isLoading: loadingQuotationById } = useFetchQuotationById(quotationState.selected?.id, { enabled: !!quotationState.selected?.id })
 
-    // useEffect(() => {
-    //     let mounted = true
-    //     if(!!!quotationState.selected?.id) return
-    //     if(!!!dataPRById) return
-    //     if(!mounted) return 
+    useEffect(() => {
+        let mounted = true
+        if(!!!quotationState.selected?.id) return
+        if(!!!dataQuotationById) return
+        if(!mounted) return 
 
-    //     if(props.title === 'edit' && quotationState.selected?.id === data.purchase_request?.id){
-    //         setItem([...data.item_product])
-    //         return
-    //     }
+        if(props.title === 'edit' && quotationState.selected?.id === data.quotation?.id){
+            setItem([...data.item_product])
+            return
+        }
 
-    //     setItem([...dataPRById.item_product])
+        setItem([...dataQuotationById.item_product])
 
-    //     return () => mounted = false
+        return () => mounted = false
 
-    // }, [quotationState.selected, dataPRById])
+    }, [quotationState.selected, dataQuotationById])
 
     // User Handle
     const [userState, setUserState] = useState({
         prepared_by: {
-            input: '',
-            selected: null
-        },
-        checked_by: {
-            input: '',
-            selected: null
-        },
-        approved1_by: {
-            input: '',
-            selected: null
-        },
-        approved2_by: {
             input: '',
             selected: null
         },
@@ -120,7 +106,7 @@ const Form = (props) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
 
-    const { mutate: save, isLoading: loadingSave, error  } = useSavePOCatering({
+    const { mutate: save, isLoading: loadingSave, error  } = useSavePOCustomer({
         onSuccess: () => {}
     })
     const errors = error?.response?.data?.errors
@@ -128,74 +114,42 @@ const Form = (props) => {
     const onSubmit = (e) => {
         e.preventDefault()
         const formData = new FormData(e.target)
-        formData.append('purchase_request_id', prState.selected?.id)
-        formData.append('supplier_id', supplierState.selected?.id)
-        formData.append('location_id', locationState.selected?.id)
+        formData.append('quotation_id', quotationState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
-        formData.append('checked_by', userState.checked_by.selected?.id)
-        formData.append('approved1_by', userState.approved1_by.selected?.id)
-        formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
-            const name =  v?.item_product?.name
-            const brand = v?.item_product?.brand
-            const size = v?.item_product?.size
             const price = parseInt(v?.price) || parseInt(v?.item_price)
-            const unit = v.item_product?.unit?.param || v?.unit 
             const item_product_id = v.item_product?.id
+
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
-            formData.append(`item_product[${i}][item_name]`, name)
-            formData.append(`item_product[${i}][item_brand]`, brand)
             formData.append(`item_product[${i}][description]`, v?.description)
-            formData.append(`item_product[${i}][size]`, size)
-            formData.append(`item_product[${i}][unit]`, unit)
             formData.append(`item_product[${i}][item_price]`, price)
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
-        // save({ formData, id: data?.id })
+        save({ formData, id: data?.id })
     }
 
     useEffect(() => {
         let mounted = true
         if(mounted){
             if(!!data){
-                // setPrState({
-                //     input: data.purchase_request?.pr_number,
-                //     selected: data.purchase_request
-                // })
-                // setSupplierState({
-                //     input: data.supplier.name,
-                //     selected: data.supplier
-                // })
-                // setLocationState({
-                //     input: `${data.location.location_code} - ${data.location.location}`,
-                //     selected: data.location
-                // })
-                // setDiscount({
-                //     id: data?.discount?.id,
-                //     value: data?.discount?.discount
-                // })
-                // setUserState({
-                //     ...userState,
-                //     prepared_by: {
-                //         input: data?.prepared_by?.name,
-                //         selected: data?.prepared_by,
-                //     },
-                //     checked_by: {
-                //         input: data?.checked_by?.name,
-                //         selected: data?.checked_by,
-                //     },
-                //     approved1_by: {
-                //         input: data?.approved1_by?.name,
-                //         selected: data?.approved1_by,
-                //     },
-                //     approved2_by: {
-                //         input: data?.approved2_by?.name,
-                //         selected: data?.approved2_by,
-                //     }
-                // })
-                // setItem([...data.item_product])
+                setQuotationState({
+                    input: data.quotation?.quotation_number,
+                    selected: data.quotation
+                })
+                setDiscount({
+                    id: data?.discount?.id,
+                    value: data?.discount?.discount
+                })
+                setUserState({
+                    ...userState,
+                    prepared_by: {
+                        input: data?.prepared_by?.name,
+                        selected: data?.prepared_by,
+                    },
+                })
+                setItem([...data.item_product])
             }
         }
 
@@ -218,7 +172,7 @@ const Form = (props) => {
 
     }, [dataDiscount])
 
-    if(loadingUser || loadingDiscount){
+    if(loadingUser || loadingDiscount || loadingQuotationList){
         return <Loading />
     }
 
@@ -243,14 +197,14 @@ const Form = (props) => {
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
                                 disabled={isApproved}
-                                options={QuotationDummy}
+                                options={dataQuotationList?.data || []}
                                 getOptionLabel={(option) => `${option.quotation_number}`}
                                 label='Quotation Number'
                                 inputValue={quotationState.input}
                                 setInputValue={handleInputQuotation}
                                 selectedValue={quotationState.selected}
                                 setSelectedValue={handleSelectedQuotation}
-                                errors={errors?.quotation}
+                                errors={errors?.quotation_id}
                             /> 
                         </Grid>
                         {!!quotationState.selected?.id ?
@@ -259,39 +213,24 @@ const Form = (props) => {
                             <TextField
                                 disabled
                                 fullWidth
-                                type='date'
                                 label="Request Date"
-                                name='request_date'
-                                defaultValue={'2023-11-11'}
-                                helperText={!!errors?.request_date && errors?.request_date[0]}
-                                error={!!errors?.request_date}
-                                required
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
+                                value={!!dataQuotationById?.pr_customer?.request_date ? moment(dataQuotationById?.pr_customer?.request_date).format('LL') : 'Loading...'}
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
                                 disabled
                                 fullWidth
-                                type='date'
                                 label="Delivery Date"
-                                name='delivery_date'
-                                defaultValue={'2023-11-11'}
-                                helperText={!!errors?.delivery_date && errors?.delivery_date[0]}
-                                error={!!errors?.delivery_date}
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
+                                value={!!dataQuotationById?.pr_customer?.delivery_date ? moment(dataQuotationById?.pr_customer?.delivery_date).format('LL') : 'Loading...'}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                             <TextField 
+                                label='Location'
                                 fullWidth
-                                name='location'
                                 disabled
-                                defaultValue='HO Jakarta'
+                                value={dataQuotationById?.pr_customer?.location?.location || 'Loading....'}
                             />
                         </Grid>
                         <Grid item xs={12} md={12}>
@@ -365,7 +304,7 @@ const Form = (props) => {
                                             >
 
                                                 {props.type === 'approval' ? 
-                                                <TableCell></TableCell>
+                                                    <TableCell></TableCell>
                                                 : null
                                                 }
                                                 <TableCellHeaderColor>No.</TableCellHeaderColor>
@@ -398,23 +337,14 @@ const Form = (props) => {
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
-                                <Button onClick={() => navigate(`/file/${data?.id}/catering_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
-                                    Next
-                                </Button>
-                                {/* {isApproved ?
-                                    <Button onClick={() => navigate(`/file/${data?.id}/catering_po`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                {isApproved ?
+                                    <Button onClick={() => navigate(`/file/${data?.id}/po_customer`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
                                         Next
                                     </Button>
                                 :
                                     <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
                                         Next
                                     </LoadingButton>
-                                } */}
-                                {props.title == 'edit' ? ''
-                                    // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
-                                    //     Print
-                                    // </LoadingButton>
-                                : null
                                 }
                             </Stack>
                         </Grid>
