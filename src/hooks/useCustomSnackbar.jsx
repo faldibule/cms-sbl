@@ -1,9 +1,5 @@
 import { useSnackbar } from 'notistack';
 
-
-const config = {
-    
-}
 const useCustomSnackbar = () => {
     const { enqueueSnackbar: setSnackbar } = useSnackbar();
     

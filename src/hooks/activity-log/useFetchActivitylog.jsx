@@ -1,11 +1,10 @@
 import http from '@variable/Api'
-import React from 'react'
 import { useQuery } from 'react-query'
 
-const useFetchPOMasuk = (params) => {
-    return useQuery(['po-masuks', params], async ({ signal }) => {
+const useFetchActivitylog = (params) => {
+    return useQuery(['activity-logs', params], async ({ signal }) => {
         try {
-            const res = await http.get('incoming-po', {
+            const res = await http.get('activity-log', {
                 signal,
                 params
             })
@@ -16,4 +15,4 @@ const useFetchPOMasuk = (params) => {
     })
 }
 
-export default useFetchPOMasuk
+export default useFetchActivitylog
