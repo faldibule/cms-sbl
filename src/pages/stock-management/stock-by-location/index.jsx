@@ -1,16 +1,12 @@
-import { useCallback, useState } from 'react'
-import { useNavigate, useParams, Link as RouterLink, useLocation, } from 'react-router-dom';
-import { Box, Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Tabs, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
 import Iconify from '@components/Iconify';
-import Loading from '@components/Loading';
+import Page from '@components/Page';
+import { Box, Card, CardContent, Container, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 
-import StockMor from '@pages/stock-management/stock-by-location/mor/index'
-import StockProduct from '@pages/stock-management/stock-by-location/product/index'
-
+import StockMor from '@pages/stock-management/stock-by-location/mor';
+import StockProduct from '@pages/stock-management/stock-by-location/product';
 
 const index = () => {
-    const navigate = useNavigate()
     const { location_id } = useParams()
     const { pathname } = useLocation();
     const segment = pathname.split('/');
