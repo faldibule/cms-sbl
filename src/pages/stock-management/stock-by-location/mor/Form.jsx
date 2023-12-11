@@ -1,16 +1,15 @@
-import { LoadingButton } from '@mui/lab'
-import { Box, Breadcrumbs, Button, Card, Grid, IconButton, InputAdornment, Link, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useEffect, useMemo, useState } from 'react'
-import Iconify from '@components/Iconify'
-import { useNavigate, useParams } from 'react-router-dom'
-import TableInputRow from '@components/mor/TableInputRow'
-import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import Loading from '@components/Loading'
-import ImportModal from '@components/ImportModal'
-import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
-import useSaveMealSheetDetail from '@hooks/meal-sheet-detail/useSaveMealSheetDetail'
 import CustomAutocomplete from '@components/CustomAutocomplete'
+import Iconify from '@components/Iconify'
+import ImportModal from '@components/ImportModal'
+import Loading from '@components/Loading'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import TableInputRow from '@components/mor/TableInputRow'
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import useSaveMOR from '@hooks/mor/useSaveMOR'
+import { LoadingButton } from '@mui/lab'
+import { Box, Breadcrumbs, Button, Card, Grid, Link, Stack, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { useEffect, useMemo, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
@@ -60,7 +59,6 @@ const Form = (props) => {
         }
     })
     const errors = error?.response?.data?.errors
-    console.log(errors)
 
     const onSubmit = (e) => {
         e.preventDefault()
@@ -105,7 +103,7 @@ const Form = (props) => {
                         <Typography variant='h5'>                       
                             {props.title === 'add' ? 'Form Input MOR' : 'Form Edit MOR' }
                         </Typography>
-                        <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
+                        <Breadcrumbs sx={{ fontSize: '0.8rem', height: 30 }}>
                             <Link height={30} underline="hover" color="inherit" href="/stock-management">Stock Management</Link>
                             <Link underline="hover" color="inherit" href={`/stock-management/stock-by-location/${location_id}/mor`}>MOR</Link>
                             <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
