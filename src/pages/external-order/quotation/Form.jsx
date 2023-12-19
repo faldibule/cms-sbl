@@ -11,7 +11,8 @@ import useFetchPRCustomerById from '@hooks/pr-customer/useFetchPRCustomerById'
 import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, InputAdornment, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Box, Button, Card, Checkbox, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { IntegerFormat, NumberFormat } from '@utils/Format'
 import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -52,8 +53,12 @@ const Form = (props) => {
             setItem([...data.item_product])
             return
         } 
-
-        setItem([...dataPRCustomerById.item_product])
+        let temp = []
+        for(let i = 0; i < 1; i++){
+            temp = [...temp, ...dataPRCustomerById.item_product]
+        }
+        // setItem([...dataPRCustomerById.item_product])
+        setItem([...temp])
 
         return () => mounted = false
 
@@ -99,11 +104,6 @@ const Form = (props) => {
         }
     }
     const { data: dataUser, isLoading: loadingUser } = useFetchUser({ paginate: 0 })
-
-    // Handle Markup
-    const [markup, setMarkup] = useState(undefined)
-    const handleMarkup = (value) => setMarkup(value)
-    const isMarkupInvalid = useMemo(() => (markup < 0 || markup > 100))
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -193,6 +193,100 @@ const Form = (props) => {
         return () => mounted = false
 
     }, [props?.id])
+
+    // handle checkbox table
+    const [selected, setSelected] = useState([])
+    const handleClick = (event, id) => {
+        const selectedIndex = selected.indexOf(id);
+        let newSelected = [];
+
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, id);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1),
+            );
+        }
+
+        setSelected([...newSelected]);
+    };
+    const isSelected = (index) => selected.indexOf(index) !== -1;
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+          const newSelected = item.map((n, i) => i);
+          setSelected(newSelected);
+          return;
+        }
+        setSelected([]);
+    };
+
+    // Handle Markup
+    const [markup, setMarkup] = useState({
+        type: '',
+        price: 0,
+        percentage: 0,
+    })
+    const handleMarkup = (e) => {
+        if(e.target?.name === 'percentage' || e.target?.name === 'type'){
+            setMarkup({
+                ...markup,
+                [e.target.name]: e.target?.value
+            })
+            return;
+        }
+        setMarkup({
+            ...markup,
+            price: NumberFormat(e.target?.value, 'Rp')
+        })
+    }
+    const handleApplyMarkup = () => {
+        const isTypePercentage = markup.type === 'markupPercentage'
+        setItem((prev) => prev.map((value, index) => {
+            const { tax } = value.item_product
+            const isHasTax = tax === 'yes'
+            let vat = isHasTax ? 11 : 0
+            const price = parseInt(value.item_price)
+            const newPrice = (price * vat / 100) + price
+            
+            let temp = {}
+            if(isTypePercentage){
+                temp = {
+                    markupPercentage: markup.percentage,
+                    markupPrice: NumberFormat(( markup.percentage * newPrice / 100), 'Rp')
+                }
+            }else{
+                const tempMarkupPrice = IntegerFormat(markup.price)
+                temp = {
+                    markupPrice: NumberFormat(markup.price, 'Rp'),
+                    markupPercentage: (tempMarkupPrice / newPrice * 100),
+                }
+            }
+
+            return selected.includes(index) ? {
+                ...value,
+                ...temp
+            } : value
+        }))
+    }
+
+    const renderItemDetails = useMemo(() => {
+        if(item.length === 0) return null
+        return item.map((v, i) => 
+            <TableInputRow 
+                isApproved={isApproved} 
+                key={i} i={i} v={v} 
+                deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} 
+                errors={errors} 
+                handleClick={handleClick}
+                isItemSelected={isSelected(i)}
+            /> 
+        )
+    }, [item, isApproved, errors, selected])
 
     if(loadingCustomer || loadingUser){
         return <Loading />
@@ -368,64 +462,102 @@ const Form = (props) => {
                                     error={!!errors?.term_condition}
                                 />
                             </Grid>
+                            
+                            {/* Markup */}
                             <Grid item xs={12} md={12}>
-                                <TextField
-                                    disabled={isApproved}
-                                    fullWidth
-                                    label='Markup Value'
-                                    type='number'
-                                    InputProps={{
-                                        startAdornment: <InputAdornment position="start">%</InputAdornment>,
-                                    }}
-                                    onChange={(e) => handleMarkup(e.target.value)}
-                                    value={markup}
-                                    required
-                                    name='markup'
-                                    helperText={isMarkupInvalid && 'Markup Value must be in betewen 0 to 100'}
-                                    error={isMarkupInvalid}
-                                />
+                                <Stack direction='row' alignItems='center' spacing={2}>
+                                    <TextField
+                                        disabled={isApproved}
+                                        fullWidth 
+                                        label='Markup Price'
+                                        name='type'
+                                        value={markup.type}
+                                        onChange={handleMarkup}
+                                        select
+                                    >
+                                        <MenuItem value='markupPercentage'>Percentage</MenuItem>  
+                                        <MenuItem value='markupPrice'>Price</MenuItem>  
+                                    </TextField>
+                                    {markup.type === 'markupPercentage' ?
+                                        <TextField
+                                            disabled={isApproved}
+                                            fullWidth
+                                            label='Markup Percentage'
+                                            type='number'
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start">%</InputAdornment>,
+                                            }}
+                                            name='percentage'
+                                            value={markup.percentage}
+                                            onChange={handleMarkup}
+                                            required
+                                        />
+                                    :
+                                        <TextField
+                                            disabled={isApproved || markup.type === ''}
+                                            fullWidth 
+                                            label='Markup Price'
+                                            name='price'
+                                            value={markup.price}
+                                            onChange={handleMarkup}
+                                        />  
+                                    }
+                                    <Button disabled={markup.type === ''} onClick={handleApplyMarkup} variant='contained'>Apply</Button>
+                                </Stack>
                             </Grid>
                             
                             <Grid item xs={12} md={12}>
-                                {item.length > 0 ? 
-                                    <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
-                                        <Table stickyHeader aria-label="simple table">
-                                            <TableHead>
-                                                <TableRow
-                                                    sx={{
-                                                        "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
-                                                        "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
-                                                        bgcolor: '#d6e9ff'
-                                                    }}
-                                                >
-                                                    <TableCellHeaderColor>No.</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Item Name</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Size</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Unit</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Quantity</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>VAT</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>New Price</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Total Markup</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Total New Price</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Grand Total</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>T/NT</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Remarks</TableCellHeaderColor>
-                                                    <TableCellHeaderColor>Action</TableCellHeaderColor>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {item.map((v, i) => <TableInputRow markup={markup} isApproved={isApproved} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} errors={errors} /> )}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                : 
-                                null
+                                {item.length > 0 ?
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow
+                                                sx={{
+                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                    bgcolor: '#d6e9ff'
+                                                }}
+                                            >
+                                                <TableCellHeaderColor padding="checkbox">
+                                                    <Checkbox
+                                                        color="primary"
+                                                        indeterminate={selected.length > 0 && selected.length < item.length}
+                                                        checked={item.length > 0 && selected.length === item.length}
+                                                        onChange={handleSelectAllClick}
+                                                        inputProps={{
+                                                            'aria-label': 'select all desserts',
+                                                        }}
+                                                    />
+                                                </TableCellHeaderColor>
+                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>VAT Buy</TableCellHeaderColor>
+                                                <TableCellHeaderColor>New Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Markup Value</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Markup Percentage</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Amount</TableCellHeaderColor>
+                                                <TableCellHeaderColor>T/NT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Remarks</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {renderItemDetails}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                : null
                                 }
                             </Grid>
                             <Grid item xs={12} md={12}>
-                                <CustomGrandTotalComponent markup={markup} item={item} />
+                                <CustomGrandTotalComponent item={item} />
                             </Grid>
                             <Grid item xs={12} md={12}>
                                 <Stack direction='row' justifyContent='end' spacing={2}>

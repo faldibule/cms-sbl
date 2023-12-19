@@ -1,19 +1,18 @@
-import { LoadingButton } from '@mui/lab'
-import { Box, Breadcrumbs, Button, Card, Grid, IconButton, InputAdornment, Link, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from '@mui/material'
-import React, { useEffect, useMemo, useState } from 'react'
-import Iconify from '@components/Iconify'
-import { useNavigate, useParams } from 'react-router-dom'
-import TableInputRow from '@components/meal-sheet-detail/TableInputRow'
-import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import useFetchCustomer from '@hooks/customer/useFetchCustomer'
-import useFetchUser from '@hooks/user-list/useFetchUser'
-import Loading from '@components/Loading'
-import ImportModal from '@components/ImportModal'
-import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
-import DialogInputRow from '@components/meal-sheet-detail/DialogInputRow'
-import useSaveMealSheetDetail from '@hooks/meal-sheet-detail/useSaveMealSheetDetail'
-import useFetchMealSheetDailyById from '@hooks/meal-sheet-daily/useFetchMealSheetDailyById'
 import CustomAutocomplete from '@components/CustomAutocomplete'
+import Iconify from '@components/Iconify'
+import ImportModal from '@components/ImportModal'
+import Loading from '@components/Loading'
+import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import DialogInputRow from '@components/meal-sheet-detail/DialogInputRow'
+import TableInputRow from '@components/meal-sheet-detail/TableInputRow'
+import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
+import useFetchMealSheetDailyById from '@hooks/meal-sheet-daily/useFetchMealSheetDailyById'
+import useSaveMealSheetDetail from '@hooks/meal-sheet-detail/useSaveMealSheetDetail'
+import useFetchUser from '@hooks/user-list/useFetchUser'
+import { LoadingButton } from '@mui/lab'
+import { Box, Breadcrumbs, Button, Card, Grid, Link, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
@@ -306,7 +305,7 @@ const Form = (props) => {
                                 fullWidth 
                                 label='Acknowladge Name'
                                 name='acknowladge_by[name]'
-                                defaultValue={data?.acknowladge_by['name']}
+                                defaultValue={data?.acknowladge_by?.name || ''}
                                 helperText={!!errors?.['acknowladge_by.name'] && errors?.['acknowladge_by.name'][0]}
                                 error={!!errors?.['acknowladge_by.name']}
                             /> 
@@ -316,7 +315,7 @@ const Form = (props) => {
                                 fullWidth 
                                 label='Acknowladge Position'
                                 name='acknowladge_by[position]'
-                                defaultValue={data?.acknowladge_by['position']}
+                                defaultValue={data?.acknowladge_by?.position || ''}
                                 helperText={!!errors?.['acknowladge_by.position'] && errors?.['acknowladge_by.position'][0]}
                                 error={!!errors?.['acknowladge_by.position']}
                             /> 

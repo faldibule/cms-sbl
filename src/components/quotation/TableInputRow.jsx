@@ -1,17 +1,33 @@
 import Iconify from "@components/Iconify"
-import { Stack, TableCell, TableRow, Typography } from "@mui/material"
-import { useMemo, useState } from "react"
-import DialogInputRow from "./DialogInputRow"
-import { NumberFormat } from "@utils/Format"
 import useValueConverter from "@hooks/useValueConverter"
+import { Checkbox, IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { NumberFormat } from "@utils/Format"
+import { useState } from "react"
+import DialogInputRow from "./DialogInputRow"
 
-const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved, markup = 0 }) => {
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved, markup = 0, handleClick = () => {}, isItemSelected }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
-    
-    const { valueMemo, tax, total, grand_total, markUpMemo, eachTax, newPrice } = useValueConverter(v, markup) 
+    const { valueMemo, markUpMemo, eachTax, newPrice, amount, vatAmmount } = useValueConverter(v, markup) 
     return (
-        <TableRow key={i}>
+        <TableRow 
+            key={i}
+            hover
+            role="checkbox"
+            aria-checked={isItemSelected}
+            tabIndex={-6}
+            selected={isItemSelected}
+        >
+            <TableCell padding="checkbox">
+                <Checkbox
+                    onClick={(event) => handleClick(event, i)}
+                    color="primary"
+                    checked={isItemSelected}
+                    inputProps={{
+                        'aria-labelledby': i,
+                    }}
+                />
+            </TableCell>
             <TableCell>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>
                 {valueMemo.name}
@@ -29,15 +45,18 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 {valueMemo.tax !== 'yes' ? 'No' : NumberFormat(eachTax, 'Rp')}({v.vat || 11}%)
             </TableCell>
             <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(newPrice, 'Rp')}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{markup === 0 ? 0 : NumberFormat(markUpMemo.markupPrice, 'Rp')}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(markUpMemo.markupTotal, 'Rp')}</TableCell>
-            <TableCell>{NumberFormat(grand_total, 'Rp')}</TableCell>
-            <TableCell>{NumberFormat(grand_total + markUpMemo.markupTotal, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(valueMemo.markupPrice, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{parseFloat(valueMemo.markupPercentage).toFixed(2)}%</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(markUpMemo.markupValue, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(amount, 'Rp')}</TableCell>
             <TableCell>
-                {
-                    !!v.tnt ? v.tnt : !!errors[`item_product.${i}.tnt`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>T/NT required</Typography> : ''
-                }
+               {valueMemo.tnt}
             </TableCell>
+            <TableCell sx={{ minWidth: 150 }}>
+                { vatAmmount !== 0 ?
+                    `${NumberFormat(vatAmmount, 'Rp')}(11%)` : 'No'}
+            </TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(amount + vatAmmount, 'Rp')}</TableCell>
             <TableCell>
                 {
                     !!v.remark ? v.remark : !!errors[`item_product.${i}.remark`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>Remark required</Typography> : ''
@@ -48,8 +67,16 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 '-'
                 : 
                 <Stack direction='row' spacing={2}>
-                    <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
-                    <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
+                    <Tooltip title='Edit'>
+                        <IconButton>
+                            <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title='Delete'>
+                        <IconButton>
+                            <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
+                        </IconButton>
+                    </Tooltip>
                 </Stack>
                 }
                 <DialogInputRow 
@@ -59,9 +86,13 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                     onChangeByIndex={onChangeByIndex}
                     i={i}
                     priceProps={valueMemo.price}
+                    markupProps={{ percentage: valueMemo.markupPercentage, price: valueMemo.markupPercentage }}
                 />
             </TableCell>
         </TableRow>
     )
 }
+
+
+
 export default TableInputRow

@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import { IntegerFormat } from '@utils/Format'
+import { useMemo } from 'react'
 
 const useValueConverter = (v, markup = 0) => {
     const valueMemo = useMemo(() => {
@@ -10,6 +11,9 @@ const useValueConverter = (v, markup = 0) => {
             description: v?.item_product?.description || v?.description,
             price: parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price),
             tax: v?.tax || v?.item_product?.tax,
+            markupPrice: v?.markupPrice || 'Rp.0',
+            markupPercentage: v?.markupPercentage || 0,
+            tnt: v?.tnt || 'T',
         }
     }, [v]) 
 
@@ -44,11 +48,25 @@ const useValueConverter = (v, markup = 0) => {
     const grand_total = useMemo(() =>  parseInt(total + (isNaN(tax) ? 0 : tax)), [total, tax])
 
     const markUpMemo = useMemo(() => {
+        const markUpPriceConverted = IntegerFormat(valueMemo.markupPrice)
         return {
-            markupPrice: (valueMemo?.price + eachTax) * markup / 100,
-            markupTotal: grand_total * markup / 100
+            markupTotal: (markUpPriceConverted) * (v?.quantity || 0),
+            markupValue: (markUpPriceConverted + newPrice),
         }
-    }, [valueMemo, grand_total, markup])
+    }, [valueMemo.markupPrice, newPrice, v?.quantity])
+
+    const amount = useMemo(() => {
+        const markUpPriceConverted = IntegerFormat(valueMemo.markupPrice)
+        return (newPrice + markUpPriceConverted) * (v?.quantity || 0)
+    }, [newPrice, v?.quantity, valueMemo.markupPrice])
+
+    const vatAmmount = useMemo(() => {
+        let vat = 11
+        if(valueMemo.tnt === 'NT'){
+            return 0
+        }
+        return (amount * vat / 100)
+    }, [amount, valueMemo.tnt])
 
     return {
         valueMemo,
@@ -57,7 +75,9 @@ const useValueConverter = (v, markup = 0) => {
         newPrice,
         eachTax,
         grand_total,
-        markUpMemo
+        markUpMemo,
+        amount,
+        vatAmmount
     }
 }
 
