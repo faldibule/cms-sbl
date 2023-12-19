@@ -1,34 +1,44 @@
 import { Stack, Typography } from '@mui/material'
-import React, { useMemo } from 'react'
-import { NumberFormat } from '../utils/Format'
+import { IntegerFormat, NumberFormat } from '@utils/Format'
+import { useMemo } from 'react'
 
-const CustomGrandTotalComponent = ({ item, discount = 0, markup = 0 }) => {
+const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
 
-    const grand_total = useMemo(() => {
-      const temp = item.reduce((sum, v) => {
-          const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
+    const getTotal = useMemo(() => {
+      let totalAmount = 0
+      let totalVAT = 0
+      item.map((value) => {
+          const { tax } = value.item_product
+          const tnt = value?.tnt || 'T'
+          const isHasTax = tax === 'yes'
+          let vat = isHasTax ? 11 : 0
+          const price = parseInt(value?.price) || parseInt(value?.item_price) || parseInt(value?.item_product?.price)
 
-          let tax = 0;
-          if(v?.tax === 'yes' || v?.item_product?.tax === 'yes'){
-            const vat = v?.vat || 11
-            tax = (price * v.quantity) * parseInt(vat) / 100
+          if(markup){
+            const newPrice = (price * vat / 100) + price
+            const markUpPriceConverted = IntegerFormat(value?.markupPrice || 'Rp.0')
+            const vatAmount = tnt === 'T' ? ((newPrice + markUpPriceConverted) * (value?.quantity || 0)) * 11 / 100 : 0 
+            
+            totalAmount = totalAmount + ((newPrice + markUpPriceConverted) * (value?.quantity || 0))
+            totalVAT = totalVAT + vatAmount
+            return;
           }
-          const total = parseInt((price * (v?.quantity || 0)) + tax)
-          return sum + total
-          
-      }, 0)
-    return temp
+
+          totalAmount = totalAmount + (price * (value?.quantity || 0))
+          totalVAT = totalVAT + ((price * (value?.quantity || 0)) * vat / 100)
+      })
+      return {
+          totalAmount,
+          totalVAT,
+      }
     }, [item])
+
     const getDiscount = useMemo(() => {
-      return grand_total * discount / 100
-    }, [grand_total, discount])
-    const getMarkup = useMemo(() => {
-      if(!markup) return 0
-      return grand_total * markup / 100
-    }, [grand_total, markup])
+      return (getTotal.totalAmount + getTotal.totalVAT) * discount / 100
+    }, [getTotal, discount])
 
     return (
-      <Stack justifyContent='end' alignItems='end' textAlign='right'>
+      <Stack justifyContent='end' alignItems='end' textAlign='right' spacing={0.5}>
           {discount !== 0 ?
             <Stack>
                 <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'red' }}>Discount</Typography>
@@ -36,16 +46,17 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = 0 }) => {
             </Stack>
             : null
           }
-          {markup !== 0 ?
-            <Stack>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>Markup Total</Typography>
-                <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>{NumberFormat(getMarkup, 'Rp')}</Typography>
-            </Stack>
-            : null
-          }
+          <Stack>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>Total</Typography>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>{NumberFormat(getTotal.totalAmount, 'Rp')}</Typography>
+          </Stack>
+          <Stack>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'green' }}>Total VAT</Typography>
+              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'green' }}>{NumberFormat(getTotal.totalVAT, 'Rp')}</Typography>
+          </Stack>
           <Stack>
               <Typography variant='h6' fontWeight='bold'>Grand Total</Typography>
-              <Typography variant='h6' fontWeight='bold'>{NumberFormat(grand_total - getDiscount + getMarkup, 'Rp')}</Typography>
+              <Typography variant='h6' fontWeight='bold'>{NumberFormat(getTotal.totalAmount + getTotal.totalVAT - getDiscount)}</Typography>
           </Stack>
       </Stack>
     )

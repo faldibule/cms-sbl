@@ -1,6 +1,6 @@
 import Iconify from "@components/Iconify"
 import useValueConverter from "@hooks/useValueConverter"
-import { Checkbox, IconButton, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material"
+import { Checkbox, Stack, TableCell, TableRow, Typography } from "@mui/material"
 import { NumberFormat } from "@utils/Format"
 import { useState } from "react"
 import DialogInputRow from "./DialogInputRow"
@@ -67,16 +67,8 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 '-'
                 : 
                 <Stack direction='row' spacing={2}>
-                    <Tooltip title='Edit'>
-                        <IconButton>
-                            <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title='Delete'>
-                        <IconButton>
-                            <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                        </IconButton>
-                    </Tooltip>
+                    <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
+                    <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
                 </Stack>
                 }
                 <DialogInputRow 
