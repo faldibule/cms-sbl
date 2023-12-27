@@ -1,4 +1,5 @@
 import CustomAutocomplete from '@components/CustomAutocomplete'
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent'
 import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
@@ -7,7 +8,7 @@ import TableInputRow from '@components/mor/TableInputRow'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import useSaveMOR from '@hooks/mor/useSaveMOR'
 import { LoadingButton } from '@mui/lab'
-import { Box, Breadcrumbs, Button, Card, Grid, Link, Stack, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Breadcrumbs, Button, Card, Grid, Stack, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -81,9 +82,7 @@ const Form = (props) => {
         let mounted = true
         if(mounted){
             if(!!data){
-                console.log(data)
                 setItem([...data.data])
-                
             }
         }
 
@@ -104,8 +103,8 @@ const Form = (props) => {
                             {props.title === 'add' ? 'Form Input MOR' : 'Form Edit MOR' }
                         </Typography>
                         <Breadcrumbs sx={{ fontSize: '0.8rem', height: 30 }}>
-                            <Link height={30} underline="hover" color="inherit" href="/stock-management">Stock Management</Link>
-                            <Link underline="hover" color="inherit" href={`/stock-management/stock-by-location/${location_id}/mor`}>MOR</Link>
+                            <CustomLinkBreadcrumsComponent title='Stock Management' to="/stock-management" />
+                            <CustomLinkBreadcrumsComponent title='MOR' to={`/stock-management/stock-by-location/${location_id}/mor`} />
                             <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
                                 {props.title === 'add' ? 'Form Input MOR' : 'Form Edit MOR' }
                             </Typography>

@@ -159,6 +159,9 @@ const index = () => {
                     {value.supplier.name}
                 </TableCell>
                 <TableCell>
+                    {value.location.location}
+                </TableCell>
+                <TableCell>
                     {value.tax}
                 </TableCell>
                 <TableCell>
@@ -211,6 +214,7 @@ const index = () => {
                                                 <TableCell>Name</TableCell>
                                                 <TableCell>Price</TableCell>
                                                 <TableCell>Supplier</TableCell>
+                                                <TableCell>Location</TableCell>
                                                 <TableCell>Tax</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>

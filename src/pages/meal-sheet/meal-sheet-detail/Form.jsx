@@ -1,4 +1,5 @@
 import CustomAutocomplete from '@components/CustomAutocomplete'
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent'
 import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
@@ -10,7 +11,7 @@ import useFetchMealSheetDailyById from '@hooks/meal-sheet-daily/useFetchMealShee
 import useSaveMealSheetDetail from '@hooks/meal-sheet-detail/useSaveMealSheetDetail'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
-import { Box, Breadcrumbs, Button, Card, Grid, Link, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Box, Breadcrumbs, Button, Card, Grid, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -164,9 +165,9 @@ const Form = (props) => {
                             {props.title === 'add' ? 'Form Input Meal Sheet Detail' : 'Form Edit Meal Sheet Detail' }
                         </Typography>
                         <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
-                            <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
-                            <Link underline="hover" color="inherit" href={`/meal-sheet/report/${group_id}/daily`}>Meal Sheet Report</Link>
-                            <Link underline="hover" color="inherit" href={`/meal-sheet/detail/${group_id}/${daily_id}`}>Meal Sheet Detail</Link>
+                            <CustomLinkBreadcrumsComponent title='Meal Sheet Group' to="/meal-sheet/group" />
+                            <CustomLinkBreadcrumsComponent title='Meal Sheet Report' to={`/meal-sheet/report/${group_id}/daily`} />
+                            <CustomLinkBreadcrumsComponent title='Meal Sheet Detail' to={`/meal-sheet/detail/${group_id}/${daily_id}`} />
                             <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
                                 {props.title === 'add' ? 'Form Input Meal Sheet Detail' : 'Form Edit Meal Sheet Detail' }
                             </Typography>

@@ -1,19 +1,20 @@
-import { useCallback, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { Breadcrumbs, Button, Card, CardContent, Container, Grid, IconButton, InputAdornment, Link, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import Iconify from '@components/Iconify';
-import CustomSearchComponent from '@components/CustomSearchComponent';
-import CustomLinkComponent from '@components/CustomLinkComponent';
-import { useRecoilValue } from 'recoil';
-import { authentication } from '@recoil/Authentication';
-import DeleteDialog from '@components/DeleteDialog';
-import Loading from '@components/Loading';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
-import useFetchMealSheetDetail from '@hooks/meal-sheet-detail/useFetchMealSheetDetail';
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent';
+import CustomLinkComponent from '@components/CustomLinkComponent';
+import CustomSearchComponent from '@components/CustomSearchComponent';
+import DeleteDialog from '@components/DeleteDialog';
+import DownloadDialog from '@components/DownloadDialog';
+import Iconify from '@components/Iconify';
+import Loading from '@components/Loading';
+import Page from '@components/Page';
 import useDeleteMealSheetDetail from '@hooks/meal-sheet-detail/useDeleteMealSheetDetail';
 import useDownloadMealSheetDetail from '@hooks/meal-sheet-detail/useDownloadMealSheetDetail';
-import DownloadDialog from '@components/DownloadDialog';
+import useFetchMealSheetDetail from '@hooks/meal-sheet-detail/useFetchMealSheetDetail';
+import { Breadcrumbs, Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { authentication } from '@recoil/Authentication';
+import { useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
 const index = () => {
     const navigate = useNavigate()
@@ -179,8 +180,8 @@ const index = () => {
                             <Stack spacing={1} mb={3}>
                                 <Typography variant='h4'>Meal Sheet Detail</Typography>
                                 <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
-                                    <Link underline="hover" color="inherit" href="/meal-sheet/group">Meal Sheet Group</Link>
-                                    <Link underline="hover" color="inherit" href={`/meal-sheet/report/${group_id}/daily`}>Meal Sheet Report</Link>
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Group' to="/meal-sheet/group" />
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Report' to={`/meal-sheet/report/${group_id}/daily`} />
                                     <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Meal Sheet Detail</Typography>
                                 </Breadcrumbs>
                             </Stack>

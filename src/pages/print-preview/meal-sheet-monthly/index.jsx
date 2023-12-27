@@ -1,14 +1,14 @@
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent'
 import Iconify from '@components/Iconify'
-import Loading from '@components/Loading'
-import { Box, Button, Card, Divider, Grid, Stack, Typography } from '@mui/material'
-import React, { useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import './style.css'
-import moment from 'moment'
-import 'moment/locale/id';
-import { LoadingButton } from '@mui/lab'
 import useDownloadMealSheetMonthly from '@hooks/meal-sheet-monthly/useDownloadMealSheetMonthly'
 import useFetchMealSheetMonthlyById from '@hooks/meal-sheet-monthly/useFetchMealSheetMonthlyById'
+import { LoadingButton } from '@mui/lab'
+import { Breadcrumbs, Button, Card, Divider, Grid, Stack, Typography } from '@mui/material'
+import moment from 'moment'
+import 'moment/locale/id'
+import { useMemo } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import './style.css'
 
 const dataMonth = [
     { month: 'Januari', value: 1 },
@@ -103,8 +103,7 @@ const PreviewMonthlyRecord = () => {
                     <td className="tg-baqh" rowspan="2" style={{ verticalAlign: 'middle', }}>Date</td>
                     <td className="tg-baqh" colspan={rows?.meal_sheet_group?.client?.length}>Client Group</td>
                     <td className="tg-baqh" colspan="2">Total Account</td>
-                    <td className="tg-baqh" colspan="3">Casual Meals</td>
-                    <td className="tg-0lax"></td>
+                    <td className="tg-baqh" colspan="4">Casual Meals</td>
                     <td className="tg-0lax"></td>
                     <td className="tg-0lax" colspan="2" rowspan="2" style={{ verticalAlign: 'middle', textAlign: 'center', }}>Remark</td>
                 </tr>
@@ -172,31 +171,31 @@ const PreviewMonthlyRecord = () => {
                 {/* Signature */}
                 <tr>
                     <td colspan="2" style={{ borderTop: 'none', borderRight: 'none', }}>
-                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '-5px', }}>
+                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
                             <p>Prepared By,</p>
                             <p style={{ marginTop: '60px', }}>{rows.prepared_by['name']}</p>
-                            <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.prepared_by['position']}</p>
+                            <p style={{ marginTop: '0px', marginBottom: '0px', }}>{rows.prepared_by['position']}</p>
                         </div>
                     </td>
                     <td colspan="4" style={{ borderTop: 'none', borderRight: 'none', borderLeft: 'none', }}>
-                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '-5px', }}>
+                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
                             <p>Checked By,</p>
                             <p style={{ marginTop: '60px', }}>{rows.checked_by['name']}</p>
-                            <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.checked_by['position']}</p>
+                            <p style={{ marginTop: '0px', marginBottom: '0px', }}>{rows.checked_by['position']}</p>
                         </div>
                     </td>
                     <td colspan="3" style={{ borderTop: 'none', borderRight: 'none', borderLeft: 'none', }}>
-                        <div style={{ marginLeft: '-50px', minHeight: '100px', textAlign: 'center', marginTop: '-5px', }}>
+                        <div style={{ marginLeft: '-50px', minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
                             <p>Approved By,</p>
                             <p style={{ marginTop: '60px', }}>{rows.approved_by['name']}</p>
-                            <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.approved_by['position']}</p>
+                            <p style={{ marginTop: '0px', marginBottom: '0px', }}>{rows.approved_by['position']}</p>
                         </div>
                     </td>
                     <td colspan="3" style={{ borderTop: 'none', borderLeft: 'none', }}>
-                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '-5px', }}>
+                        <div style={{ minHeight: '100px', textAlign: 'center', marginTop: '0px', }}>
                             <p>Acknowledge By,</p>
                             <p style={{ marginTop: '60px', }}>{rows.acknowladge_by['name']}</p>
-                            <p style={{ marginTop: '-5px', marginBottom: '0px', }}>{rows.acknowladge_by['position']}</p>
+                            <p style={{ marginTop: '0px', marginBottom: '0px', }}>{rows.acknowladge_by['position']}</p>
                         </div>
                     </td>
                 </tr>
@@ -238,9 +237,16 @@ const index = () => {
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={12}>
-                            <Typography variant='h5'>
-                                Print Preview Meal Sheet Monthly
-                            </Typography>
+                            <Stack>
+                                <Typography variant='h5'>
+                                    Print Preview Meal Sheet Monthly
+                                </Typography>
+                                <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Group' to="/meal-sheet/group" />
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Report' to={`/meal-sheet/report/${group_id}/monthly`} />
+                                    <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Preview meal sheet monthly</Typography>
+                                </Breadcrumbs>
+                            </Stack>
                             <Divider />
                         </Grid>
                         <Grid item xs={12} md={12}>

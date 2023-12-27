@@ -1,12 +1,15 @@
-import { useCallback, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent';
 import Loading from '@components/Loading';
+import Page from '@components/Page';
+import useFetchLocationById from '@hooks/location/useFetchLocationById';
 import useFetchStockDetailProduct from '@hooks/stock-by-location/useFetchStockDetailProduct';
 import useFetchHistoryStock from '@hooks/stock-detail-product/useFetchHistoryStock';
 import useSaveHistoryStock from '@hooks/stock-detail-product/useSaveHistoryStock';
 import { LoadingButton } from '@mui/lab';
+import { Box, Breadcrumbs, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import moment from 'moment';
+import { useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const CustomGridLabel = ({ label, value }) => {
     return (
@@ -34,6 +37,8 @@ const index = () => {
     const { data, isLoading: loadingDetailProduct, refetch: refetchDetailProduct } = useFetchStockDetailProduct(params)
 
     const id_product = data?.product_stock?.id
+    
+    const { data: dataLocationById, isLoading: loadingDataLocationById } = useFetchLocationById(location_id)
 
     const [paramsHistory, setParamsHistory] = useState({
         page: 1,
@@ -95,7 +100,7 @@ const index = () => {
     
     const renderData = useCallback(() => {
         const rows = dataHistory
-        if(!!!data?.product_stock?.id){
+        if(!data?.product_stock?.id){
             return (
                 <TableRow>
                     <TableCell
@@ -125,7 +130,8 @@ const index = () => {
                 </TableRow>
             )
         }
-        if(rows === undefined) {
+
+        if(rows === undefined || !dataLocationById) {
             return (
                 <TableRow>
                     <TableCell
@@ -186,24 +192,51 @@ const index = () => {
                         {value.quantity}
                     </TableCell>
                     <TableCell>
+                        {value.from}
+                    </TableCell>
+                    {dataLocationById.main === 1 ? 
+                        <TableCell>
+                            {value?.to || '-'}
+                        </TableCell>
+                        : null
+                    } 
+                    <TableCell>
+                        {value.purchase_order}
+                    </TableCell>
+                    <TableCell>
+                        {moment(value.delivery_date).format('LL')}
+                    </TableCell>
+                    <TableCell>
                         {value.description}
                     </TableCell>
                 </TableRow>
             )
         })
-    }, [dataHistory, data])
+    }, [dataHistory, data, dataLocationById])
 
-    if(loadingDetailProduct){
+    
+    if(!loadingDetailProduct && !data) {
+        return 'Data Tidak Ditemukan !'
+    }
+   
+    if(loadingDetailProduct || loadingDataLocationById){
         return <Loading />
     }
-
+    
     return (
         <Page title='Stock Detail Product'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>Stock Detail Product</Typography>
+                            <Stack spacing={1} mb={3}>
+                                <Typography variant='h4'>Stock Detail Product</Typography>
+                                <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
+                                    <CustomLinkBreadcrumsComponent title='Stock Management' to="/stock-management" />
+                                    <CustomLinkBreadcrumsComponent title='Stock By Location' to={`/stock-management/stock-by-location/${location_id}/product`} />
+                                    <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Stock Detail</Typography>
+                                </Breadcrumbs>
+                            </Stack>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={12}>
@@ -335,6 +368,13 @@ const index = () => {
                                                             >
                                                                 <TableCell>No.</TableCell>
                                                                 <TableCell>Quantity</TableCell>
+                                                                <TableCell>From</TableCell>
+                                                                {dataLocationById.main === 1 ? 
+                                                                    <TableCell>To</TableCell>
+                                                                    : null
+                                                                }
+                                                                <TableCell>PO Number</TableCell>
+                                                                <TableCell>PO Date</TableCell>
                                                                 <TableCell>Description</TableCell>
                                                             </TableRow>
                                                         </TableHead>

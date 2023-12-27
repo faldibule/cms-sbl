@@ -10,7 +10,7 @@
     font-family: Arial, sans-serif;
     font-size: 11px;
     overflow: hidden;
-    padding: 5px 5px;
+    padding: 2px 2px;
     font-weight: bold;
     word-break: normal;
 }
@@ -78,8 +78,9 @@
 }
 
 .tg .tg-0lax {
-    text-align: left;
-    vertical-align: top
+    text-align: center;
+    vertical-align: middle;
+    max-width: 60px;
 }
 .tg .text-left {
     text-align: center;

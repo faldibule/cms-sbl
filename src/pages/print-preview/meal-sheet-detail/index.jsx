@@ -1,10 +1,11 @@
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent'
 import Iconify from '@components/Iconify'
 import useDownloadMealSheetDetail from '@hooks/meal-sheet-detail/useDownloadMealSheetDetail'
 import useFetchMealSheetDetailById from '@hooks/meal-sheet-detail/useFetchMealSheetDetailById'
 import { LoadingButton } from '@mui/lab'
-import { Button, Card, Divider, Grid, Stack, Typography } from '@mui/material'
-import moment from 'moment/moment';
+import { Breadcrumbs, Button, Card, Divider, Grid, Stack, Typography } from '@mui/material'
 import 'moment/locale/id'
+import moment from 'moment/moment'
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import './style.css'
@@ -218,9 +219,19 @@ const index = () => {
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={12}>
-                            <Typography variant='h5'>
-                                Print Preview Meal Sheet Daily
-                            </Typography>
+                            <Stack>
+                                <Typography variant='h5'>
+                                    Print Preview Meal Sheet Daily
+                                </Typography>
+                                <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Group' to="/meal-sheet/group" />
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Report' to={`/meal-sheet/report/${group_id}/daily`} />
+                                    <CustomLinkBreadcrumsComponent title='Meal Sheet Detail' to={`/meal-sheet/detail/${group_id}/${daily_id}`} />
+                                    <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
+                                        Preview meal sheet daily
+                                    </Typography>
+                                </Breadcrumbs>
+                            </Stack>
                             <Divider />
                         </Grid>
                         <Grid item xs={12} md={12}>
