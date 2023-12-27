@@ -1,8 +1,7 @@
 import http from '@variable/Api'
-import React from 'react'
 import { useQuery } from 'react-query'
 
-const useFetchDOCateringById = (id) => {
+const useFetchDOCateringById = (id, config = {}) => {
     return useQuery(['do-catering', id], async ({ signal }) => {
         try {
             const res = await http.get(`do-catering/${id}`)
@@ -11,7 +10,8 @@ const useFetchDOCateringById = (id) => {
             // console.log(err)
         }
     }, {
-        cacheTime: 0
+        cacheTime: 0,
+        ...config,
     })
 }
 

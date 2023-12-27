@@ -19,14 +19,21 @@ const Form = (props) => {
     const { data } = props
     const isApproved = useMemo(() => {
         if(!!!data) return false
-        return data.status === 'submit'
+        return data.status === 'finish'
+    }, [data])
+
+    const approvalMemo = useMemo(() => {
+        return {
+            isApproved1: !!data?.approved1_date,
+            approved1_date: data?.approved1_date,
+
+            isApproved2: !!data?.approved2_date,
+            approved2_date: data?.approved2_date
+        }
     }, [data])
 
     const navigate = useNavigate()
     const [item, setItem] = useState([])
-    const [form, setForm] = useState({
-        item: '',
-    })
 
     // Quotation Handle
     const [quotationState, setQuotationState] = useState({
@@ -35,7 +42,7 @@ const Form = (props) => {
     })
     const handleSelectedQuotation = (value) => setQuotationState({...quotationState, selected: value})
     const handleInputQuotation = (value) => setQuotationState({...quotationState, input: value})
-    const { data: dataQuotationList, isLoading: loadingQuotationList } = useFetchQuotation({ paginate: 0 })
+    const { data: dataQuotationList, isLoading: loadingQuotationList } = useFetchQuotation({ paginate: 0, status: ['finish'] })
     const { data: dataQuotationById, isLoading: loadingQuotationById } = useFetchQuotationById(quotationState.selected?.id, { enabled: !!quotationState.selected?.id })
 
     useEffect(() => {
@@ -58,6 +65,14 @@ const Form = (props) => {
     // User Handle
     const [userState, setUserState] = useState({
         prepared_by: {
+            input: '',
+            selected: null
+        },
+        approved1_by: {
+            input: '',
+            selected: null
+        },
+        approved2_by: {
             input: '',
             selected: null
         },
@@ -116,6 +131,8 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         formData.append('quotation_id', quotationState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
+        formData.append('approved1_by', userState.approved1_by.selected?.id)
+        formData.append('approved2_by', userState.approved2_by.selected?.id)
         item.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const item_product_id = v.item_product?.id
@@ -148,6 +165,14 @@ const Form = (props) => {
                         input: data?.prepared_by?.name,
                         selected: data?.prepared_by,
                     },
+                    approved1_by: {
+                        input: data?.approved1_by?.name,
+                        selected: data?.approved1_by,
+                    },
+                    approved2_by: {
+                        input: data?.approved2_by?.name,
+                        selected: data?.approved2_by,
+                    }
                 })
                 setItem([...data.item_product])
             }
@@ -290,6 +315,54 @@ const Form = (props) => {
                                 errors={errors?.prepared_by}
                             />
                         </Grid>
+                        <Grid item xs={12} md={approvalMemo.isApproved1 ? 3 : 6}>
+                            <CustomAutocomplete 
+                                disabled={isApproved || approvalMemo.isApproved1}
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
+                                label='Approved By 1'
+                                inputValue={userState.approved1_by.input}
+                                setInputValue={handleUser('approved1_by', 'input')}
+                                selectedValue={userState.approved1_by.selected}
+                                setSelectedValue={handleUser('approved1_by', 'selected')}
+                                errors={errors?.approved1_by}
+                            />
+                        </Grid>
+                        {approvalMemo.isApproved1 ?
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    disabled
+                                    fullWidth
+                                    label="Approved 1 On"
+                                    value={moment(approvalMemo?.approved1_date).format('LL') || ''}
+                                />
+                            </Grid>
+                        : null
+                        }
+                        <Grid item xs={12} md={approvalMemo.isApproved2 ? 3 : 6}>
+                            <CustomAutocomplete 
+                                disabled={isApproved || approvalMemo.isApproved2}
+                                getOptionLabel={(opt) => `${opt.name}`}
+                                options={dataUser.data}
+                                label='Approved By 2'
+                                inputValue={userState.approved2_by.input}
+                                setInputValue={handleUser('approved2_by', 'input')}
+                                selectedValue={userState.approved2_by.selected}
+                                setSelectedValue={handleUser('approved2_by', 'selected')}
+                                errors={errors?.approved2_by}
+                            />
+                        </Grid>
+                        {approvalMemo.isApproved2 ?
+                            <Grid item xs={12} md={3}>
+                                <TextField
+                                    disabled
+                                    fullWidth
+                                    label="Approved 2 On"
+                                    value={moment(approvalMemo?.approved2_date).format('LL') || ''}
+                                />
+                            </Grid>
+                        : null
+                        }
                         <Grid item xs={12} md={12}>
                             {item.length > 0 ? 
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>

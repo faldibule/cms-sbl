@@ -20,6 +20,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
         >
             <TableCell padding="checkbox">
                 <Checkbox
+                    disabled={isApproved}
                     onClick={(event) => handleClick(event, i)}
                     color="primary"
                     checked={isItemSelected}

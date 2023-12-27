@@ -8,7 +8,7 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
       let totalAmount = 0
       let totalVAT = 0
       item.map((value) => {
-          const { tax } = value.item_product
+          const tax = value.item_product?.tax || value?.tax
           const tnt = value?.tnt || 'T'
           const isHasTax = tax === 'yes'
           let vat = isHasTax ? 11 : 0

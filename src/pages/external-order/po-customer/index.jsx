@@ -135,6 +135,7 @@ const index = () => {
                                                 <TableCell>Request Date</TableCell>
                                                 <TableCell>User Maker</TableCell>
                                                 <TableCell>Evidence</TableCell>
+                                                <TableCell>Reject Reason</TableCell>
                                                 <TableCell>Status</TableCell>
                                                 <TableCell>Action</TableCell>
                                             </TableRow>

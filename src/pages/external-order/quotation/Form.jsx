@@ -143,7 +143,7 @@ const Form = (props) => {
         formData.append('checked_by', userState.checked_by.selected?.id)
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
-        formData.append('mark_up', markup)
+        formData.append('mark_up', 0)
         item.forEach((v, i) => {
             const size = v?.size || v?.item_product?.size
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
@@ -156,7 +156,7 @@ const Form = (props) => {
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][item_price]`, price)
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
-            formData.append(`item_product[${i}][tnt]`, !!v.tnt ? v.tnt : '')
+            formData.append(`item_product[${i}][tnt]`, !!v.tnt ? v.tnt : 'T')
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
         })
         save({ formData, id: data?.id })
@@ -260,7 +260,7 @@ const Form = (props) => {
                     markupPrice: NumberFormat(( markup.percentage * newPrice / 100), 'Rp')
                 }
             }else{
-                const tempMarkupPrice = IntegerFormat(markup.price)
+                const tempMarkupPrice = IntegerFormat(markup.price === 0 ? 'Rp.0' : markup.price)
                 temp = {
                     markupPrice: NumberFormat(markup.price, 'Rp'),
                     markupPercentage: (tempMarkupPrice / newPrice * 100),
@@ -520,6 +520,7 @@ const Form = (props) => {
                                             >
                                                 <TableCellHeaderColor padding="checkbox">
                                                     <Checkbox
+                                                        disabled={isApproved}
                                                         color="primary"
                                                         indeterminate={selected.length > 0 && selected.length < item.length}
                                                         checked={item.length > 0 && selected.length === item.length}

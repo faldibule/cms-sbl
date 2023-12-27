@@ -21,8 +21,7 @@ const useSaveDOCatering = ({ onSuccess }) => {
                 success('Success Add DO Catering!')
             }
             const id_temp = res.data.data.id
-            // navigate(`/file/${id_temp}/catering_do`)
-            navigate(`/internal-order/do-catering`)
+            navigate(`/file/${id_temp}/do_catering`)
         },
         onSuccess,
     })

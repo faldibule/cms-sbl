@@ -23,22 +23,22 @@ const useApprovalLogic = (value) => {
                 color: 'primary'
             }
         }
-        if(!!approved1_date && !!approved2_date){
+        if(!!approved1_date){
             labelAndColor = {
-                label: 'Checked',
-                color: 'primary'
+                label: 'Approved 1',
+                color: 'success'
+            }
+        }
+        if(!!approved2_date){
+            labelAndColor = {
+                label: 'Approved 2',
+                color: 'success'
             }
         }
         if(status === 'reject'){
             labelAndColor = {
                 label: 'Rejected',
                 color: 'error'
-            }
-        }
-        if(status === 'finish'){
-            labelAndColor = {
-                label: 'Approved',
-                color: 'success'
             }
         }
         if(status === 'draft'){

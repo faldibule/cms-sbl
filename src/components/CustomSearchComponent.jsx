@@ -1,16 +1,29 @@
 import { IconButton, InputAdornment, TextField } from '@mui/material';
-import React from 'react'
+import { useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 import Iconify from './Iconify';
 
 const CustomSearchComponent = ({ search = "", setParams = () => {}, params = {} }) => {
-  return (
+    const [text, setText] = useState('');
+    const [value] = useDebounce(text, 500);
+    useEffect(() => {
+        let mounted = true
+        if(mounted){
+            setParams({
+                ...params,
+                search: value
+            })
+        }
+        return () => mounted = false
+    }, [value])
+    return (
         <TextField
             name="search"
             variant="outlined"
             label="Search"
             autoComplete="off"
-            onChange={(e) => setParams({ ...params, search: e.target.value }) }
-            value={search}
+            onChange={(e) => setText(e.target.value)}
+            value={text}
             fullWidth
             InputProps={{
                 startAdornment: (
@@ -18,16 +31,16 @@ const CustomSearchComponent = ({ search = "", setParams = () => {}, params = {} 
                         <Iconify icon='mdi:search' />
                     </InputAdornment>
                 ),
-                endAdornment: search !== "" && (
+                endAdornment: text !== "" && (
                     <InputAdornment position="end">
-                        <IconButton onClick={() => setParams({ ...params, search: "" })}>
-                            <Iconify icon='mdi:search' />
+                        <IconButton onClick={() => setText('')}>
+                            <Iconify icon='mdi:close' />
                         </IconButton>
                     </InputAdornment>
                 ),
             }}
         />
-  )
+    )
 }
 
 export default CustomSearchComponent;
