@@ -57,7 +57,7 @@ const Form = (props) => {
     })
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0, location_id: locationState.selected?.id || '' }, { enabled: !!locationState.selected?.id })
+    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0 })
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)

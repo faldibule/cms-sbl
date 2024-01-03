@@ -192,7 +192,7 @@ const index = () => {
                         {value.quantity}
                     </TableCell>
                     <TableCell>
-                        {value.from}
+                        {value?.from || '-'}
                     </TableCell>
                     {dataLocationById.main === 1 ? 
                         <TableCell>

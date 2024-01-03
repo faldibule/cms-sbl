@@ -6,12 +6,24 @@ import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent';
 import StockMor from '@pages/stock-management/stock-by-location/mor';
 import StockProduct from '@pages/stock-management/stock-by-location/product';
+import useFetchLocationById from '@hooks/location/useFetchLocationById';
+import Loading from '@components/Loading';
 
 const index = () => {
     const { location_id } = useParams()
     const { pathname } = useLocation();
     const segment = pathname.split('/');
     const lastSegment = segment[segment.length - 1];
+
+    const { data: dataLocationById, isLoading: loadingDataLocationById } = useFetchLocationById(location_id)
+
+    if(!loadingDataLocationById && !dataLocationById) {
+        return 'Data Location Tidak Ditemukan!'
+    }
+   
+    if(loadingDataLocationById){
+        return <Loading />
+    }
     
     return (
         <Page title='Stock By Location'>
@@ -20,7 +32,7 @@ const index = () => {
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Stack spacing={1} mb={3}>
-                                <Typography variant='h4'>Stock By Location</Typography>
+                                <Typography variant='h4'>Stock By Location - {dataLocationById.location}</Typography>
                                 <Breadcrumbs sx={{ fontSize: '0.8rem' }}>
                                     <CustomLinkBreadcrumsComponent title='Stock Management' to="/stock-management" />
                                     <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">Stock By Location</Typography>
