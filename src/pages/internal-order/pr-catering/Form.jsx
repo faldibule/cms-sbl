@@ -57,7 +57,7 @@ const Form = (props) => {
     })
     const handleSelectedItem = (value) => setItem([...item, value])
     const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0 })
+    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0, location_id: locationState.selected?.id || '' }, { enabled: !!locationState.selected?.id })
 
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -234,7 +234,7 @@ const Form = (props) => {
                                     setSelectedValue={handleSelectedItem}
                                     isAutoCompleteItem={true}
                                     size='small'
-                                    disabled={!dataItemProduct || dataItemProduct?.data?.length === 0 || isApproved}
+                                    disabled={!dataItemProduct || dataItemProduct?.data?.length === 0 || isApproved || !locationState.selected?.id}
                                 />
                                 <Button onClick={handleModalImport} disabled={isApproved} fullWidth sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     Import

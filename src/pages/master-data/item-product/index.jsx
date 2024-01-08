@@ -156,6 +156,9 @@ const index = () => {
                     {NumberFormat(value.price, 'Rp')}
                 </TableCell>
                 <TableCell>
+                    {NumberFormat(value.sell_price, 'Rp')}
+                </TableCell>
+                <TableCell>
                     {value.supplier.name}
                 </TableCell>
                 <TableCell>
@@ -213,6 +216,7 @@ const index = () => {
                                                 <TableCell>Code</TableCell>
                                                 <TableCell>Name</TableCell>
                                                 <TableCell>Price</TableCell>
+                                                <TableCell>Sell Price</TableCell>
                                                 <TableCell>Supplier</TableCell>
                                                 <TableCell>Location</TableCell>
                                                 <TableCell>Tax</TableCell>

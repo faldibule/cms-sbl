@@ -1,18 +1,27 @@
-import { IntegerFormat } from '@utils/Format'
+import { IntegerFormat, NumberFormat } from '@utils/Format'
 import { useMemo } from 'react'
 
-const useValueConverter = (v, markup = 0) => {
+const useValueConverter = (v) => {
     const valueMemo = useMemo(() => {
+        const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
+        const tax = v?.tax || v?.item_product?.tax
+
+        const taxValue = tax === 'yes' ? 11 : 0
+        const taxPrice = price * taxValue / 100
+        const newPrice = price + taxPrice
+
+        const markupPrice = v?.markupPrice || NumberFormat(v?.markup_value, 'Rp') || NumberFormat(v?.item_product?.sell_price - newPrice, 'Rp') || 'Rp.0'
+        const markupPercentage = v?.markupPercentage || IntegerFormat(markupPrice) / newPrice * 100 || 0
         return {
             name: v?.item_product?.name || v?.name || v?.item_name || '',
             brand: v?.item_product?.brand || v?.brand || '',
             size: v?.item_product?.size || v?.size || v?.item_size || '',
             unit: v?.item_product?.unit?.param || v?.unit?.param || v?.unit || '',
             description: v?.item_product?.description || v?.description,
-            price: parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price),
-            tax: v?.tax || v?.item_product?.tax,
-            markupPrice: v?.markupPrice || 'Rp.0',
-            markupPercentage: v?.markupPercentage || 0,
+            price,
+            tax,
+            markupPrice,
+            markupPercentage,
             tnt: v?.tnt || 'T',
         }
     }, [v]) 
@@ -65,7 +74,7 @@ const useValueConverter = (v, markup = 0) => {
         if(valueMemo.tnt === 'NT'){
             return 0
         }
-        return (amount * vat / 100)
+        return parseInt(amount * vat / 100)
     }, [amount, valueMemo.tnt])
 
     return {

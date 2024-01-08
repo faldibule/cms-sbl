@@ -149,6 +149,8 @@ const Form = (props) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
             const unit = v.item_product?.unit?.param || v?.unit?.param 
             const item_product_id = v?.item_product?.id || v?.id
+            const tnt = !!v.tnt ? v.tnt : 'T'
+            const markupValue = !!v?.markupPrice ? IntegerFormat(v?.markupPrice) : v?.markup_value || v?.item_product?.sell_price - price
 
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
             formData.append(`item_product[${i}][weight]`, size)
@@ -156,8 +158,12 @@ const Form = (props) => {
             formData.append(`item_product[${i}][quantity]`, v.quantity)
             formData.append(`item_product[${i}][item_price]`, price)
             formData.append(`item_product[${i}][vat]`, !!v.vat ? v.vat : 11)
-            formData.append(`item_product[${i}][tnt]`, !!v.tnt ? v.tnt : 'T')
+            formData.append(`item_product[${i}][tnt]`, tnt)
             formData.append(`item_product[${i}][remark]`, !!v.remark ? v.remark : '')
+
+            // New Param
+            formData.append(`item_product[${i}][markup_value]`, markupValue)
+            formData.append(`item_product[${i}][markup_vat]`, tnt === 'T' ? 11 : 0)
         })
         save({ formData, id: data?.id })
     }
@@ -277,7 +283,7 @@ const Form = (props) => {
     const renderItemDetails = useMemo(() => {
         if(item.length === 0) return null
         return item.map((v, i) => 
-            <TableInputRow 
+            <TableInputRow  
                 isApproved={isApproved} 
                 key={i} i={i} v={v} 
                 deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} 

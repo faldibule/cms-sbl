@@ -16,11 +16,11 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
 
           if(markup){
             const newPrice = (price * vat / 100) + price
-            const markUpPriceConverted = IntegerFormat(value?.markupPrice || 'Rp.0')
+            const markUpPriceConverted = !!value.markupPrice ? IntegerFormat(value?.markupPrice || 'Rp.0') : value?.markup_value || value?.item_product?.sell_price - price
             const vatAmount = tnt === 'T' ? ((newPrice + markUpPriceConverted) * (value?.quantity || 0)) * 11 / 100 : 0 
             
             totalAmount = totalAmount + ((newPrice + markUpPriceConverted) * (value?.quantity || 0))
-            totalVAT = totalVAT + vatAmount
+            totalVAT = totalVAT + parseInt(vatAmount)
             return;
           }
 
@@ -56,7 +56,7 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
           </Stack>
           <Stack>
               <Typography variant='h6' fontWeight='bold'>Grand Total</Typography>
-              <Typography variant='h6' fontWeight='bold'>{NumberFormat(getTotal.totalAmount + getTotal.totalVAT - getDiscount)}</Typography>
+              <Typography variant='h6' fontWeight='bold'>{NumberFormat(getTotal.totalAmount + getTotal.totalVAT - getDiscount, 'Rp')}</Typography>
           </Stack>
       </Stack>
     )

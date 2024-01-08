@@ -5,10 +5,10 @@ import { NumberFormat } from "@utils/Format"
 import { useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 
-const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved, markup = 0, handleClick = () => {}, isItemSelected }) => {
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved, handleClick = () => {}, isItemSelected }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
-    const { valueMemo, markUpMemo, eachTax, newPrice, amount, vatAmmount } = useValueConverter(v, markup) 
+    const { valueMemo, markUpMemo, eachTax, newPrice, amount, vatAmmount } = useValueConverter(v) 
     return (
         <TableRow 
             key={i}

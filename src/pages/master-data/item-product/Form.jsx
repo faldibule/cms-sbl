@@ -8,7 +8,7 @@ import useFetchUnit from '@hooks/unit/useFetchUnit'
 import { LoadingButton } from '@mui/lab'
 import { Box, Card, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { IntegerFormat, NumberFormat } from '@utils/Format'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 const Form = (props) => {
     const { data } = props
@@ -79,6 +79,10 @@ const Form = (props) => {
     const [price, setPrice] = useState('')
     const handlePrice = (v) => setPrice(NumberFormat(v, 'Rp'))
 
+    // Handle Price
+    const [sellPrice, setSellPrice] = useState('')
+    const handleSellPrice = (v) => setSellPrice(NumberFormat(v, 'Rp'))
+
     // HandleSubmit
     const { mutate: save, isLoading: loadingSave, error } = useSaveItemProduct({
         onSuccess: () => {
@@ -91,6 +95,7 @@ const Form = (props) => {
         formData.append('location_id', locationState.selected?.id)
         formData.append('supplier_id', supplierState.selected?.id)
         formData.append('price', IntegerFormat(price)) 
+        formData.append('sell_price', IntegerFormat(sellPrice)) 
         save({ formData, id: data?.id })
     }
 
@@ -123,6 +128,7 @@ const Form = (props) => {
                     selected: data.supplier
                 })
                 handlePrice(data.price)
+                handleSellPrice(data.sell_price)
             }
         }
 
@@ -191,7 +197,7 @@ const Form = (props) => {
                                 error={!!errors?.size}
                             /> 
                         </Grid>
-                        <Grid item xs={12} md={12}>
+                        <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
                                 label='Price'
@@ -201,6 +207,18 @@ const Form = (props) => {
                                 required
                                 helperText={!!errors?.price && errors?.price[0]}
                                 error={!!errors?.price}
+                            /> 
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Sell Price'
+                                name='sell_price'
+                                value={sellPrice}
+                                onChange={(e) => handleSellPrice(e.target.value)}
+                                required
+                                helperText={!!errors?.sell_price && errors?.sell_price[0]}
+                                error={!!errors?.sell_price}
                             /> 
                         </Grid>
                         <Grid item xs={12} md={6}>
