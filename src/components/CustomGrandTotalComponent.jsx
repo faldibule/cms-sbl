@@ -16,7 +16,9 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
 
           if(markup){
             const newPrice = (price * vat / 100) + price
-            const markUpPriceConverted = !!value.markupPrice ? IntegerFormat(value?.markupPrice || 'Rp.0') : value?.markup_value || value?.item_product?.sell_price - price
+            const markUpPriceConverted = !!value.markupPrice && !isNaN(value.markupPrice) ? 
+                                            IntegerFormat(value?.markupPrice || 'Rp.0') : 
+                                              value?.markup_value || value?.item_product?.sell_price - newPrice
             const vatAmount = tnt === 'T' ? ((newPrice + markUpPriceConverted) * (value?.quantity || 0)) * 11 / 100 : 0 
             
             totalAmount = totalAmount + ((newPrice + markUpPriceConverted) * (value?.quantity || 0))

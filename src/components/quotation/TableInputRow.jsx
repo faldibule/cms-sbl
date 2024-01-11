@@ -43,7 +43,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             </TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
             <TableCell>
-                {valueMemo.tax !== 'yes' ? 'No' : NumberFormat(eachTax, 'Rp')}({v.vat || 11}%)
+                {valueMemo.tax !== 'yes' ? 'No' : `${NumberFormat(eachTax, 'Rp')}(11%)`}
             </TableCell>
             <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(newPrice, 'Rp')}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{NumberFormat(valueMemo.markupPrice, 'Rp')}</TableCell>
@@ -79,7 +79,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                     onChangeByIndex={onChangeByIndex}
                     i={i}
                     priceProps={valueMemo.price}
-                    markupProps={{ percentage: valueMemo.markupPercentage, price: valueMemo.markupPercentage }}
+                    markupProps={{ percentage: valueMemo.markupPercentage, price: valueMemo.markupPrice }}
                 />
             </TableCell>
         </TableRow>

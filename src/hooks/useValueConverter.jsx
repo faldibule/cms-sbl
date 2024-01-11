@@ -10,7 +10,12 @@ const useValueConverter = (v) => {
         const taxPrice = price * taxValue / 100
         const newPrice = price + taxPrice
 
-        const markupPrice = v?.markupPrice || NumberFormat(v?.markup_value, 'Rp') || NumberFormat(v?.item_product?.sell_price - newPrice, 'Rp') || 'Rp.0'
+        const markupPrice = !!v?.markupPrice && !isNaN(v?.markupPrice) ? 
+                                v?.markupPrice : 
+                                    !!v?.markup_value ? 
+                                        NumberFormat(v?.markup_value, 'Rp') : 
+                                            NumberFormat(v?.item_product?.sell_price - newPrice, 'Rp') 
+        
         const markupPercentage = v?.markupPercentage || IntegerFormat(markupPrice) / newPrice * 100 || 0
         return {
             name: v?.item_product?.name || v?.name || v?.item_name || '',

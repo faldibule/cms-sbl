@@ -374,7 +374,7 @@ const index = () => {
                                                                     : null
                                                                 }
                                                                 <TableCell>PO Number</TableCell>
-                                                                <TableCell>PO Date</TableCell>
+                                                                <TableCell>Delivery Date</TableCell>
                                                                 <TableCell>Description</TableCell>
                                                             </TableRow>
                                                         </TableHead>

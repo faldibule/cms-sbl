@@ -544,9 +544,9 @@ const Form = (props) => {
                                                 <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
                                                 <TableCellHeaderColor>VAT Buy</TableCellHeaderColor>
                                                 <TableCellHeaderColor>New Price</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Markup Value</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Markup Percentage</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Markup Percentage</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Sell Price</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Amount</TableCellHeaderColor>
                                                 <TableCellHeaderColor>T/NT</TableCellHeaderColor>
                                                 <TableCellHeaderColor>VAT</TableCellHeaderColor>
