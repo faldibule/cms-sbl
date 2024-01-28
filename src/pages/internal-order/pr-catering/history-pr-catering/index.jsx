@@ -1,43 +1,23 @@
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 import CustomSearchComponent from '@components/CustomSearchComponent';
-import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
 import Page from '@components/Page';
-import TableDataRow from '@components/pr-catering/TableDataRow';
-import useFetchPRCatering from '@hooks/pr-catering/useFetchPRCatering';
-import { Button, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import useFetchHistory from '@hooks/history/useFetchHistory';
+import useFetchPRCateringById from '@hooks/pr-catering/useFetchPRCateringById';
+import { Breadcrumbs, Card, CardContent, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import moment from 'moment';
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 const index = () => {
-    const navigate = useNavigate()
+    const { pr_catering_id } = useParams()
     const [params, setParams] = useState({
-        page: 1,
-        limit: 5,
-        search: '',
-        paginate: 1,
+        reference_type: 'pr_catering',
+        reference_id: pr_catering_id
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchPRCatering(params)
-    const handleChangePage = (event, newPage) => {
-        setParams((prev) => {
-            return {
-                ...prev,
-                page: newPage + 1,
-            };
-        });
-    };
-    const handleChangeRowsPerPage = (event) => {
-        setParams((prev) => {
-            return {
-                ...prev,
-                page: 1,
-                limit: +event.target.value,
-            };
-        });
-    };
-    
-    if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
-        setParams({ ...params, page: rows.meta.last_page })
-    }
+    const { data: rows } = useFetchHistory(params)
+    const { data: detailPRCatering, isLoading: loadingDetailPRCatering } = useFetchPRCateringById(pr_catering_id)
 
     const renderData = useCallback(() => {
         if(rows === undefined) {
@@ -57,7 +37,7 @@ const index = () => {
                 </TableRow>
             )
         } 
-        if(rows.data.length === 0){
+        if(rows.length === 0){
             return (
                 <TableRow>
                     <TableCell
@@ -87,23 +67,44 @@ const index = () => {
                 </TableRow>
             )
         }
-        return rows.data.map((value, key) => {
-            return <TableDataRow key={key} value={value} rows={rows} i={key} refetch={refetch} />
+        return rows.map((value, i) => {
+            return (
+                <TableRow key={i}>
+                    <TableCell
+                        component="th"
+                        scope="row"
+                        align="center"
+                    >
+                        {i + 1}.
+                    </TableCell>
+                    <TableCell>
+                        <CustomLinkComponent label={value.order_number} url={`/internal-order/history-pr-catering/${pr_catering_id}/detail/${value.id}`} />
+                    </TableCell>                                                         
+                    <TableCell>
+                        {moment(value.created_at).format('LL')}
+                    </TableCell>
+                </TableRow>
+            )
         })
     }, [rows])
 
+    if(loadingDetailPRCatering){
+        return <Loading />
+    }
+
     return (
-        <Page title='PR Catering'>
+        <Page title='History PR Catering'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>
-                                PR Catering
+                        <Stack>
+                            <Typography variant='h4'>
+                                History PR Catering - {detailPRCatering.pr_number}
                             </Typography>
-                            <Button onClick={() => navigate('/internal-order/pr-catering/add')} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
-                                Input
-                            </Button>
+                            <Breadcrumbs sx={{ fontSize: '0.8rem', my: 1 }}>
+                                <CustomLinkBreadcrumsComponent title='PR Catering' to="/internal-order/pr-catering" />
+                                <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">History PR Catering</Typography>
+                            </Breadcrumbs>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={12}>
@@ -129,13 +130,7 @@ const index = () => {
                                             >
                                                 <TableCell>No.</TableCell>
                                                 <TableCell>PR Number</TableCell>
-                                                <TableCell>Location</TableCell>
-                                                <TableCell>Request Date</TableCell>
-                                                <TableCell>Delivery Date</TableCell>
-                                                <TableCell>Prepared By</TableCell>
-                                                <TableCell>History</TableCell>
-                                                <TableCell>Evidence</TableCell>
-                                                <TableCell>Action</TableCell>
+                                                <TableCell>Generate Time</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -143,29 +138,10 @@ const index = () => {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
-                                {rows !== undefined && rows.data.length > 0 && (
-                                    <TablePagination
-                                        component="div"
-                                        count={rows.meta.total}
-                                        page={params.page - 1}
-                                        rowsPerPage={params.limit}
-                                        onPageChange={handleChangePage}
-                                        onRowsPerPageChange={
-                                            handleChangeRowsPerPage
-                                        }
-                                        rowsPerPageOptions={[
-                                            1, 5, 10, 25, 50, 100,
-                                        ]}
-                                        showFirstButton
-                                        showLastButton
-                                    />
-                                )}
                             </CardContent>
                         </Card>
                     </Grid>
                 </Grid>
-                
-                
             </Container>
         </Page>
     );

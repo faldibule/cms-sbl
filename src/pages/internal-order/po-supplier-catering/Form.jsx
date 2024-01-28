@@ -43,7 +43,7 @@ const Form = (props) => {
     })
     const handleSelectedSupplier = (value) => setSupplierState({...supplierState, selected: value})
     const handleInputSupplier = (value) => setSupplierState({...supplierState, input: value})
-    const { data: dataSupplier, isLoading: loadingSupplier } = useFetchSupplier({ paginate: 0 })
+    const { data: dataSupplier, isLoading: loadingSupplier } = useFetchSupplier({ paginate: 0, po_catering_id: poCateringState.selected?.id }, { enabled: !!poCateringState.selected?.id })
 
     useEffect(() => {
         let mounted = true
@@ -168,7 +168,7 @@ const Form = (props) => {
 
     }, [dataDiscount])
 
-    if(loadingSupplier || loadingDiscount || loadingPOCateringList){
+    if(loadingDiscount || loadingPOCateringList){
         return <Loading />
     }
 
@@ -205,8 +205,8 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
-                                options={dataSupplier.data}
+                                disabled={isApproved || !dataSupplier?.data || loadingSupplier}
+                                options={dataSupplier?.data || []}
                                 getOptionLabel={(option) => `${option.name}`}
                                 label='Supplier'
                                 inputValue={supplierState.input}

@@ -367,7 +367,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' spacing={2}>
-                                <LoadingButton loading={loadingSave} variant='contained' type='submit'>
+                                <LoadingButton disabled={item.length === 0} loading={loadingSave} variant='contained' type='submit'>
                                     Submit
                                 </LoadingButton>
                                 {props.title == 'edit' ? ''

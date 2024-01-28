@@ -1,9 +1,8 @@
 import { TableCell } from '@mui/material'
-import React from 'react'
 
-const TableCellHeaderColor = ({ children, ...rest }) => {
+const TableCellHeaderColor = ({ children,  bgcolor = '#d6e9ff', ...rest }) => {
   return (
-    <TableCell {...rest} sx={{  bgcolor: '#d6e9ff' }}>{children}</TableCell>
+    <TableCell {...rest} sx={{  bgcolor, }}>{children}</TableCell>
   )
 }
 

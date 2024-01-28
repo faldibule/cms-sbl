@@ -1,10 +1,10 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchSupplier = (params, config = {}) => {
-    return useQuery(['suppliers', params], async ({ signal }) => {
+const useFetchHistory = (params) => {
+    return useQuery(['histories', params], async ({ signal }) => {
         try {
-            const res = await http.get('supplier', {
+            const res = await http.get('order-history', {
                 signal,
                 params
             })
@@ -12,7 +12,7 @@ const useFetchSupplier = (params, config = {}) => {
         } catch (err) {
             // console.log(err)
         }
-    }, config)
+    })
 }
 
-export default useFetchSupplier
+export default useFetchHistory

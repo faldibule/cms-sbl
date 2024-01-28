@@ -3,6 +3,7 @@ import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import DeletedTableRow from '@components/po-catering/DeletedTableRow'
 import TableInputRow from '@components/po-catering/TableInputRow'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
 import useSavePOCatering from '@hooks/po-catering/useSavePOCatering'
@@ -45,7 +46,7 @@ const Form = (props) => {
     })
     const handleSelectedPRCatering = (value) => setPRCateringState({...prCateringState, selected: value})
     const handleInputPRCatering = (value) => setPRCateringState({...prCateringState, input: value})
-    const { data: dataPRCateringList, isLoading: loadingPRCateringList } = useFetchPRCatering({ paginate: 0 })
+    const { data: dataPRCateringList, isLoading: loadingPRCateringList } = useFetchPRCatering({ paginate: 0, po_catering: 'no' })
     const { data: dataPRCateringById, isLoading: loadingPRCateringById } = useFetchPRCateringById(prCateringState.selected?.id, { enabled: !!prCateringState.selected?.id })
 
     useEffect(() => {
@@ -128,6 +129,34 @@ const Form = (props) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
 
+    // Get product that exist in PR but not exist in PO
+    const differenceProductPRtoPO = useMemo(() => {
+        if(!dataPRCateringById) return []
+
+        const tempIdOfPrCateringById = item.map(v => v.item_product.id)
+        return dataPRCateringById.item_product.filter(v => !tempIdOfPrCateringById.includes(v.item_product.id))
+    }, [dataPRCateringById, item ])
+
+    // Get product that exist in PO but not exist in PR (deleted)
+    const differenceProductPOtoPR = useMemo(() => {
+        if(!dataPRCateringById) return []
+
+        // get all product id from PR
+        const tempIdOfPrCateringById = dataPRCateringById.item_product.map(v => v.item_product.id)
+
+        return item.filter(v => !tempIdOfPrCateringById.includes(v.item_product.id))
+    }, [dataPRCateringById, item])
+
+    const itemFiltered = useMemo(() => {
+        if(!data) return item
+        if(!dataPRCateringById) return []
+
+        // get all product id from PR
+        const tempIdOfPrCateringById = dataPRCateringById.item_product.map(v => v.item_product.id)
+
+        return [...item.filter(v => tempIdOfPrCateringById.includes(v.item_product.id)), ...differenceProductPRtoPO]
+    }, [dataPRCateringById, item, differenceProductPRtoPO])
+
     const { mutate: save, isLoading: loadingSave, error  } = useSavePOCatering({
         onSuccess: () => {}
     })
@@ -141,7 +170,7 @@ const Form = (props) => {
         formData.append('checked_by', userState.checked_by.selected?.id)
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
-        item.forEach((v, i) => {
+        itemFiltered.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const item_product_id = v.item_product?.id
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
@@ -398,9 +427,51 @@ const Form = (props) => {
                             </Grid>
                         : null
                         }
+                        {(!!data && differenceProductPOtoPR.length > 0) ?
                         <Grid item xs={12} md={12}>
-                            {item.length > 0 ? 
+                            <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Deleted Item Product</Typography>
+                            <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                <Table stickyHeader aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow
+                                            sx={{
+                                                "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                bgcolor: '#d6e9ff'
+                                            }}
+                                        >
+
+                                            {props.type === 'approval' ? 
+                                            <TableCell></TableCell>
+                                            : null
+                                            }
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>No.</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Item Name</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Item Brand</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Description</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Size</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Unit</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Price</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Quantity</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>VAT</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Total Tax</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Total Price</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Grand Total</TableCellHeaderColor>
+                                            <TableCellHeaderColor bgcolor='#ffd3d3'>Remarks</TableCellHeaderColor>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {differenceProductPOtoPR.map((v, i) => <DeletedTableRow isApproved={true} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Grid>
+                        : null
+                        }
+                        <Grid item xs={12} md={12}>
+                            {itemFiltered.length > 0 ? 
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Current Item Product</Typography>
                                     <Table stickyHeader aria-label="simple table">
                                         <TableHead>
                                             <TableRow
@@ -432,7 +503,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            {itemFiltered.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -441,7 +512,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={item} discount={discount.value} />
+                            <CustomGrandTotalComponent item={itemFiltered} discount={discount.value} />
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
