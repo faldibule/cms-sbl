@@ -69,6 +69,10 @@ import PRCustomer from './pages/external-order/pr-customer';
 import AddPRCustomer from './pages/external-order/pr-customer/Add';
 import EditPRCustomer from './pages/external-order/pr-customer/Edit';
 
+// ----- History PR Catering -----
+import HistoryPRCustomer from './pages/external-order/pr-customer/history-pr-customer';
+import DetailHistoryPRCustomer from './pages/external-order/pr-customer/history-pr-customer/Detail';
+
 // ----- Quotation ------
 import Quotation from './pages/external-order/quotation';
 import AddQuotation from './pages/external-order/quotation/Add';
@@ -229,6 +233,10 @@ export default function Router() {
                 { path: "pr-customer", element: <PRCustomer /> },
                 { path: "pr-customer/add", element: <AddPRCustomer /> },
                 { path: "pr-customer/edit/:id", element: <EditPRCustomer /> },
+
+                // History PR Customer
+                { path: "history-pr-customer/:pr_customer_id", element: <HistoryPRCustomer /> },
+                { path: "history-pr-customer/:pr_customer_id/detail/:id", element: <DetailHistoryPRCustomer /> },
 
                 // PR Catering
                 { path: "quotation", element: <Quotation /> },

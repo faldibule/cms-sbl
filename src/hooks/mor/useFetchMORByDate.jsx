@@ -1,7 +1,7 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchMORByDate = (params) => {
+const useFetchMORByDate = (params, config = {}) => {
     return useQuery(['mor-by-date', params], async ({ signal }) => {
         try {
             const res = await http.get('mor', {
@@ -11,6 +11,8 @@ const useFetchMORByDate = (params) => {
             return res.data.data
         } catch (err) {
         }
+    }, {
+        cacheTime: 0
     })
 }
 

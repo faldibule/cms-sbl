@@ -1,3 +1,4 @@
+import ConfirmDialog from '@components/ConfirmDialog'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
@@ -23,6 +24,20 @@ const Form = (props) => {
 
     const navigate = useNavigate()
     const [item, setItem] = useState([])
+    const [isEdit, setIsEdit] = useState(!data?.quotation)
+
+    const [modalConfirmEdit, setModalConfirmEdit] = useState(false)
+    const handleEditButton = () => {
+        if(!isEdit){
+            setModalConfirmEdit(true)
+            return
+        }
+        setIsEdit(false)
+    }
+    const handleClickModalEdit = () => {
+        setModalConfirmEdit(false)
+        setIsEdit(true)
+    }
 
     const [userState, setUserState] = useState({
         prepared_by: {
@@ -93,6 +108,9 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         formData.append('location_id', locationState.selected?.id)
         formData.append('prepared_by', userState.prepared_by.selected?.id)
+        if(!!data){
+            formData.append('history', data.quotation ? 'yes' : 'no')
+        }
         item.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
             const item_product_id = v?.item_product?.id || v?.id
@@ -138,14 +156,24 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input PR Customer' : 'Form Edit PR Customer' }
-                    </Typography>
-                    {!!data ? 
-                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
-                            {data?.pr_number}
-                        </Typography>
-                    : null}
+                    <Stack direction='row' alignItems='center' justifyContent='space-between'>
+                        <Stack>
+                            <Typography variant='h5'>
+                                {props.title === 'add' ? 'Form Input PR Customer' : 'Form Edit PR Customer' }
+                            </Typography>
+                            {!!data ? 
+                                <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                                    {data?.pr_number}
+                                </Typography>
+                            : null}
+                        </Stack>
+                        {!!data && data?.quotation ?
+                            <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
+                                {isEdit ? 'Cancel Edit' : 'Edit Data PR Customer'}
+                            </Button>
+                            : null
+                        }
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -154,7 +182,7 @@ const Form = (props) => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 options={dataLocation.data}
                                 getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
                                 label='Location'
@@ -168,7 +196,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 type='date'
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 label="Request Date"
                                 fullWidth
                                 InputProps={{
@@ -183,7 +211,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 type='date'
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 name='delivery_date'
                                 label="Delivery Date"
                                 fullWidth
@@ -197,7 +225,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Prepared By'
@@ -210,14 +238,14 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 fullWidth 
                                 label='Description'
                                 name='description'
                                 defaultValue={data?.description}
                                 required
                                 multiline
-                                rows={3}
+                                rows={3} 
                                 helperText={!!errors?.description && errors?.description[0]}
                                 error={!!errors?.description}
                             />
@@ -234,9 +262,9 @@ const Form = (props) => {
                                     setSelectedValue={handleSelectedItem}
                                     isAutoCompleteItem={true}
                                     size='small'
-                                    disabled={!dataItemProduct || dataItemProduct?.data?.length === 0 || isApproved || !locationState.selected?.id}
+                                    disabled={!isEdit || !dataItemProduct || dataItemProduct?.data?.length === 0 || isApproved || !locationState.selected?.id}
                                 />
-                                <Button onClick={handleModalImport} disabled={isApproved} fullWidth sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                <Button onClick={handleModalImport} disabled={isApproved || !isEdit} fullWidth sx={{ width: 120 }} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
                                     Import
                                 </Button>
                             </Stack>
@@ -270,7 +298,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            {item.map((v, i) => <TableInputRow isApproved={isApproved || !isEdit} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -291,6 +319,12 @@ const Form = (props) => {
                     </Grid>
                 </Card>
             </Box>
+            <ConfirmDialog 
+                handleClick={handleClickModalEdit}
+                title='Edit'
+                handleClose={() => setModalConfirmEdit(false)}
+                open={modalConfirmEdit}
+            />
             <ImportModal 
                 handleClose={handleModalImport}
                 open={modalImport}

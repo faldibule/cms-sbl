@@ -88,6 +88,10 @@ const index = () => {
         })
     }, [rows])
 
+    if(!loadingDetailPRCatering && !detailPRCatering){
+        return 'PR Catering Tidak ditemukan'
+    }
+
     if(loadingDetailPRCatering){
         return <Loading />
     }

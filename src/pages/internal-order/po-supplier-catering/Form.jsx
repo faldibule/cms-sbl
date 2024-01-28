@@ -1,9 +1,11 @@
+import ConfirmDialog from '@components/ConfirmDialog'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import DeletedTableRow from '@components/po-catering/DeletedTableRow'
 import TableInputRow from '@components/po-supplier-catering/TableInputRow'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
 import useFetchPOCatering from '@hooks/po-catering/useFetchPOCatering'
@@ -19,13 +21,29 @@ import { useNavigate } from 'react-router-dom'
 const Form = (props) => {
     const { data } = props
 
-    const isApproved = useMemo(() => {
-        if(!!!data) return false
-        return data.status === 'submit'
-    }, [data])
-
     const navigate = useNavigate()
     const [item, setItem] = useState([])
+    const [isEdit, setIsEdit] = useState(false)
+
+    const isApproved = useMemo(() => {
+        if(!data) return false
+        if(!isEdit) return data.status === 'submit'
+        return !isEdit
+    }, [data, isEdit])
+
+    const [modalConfirmEdit, setModalConfirmEdit] = useState(false)
+    const handleEditButton = () => {
+        if(!isEdit){
+            setModalConfirmEdit(true)
+            return
+        }
+        setIsEdit(false)
+    }
+    const handleClickModalEdit = () => {
+        setModalConfirmEdit(false)
+        setIsEdit(true)
+    }
+
     // PO Catering Handle
     const [poCateringState, setPOCateringState] = useState({
         input: '',
@@ -93,6 +111,47 @@ const Form = (props) => {
     const deleteItemTable = (e, index) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
+
+    const getProductIdList = useMemo(() => {
+        if(!dataPOCateringById) return {}
+        if(!supplierState.selected?.id) return {}
+
+       const dataPOCateringByIdFilteredBySupplier = dataPOCateringById.item_product.filter(v => v.item_product?.supplier?.id === supplierState.selected?.id)
+       const itemFilteredBySupplier = item.filter(v => v.item_product?.supplier?.id === supplierState.selected?.id)
+       return {
+            dataPOCateringByIdFilteredBySupplier,
+            itemFilteredBySupplier
+       }
+
+    }, [dataPOCateringById, supplierState.selected, item])
+
+    // Get product that exist in PR but not exist in PO
+    const differenceProductPRtoPO = useMemo(() => {
+        if(!dataPOCateringById) return []
+
+        const tempIdProductPOCatering = getProductIdList.itemFilteredBySupplier.map(v => v.item_product.id)
+        return getProductIdList.dataPOCateringByIdFilteredBySupplier.filter(v => !tempIdProductPOCatering.includes(v.item_product.id))
+    }, [getProductIdList])
+
+    // Get product that exist in PO but not exist in PR (deleted)
+    const differenceProductPOtoPR = useMemo(() => {
+        if(!dataPOCateringById) return []
+
+        // get all product id from PR
+        const tempIdProductPOCatering = getProductIdList.dataPOCateringByIdFilteredBySupplier.map(v => v.item_product.id)
+
+        return getProductIdList.itemFilteredBySupplier.filter(v => !tempIdProductPOCatering.includes(v.item_product.id))
+    }, [getProductIdList])
+
+    const itemFiltered = useMemo(() => {
+        if(!data) return item
+        if(!dataPOCateringById) return []
+
+        // get all product id from PR
+        const tempIdProductPOCatering = getProductIdList.dataPOCateringByIdFilteredBySupplier.map(v => v.item_product.id)
+
+        return [...getProductIdList.itemFilteredBySupplier.filter(v => tempIdProductPOCatering.includes(v.item_product.id)), ...differenceProductPRtoPO]
+    }, [getProductIdList])
     
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
@@ -114,7 +173,8 @@ const Form = (props) => {
         formData.append('checked_by', dataPOCateringById.checked_by?.id)
         formData.append('approved1_by', dataPOCateringById.approved1_by?.id)
         formData.append('approved2_by', dataPOCateringById.approved2_by?.id)
-        item.forEach((v, i) => {
+        formData.append('hard_edit', 'yes')
+        itemFiltered.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
             const item_product_id = v?.item_product?.id || v?.id
 
@@ -176,14 +236,24 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input PO Supplier Catering' : 'Form Edit PO Supplier Catering' }
-                    </Typography>
-                    {!!data ? 
-                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
-                            {data?.po_number}
-                        </Typography>
-                    : null}
+                    <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between'>
+                        <Stack>
+                            <Typography variant='h5'>
+                                {props.title === 'add' ? 'Form Input PO Supplier Catering' : 'Form Edit PO Supplier Catering' }
+                            </Typography>
+                            {!!data ? 
+                                <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                                    {data?.po_number}
+                                </Typography>
+                            : null}
+                        </Stack>
+                        {!!data && data?.status === 'submit' ?
+                            <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
+                                {isEdit ? 'Cancel Edit' : 'Edit Data PO Supplier Catering'}
+                            </Button>
+                        : null
+                        }
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -297,8 +367,49 @@ const Form = (props) => {
                                     <MenuItem value='submit'>Submit</MenuItem>
                                 </TextField> 
                             </Grid>
+                            {(!!data && differenceProductPOtoPR.length > 0) ?
+                                <Grid item xs={12} md={12}>
+                                    <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Deleted Item Product</Typography>
+                                    <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                        <Table stickyHeader aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow
+                                                    sx={{
+                                                        "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                        "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                        bgcolor: '#d6e9ff'
+                                                    }}
+                                                >
+
+                                                    {props.type === 'approval' ? 
+                                                    <TableCell></TableCell>
+                                                    : null
+                                                    }
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>No.</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Item Name</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Item Brand</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Description</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Size</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Unit</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Quantity</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>VAT</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Total Tax</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Total Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Grand Total</TableCellHeaderColor>
+                                                    <TableCellHeaderColor bgcolor='#ffd3d3'>Remarks</TableCellHeaderColor>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {differenceProductPOtoPR.map((v, i) => <DeletedTableRow isApproved={true} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Grid>
+                                : null
+                            }
                             <Grid item xs={12} md={12}>
-                                {item.length > 0 ? 
+                                {itemFiltered.length > 0 ? 
                                     <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
                                         <Table stickyHeader aria-label="simple table">
                                             <TableHead>
@@ -329,7 +440,7 @@ const Form = (props) => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {item.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                                {itemFiltered.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
@@ -338,7 +449,7 @@ const Form = (props) => {
                                 }
                             </Grid>
                             <Grid item xs={12} md={12}>
-                                <CustomGrandTotalComponent discount={discount.value} item={item} />
+                                <CustomGrandTotalComponent discount={discount.value} item={itemFiltered} />
                             </Grid> 
                             <Grid item xs={12} md={12}>
                                 <Stack direction='row' justifyContent='end' spacing={2}>
@@ -359,6 +470,12 @@ const Form = (props) => {
                     </Grid>
                 </Card>
             </Box>
+            <ConfirmDialog 
+                handleClick={handleClickModalEdit}
+                title='Edit'
+                handleClose={() => setModalConfirmEdit(false)}
+                open={modalConfirmEdit}
+            />
             <ImportModal 
                 handleClose={handleModalImport}
                 open={modalImport}

@@ -5,7 +5,7 @@ import { NumberFormat } from "@utils/Format"
 import { useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 
-const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved = false }) => {
+const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, isApproved }) => {
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
 
@@ -14,18 +14,15 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     return (
         <TableRow key={i}>
             <TableCell>{i + 1}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>
-                {valueMemo.name}
-                {
-                    !!errors[`item_product.${i}.item_product_id`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem' }}>(duplicate)</Typography> : ''
-                }
-            </TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{valueMemo.name}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{valueMemo.brand}</TableCell>
+            <TableCell sx={{ minWidth: 150 }} align="left">{valueMemo.description}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{valueMemo.size}</TableCell>
-            <TableCell>{valueMemo.size}</TableCell>
-            <TableCell>
-                {v?.quantity || 0}
-            </TableCell>
+            <TableCell>{valueMemo.unit}</TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
+            <TableCell>
+                {v.quantity || 0}
+            </TableCell>
             <TableCell>
                 {v.vat || 11}%
             </TableCell>
@@ -39,12 +36,12 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             </TableCell>
             <TableCell align='center'>
                 {isApproved ?
-                '-'
-                : 
-                <Stack direction='row' spacing={2}>
-                    <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
-                    <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} />
-                </Stack>
+                    '-'
+                :
+                    <Stack direction='row' spacing={2}>
+                        <Iconify onClick={handleClose} icon='material-symbols:edit' sx={{ color: 'green', fontSize: '1rem', cursor: 'pointer' }} />
+                        {/* <Iconify onClick={(e) => deleteItemTable(e, i)} icon='material-symbols:delete' sx={{ color: 'red', fontSize: '1rem', cursor: 'pointer' }} /> */}
+                    </Stack>
                 }
                 <DialogInputRow 
                     handleClose={handleClose} 

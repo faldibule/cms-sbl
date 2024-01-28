@@ -1,3 +1,4 @@
+import ConfirmDialog from '@components/ConfirmDialog'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
@@ -18,11 +19,6 @@ import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
-    const isApproved = useMemo(() => {
-        if(!!!data) return false
-        return data.status === 'finish'
-    }, [data])
-
     const approvalMemo = useMemo(() => {
         return {
             isChecked: !!data?.checked_date,
@@ -38,6 +34,26 @@ const Form = (props) => {
 
     const navigate = useNavigate()
     const [item, setItem] = useState([])
+    const [isEdit, setIsEdit] = useState(false)
+
+    const isApproved = useMemo(() => {
+        if(!data) return false
+        if(!isEdit) return data.status === 'finish'
+        return !isEdit
+    }, [data, isEdit])
+
+    const [modalConfirmEdit, setModalConfirmEdit] = useState(false)
+    const handleEditButton = () => {
+        if(!isEdit){
+            setModalConfirmEdit(true)
+            return
+        }
+        setIsEdit(false)
+    }
+    const handleClickModalEdit = () => {
+        setModalConfirmEdit(false)
+        setIsEdit(true)
+    }
 
     // PR Handle
     const [prCateringState, setPRCateringState] = useState({
@@ -245,14 +261,24 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input PO Catering' : 'Form Edit PO Catering' }
-                    </Typography>
-                    {!!data ? 
-                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
-                            {data?.po_number}
-                        </Typography>
-                    : null}
+                    <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between'>
+                        <Stack>
+                            <Typography variant='h5'>
+                                {props.title === 'add' ? 'Form Input PO Catering' : 'Form Edit PO Catering' }
+                            </Typography>
+                            {!!data ? 
+                                <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                                    {data?.po_number}
+                                </Typography>
+                            : null}
+                        </Stack>
+                        {!!data && data?.status === 'finish' ?
+                            <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
+                                {isEdit ? 'Cancel Edit' : 'Edit Data PO Catering'}
+                            </Button>
+                        : null
+                        }
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -527,14 +553,18 @@ const Form = (props) => {
                                 }
                             </Stack>
                         </Grid>
-                        
                         </>
                         : null
                         }
+                        <ConfirmDialog 
+                            handleClick={handleClickModalEdit}
+                            title='Edit'
+                            handleClose={() => setModalConfirmEdit(false)}
+                            open={modalConfirmEdit}
+                        />
                     </Grid>
                 </Card>
             </Box>
-
         </Stack>
     )
 }

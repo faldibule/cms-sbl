@@ -53,6 +53,9 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                 {value.prepared_by.name}
             </TableCell>
             <TableCell>
+                <CustomLinkComponent label='View History' url={`/external-order/history-pr-customer/${value.id}`} />
+            </TableCell>
+            <TableCell>
                 <CustomLinkComponent label='View' url={`/file/${value.id}/pr_customer`} />
             </TableCell>
             <TableCell>

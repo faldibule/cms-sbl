@@ -1,27 +1,23 @@
+import ConfirmDialog from '@components/ConfirmDialog'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import TableInputRow from '@components/do-catering/TableInputRow'
-import useFetchDiscount from '@hooks/discount/useFetchDiscount'
+import DeletedTableRow from '@components/po-catering/DeletedTableRow'
 import useSaveDOCustomer from '@hooks/do-customer/useSaveDOCustomer'
 import useFetchPOCustomer from '@hooks/po-customer/useFetchPOCustomer'
 import useFetchPOCustomerById from '@hooks/po-customer/useFetchPOCustomerById'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
-import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
-import { dummy_item_product } from '@utils/Dummy'
+import { Box, Button, Card, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import moment from 'moment'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
-    const isApproved = useMemo(() => {
-        if(!!!data) return false
-        return data.status === 'finish'
-    }, [data])
     const approvalMemo = useMemo(() => {
         return {
             isApproved: !!data?.approved_date,
@@ -31,6 +27,27 @@ const Form = (props) => {
 
     const navigate = useNavigate()
     const [item, setItem] = useState([])
+    const [isEdit, setIsEdit] = useState(false)
+ 
+    const isApproved = useMemo(() => {
+        if(!data) return false
+        if(!isEdit) return data.status === 'finish'
+
+        return !isEdit
+    }, [data, isEdit])
+
+    const [modalConfirmEdit, setModalConfirmEdit] = useState(false)
+    const handleEditButton = () => {
+        if(!isEdit){
+            setModalConfirmEdit(true)
+            return
+        }
+        setIsEdit(false)
+    }
+    const handleClickModalEdit = () => {
+        setModalConfirmEdit(false)
+        setIsEdit(true)
+    }
 
     // PO Customer Handle
     const [poCustomerState, setPOCustomerState] = useState({
@@ -95,6 +112,34 @@ const Form = (props) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
 
+    // Get product that exist in PR but not exist in PO
+    const differenceProductPRtoPO = useMemo(() => {
+        if(!dataPOCustomerById) return []
+
+        const tempIdProductPOCustomer = item.map(v => v.item_product.id)
+        return dataPOCustomerById.item_product.filter(v => !tempIdProductPOCustomer.includes(v.item_product.id))
+    }, [dataPOCustomerById, item])
+
+    // Get product that exist in PO but not exist in PR (deleted)
+    const differenceProductPOtoPR = useMemo(() => {
+        if(!dataPOCustomerById) return []
+
+        // get all product id from PR
+        const tempIdProductPOCustomer = dataPOCustomerById.item_product.map(v => v.item_product.id)
+
+        return item.filter(v => !tempIdProductPOCustomer.includes(v.item_product.id))
+    }, [dataPOCustomerById, item])
+
+    const itemFiltered = useMemo(() => {
+        if(!data) return item
+        if(!dataPOCustomerById) return []
+
+        // get all product id from PR
+        const tempIdProductPOCustomer = dataPOCustomerById.item_product.map(v => v.item_product.id)
+
+        return [...item.filter(v => tempIdProductPOCustomer.includes(v.item_product.id)), ...differenceProductPRtoPO]
+    }, [dataPOCustomerById, item, differenceProductPRtoPO])
+        
     const { mutate: save, isLoading: loadingSave, error  } = useSaveDOCustomer({
         onSuccess: () => {}
     })
@@ -105,7 +150,8 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         formData.append('po_customer_id', poCustomerState.selected?.id)
         formData.append('approved_by', userState.approved_by.selected?.id)
-        item.forEach((v, i) => {
+        formData.append('hard_edit', 'yes')
+        itemFiltered.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const item_product_id = v.item_product?.id
             formData.append(`item_product[${i}][item_product_id]`, item_product_id)
@@ -149,14 +195,24 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input DO Customer' : 'Form Edit DO Customer' }
-                    </Typography>
-                    {!!data ? 
-                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
-                            {data?.do_number}
-                        </Typography>
-                    : null}
+                    <Stack direction='row' justifyContent='space-between'>
+                        <Stack>
+                            <Typography variant='h5'>
+                                {props.title === 'add' ? 'Form Input DO Customer' : 'Form Edit DO Customer' }
+                            </Typography>
+                            {!!data ? 
+                                <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                                    {data?.do_number}
+                                </Typography>
+                            : null}
+                        </Stack>
+                        {!!data && data?.status === 'finish' ?
+                            <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
+                                {isEdit ? 'Cancel Edit' : 'Edit Data DO Customer'}
+                            </Button>
+                        : null
+                        }
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -234,8 +290,52 @@ const Form = (props) => {
                             </Grid>
                         : null
                         }
+
+                        {/* Deleted item */}
+                        {(!!data && differenceProductPOtoPR.length > 0) ?
+                            <Grid item xs={12} md={12}>
+                                <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Deleted Item Product</Typography>
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow
+                                                sx={{
+                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                    bgcolor: '#d6e9ff'
+                                                }}
+                                            >
+
+                                                {props.type === 'approval' ? 
+                                                <TableCell></TableCell>
+                                                : null
+                                                }
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Item Brand</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Total Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Remarks</TableCellHeaderColor>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {differenceProductPOtoPR.map((v, i) => <DeletedTableRow isApproved={true} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        : null
+                        }
+
                         <Grid item xs={12} md={12}>
-                            {item.length > 0 ? 
+                            {itemFiltered.length > 0 ? 
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
                                     <Table stickyHeader aria-label="simple table">
                                         <TableHead>
@@ -268,7 +368,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            {itemFiltered.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -277,7 +377,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent discount={dataPOCustomerById?.discount.discount || 0} item={item} />
+                            <CustomGrandTotalComponent discount={dataPOCustomerById?.discount.discount || 0} item={itemFiltered} />
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
@@ -299,8 +399,13 @@ const Form = (props) => {
                         }
                     </Grid>
                 </Card>
+                <ConfirmDialog 
+                    handleClick={handleClickModalEdit}
+                    title='Edit'
+                    handleClose={() => setModalConfirmEdit(false)}
+                    open={modalConfirmEdit}
+                />
             </Box>
-
         </Stack>
     )
 }

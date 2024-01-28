@@ -1,9 +1,11 @@
+import ConfirmDialog from '@components/ConfirmDialog'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import TableInputRow from '@components/po-catering/TableInputRow'
+import DeletedTableRow from '@components/po-catering/DeletedTableRow'
+import TableInputRow from '@components/po-customer/TableInputRow'
 import useFetchDiscount from '@hooks/discount/useFetchDiscount'
 import useSavePOCustomer from '@hooks/po-customer/useSavePOCustomer'
 import useFetchQuotation from '@hooks/quotation/useFetchQuotation'
@@ -17,10 +19,6 @@ import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
-    const isApproved = useMemo(() => {
-        if(!!!data) return false
-        return data.status === 'finish'
-    }, [data])
 
     const approvalMemo = useMemo(() => {
         return {
@@ -34,6 +32,27 @@ const Form = (props) => {
 
     const navigate = useNavigate()
     const [item, setItem] = useState([])
+    const [isEdit, setIsEdit] = useState(false)
+ 
+    const isApproved = useMemo(() => {
+        if(!data) return false
+        if(!isEdit) return data.status === 'finish'
+
+        return !isEdit
+    }, [data, isEdit])
+
+    const [modalConfirmEdit, setModalConfirmEdit] = useState(false)
+    const handleEditButton = () => {
+        if(!isEdit){
+            setModalConfirmEdit(true)
+            return
+        }
+        setIsEdit(false)
+    }
+    const handleClickModalEdit = () => {
+        setModalConfirmEdit(false)
+        setIsEdit(true)
+    }
 
     // Quotation Handle
     const [quotationState, setQuotationState] = useState({
@@ -121,6 +140,35 @@ const Form = (props) => {
         setItem([...item.filter((v, i) => i !== index)])
     }
 
+    // Get product that exist in PR but not exist in PO
+    const differenceProductPRtoPO = useMemo(() => {
+        if(!dataQuotationById) return []
+
+        const tempIdProductQuotation = item.map(v => v.item_product.id)
+        return dataQuotationById.item_product.filter(v => !tempIdProductQuotation.includes(v.item_product.id))
+    }, [dataQuotationById, item])
+
+    // Get product that exist in PO but not exist in PR (deleted)
+    const differenceProductPOtoPR = useMemo(() => {
+        if(!dataQuotationById) return []
+
+        // get all product id from PR
+        const tempIdProductQuotation = dataQuotationById.item_product.map(v => v.item_product.id)
+
+        return item.filter(v => !tempIdProductQuotation.includes(v.item_product.id))
+    }, [dataQuotationById, item])
+
+    const itemFiltered = useMemo(() => {
+        if(!data) return item
+        if(!dataQuotationById) return []
+
+        // get all product id from PR
+        const tempIdProductQuotation = dataQuotationById.item_product.map(v => v.item_product.id)
+
+        return [...item.filter(v => tempIdProductQuotation.includes(v.item_product.id)), ...differenceProductPRtoPO]
+    }, [dataQuotationById, item, differenceProductPRtoPO])
+    
+
     const { mutate: save, isLoading: loadingSave, error  } = useSavePOCustomer({
         onSuccess: () => {}
     })
@@ -133,7 +181,7 @@ const Form = (props) => {
         formData.append('prepared_by', userState.prepared_by.selected?.id)
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
-        item.forEach((v, i) => {
+        itemFiltered.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const item_product_id = v.item_product?.id
 
@@ -205,14 +253,24 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input PO Customer' : 'Form Edit PO Customer' }
-                    </Typography>
-                    {!!data ? 
-                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
-                            {data?.po_number}
-                        </Typography>
-                    : null}
+                    <Stack direction='row' justifyContent='space-between'>
+                        <Stack>
+                            <Typography variant='h5'>
+                                {props.title === 'add' ? 'Form Input PO Customer' : 'Form Edit PO Customer' }
+                            </Typography>
+                            {!!data ? 
+                                <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                                    {data?.po_number}
+                                </Typography>
+                            : null}
+                        </Stack>
+                        {!!data && data?.status === 'finish' ?
+                            <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
+                                {isEdit ? 'Cancel Edit' : 'Edit Data PO Customer'}
+                            </Button>
+                        : null
+                        }
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -221,7 +279,7 @@ const Form = (props) => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 options={dataQuotationList?.data || []}
                                 getOptionLabel={(option) => `${option.quotation_number}`}
                                 label='Quotation Number'
@@ -260,7 +318,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 fullWidth
                                 label='Discount'
                                 name='discount_id'
@@ -276,7 +334,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 fullWidth 
                                 label='Term & Conditions'
                                 multiline
@@ -290,7 +348,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 fullWidth 
                                 label='Term of Payment'
                                 multiline
@@ -304,7 +362,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
-                                disabled={isApproved}
+                                disabled={isApproved || !isEdit}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Prepared By'
@@ -317,7 +375,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={approvalMemo.isApproved1 ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved || approvalMemo.isApproved1}
+                                disabled={isApproved || !isEdit || approvalMemo.isApproved1}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Approved By 1'
@@ -341,7 +399,7 @@ const Form = (props) => {
                         }
                         <Grid item xs={12} md={approvalMemo.isApproved2 ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved || approvalMemo.isApproved2}
+                                disabled={isApproved || !isEdit || approvalMemo.isApproved2}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Approved By 2'
@@ -363,8 +421,53 @@ const Form = (props) => {
                             </Grid>
                         : null
                         }
+
+                        {/* Deleted item */}
+                        {(!!data && differenceProductPOtoPR.length > 0) ?
+                            <Grid item xs={12} md={12}>
+                                <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Deleted Item Product</Typography>
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow
+                                                sx={{
+                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                    bgcolor: '#d6e9ff'
+                                                }}
+                                            >
+
+                                                {props.type === 'approval' ? 
+                                                <TableCell></TableCell>
+                                                : null
+                                                }
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Item Brand</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Total Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Remarks</TableCellHeaderColor>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {differenceProductPOtoPR.map((v, i) => <DeletedTableRow isApproved={true} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        : null
+                        }
+
                         <Grid item xs={12} md={12}>
-                            {item.length > 0 ? 
+                            <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Current Item Product</Typography>
+                            {itemFiltered.length > 0 ? 
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
                                     <Table stickyHeader aria-label="simple table">
                                         <TableHead>
@@ -397,7 +500,7 @@ const Form = (props) => {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {item.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                            {itemFiltered.map((v, i) => <TableInputRow isApproved={isApproved} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -406,7 +509,7 @@ const Form = (props) => {
                             }
                         </Grid>
                         <Grid item xs={12} md={12}>
-                            <CustomGrandTotalComponent item={item} discount={discount.value} />
+                            <CustomGrandTotalComponent item={itemFiltered} discount={discount.value} />
                         </Grid> 
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
@@ -427,8 +530,13 @@ const Form = (props) => {
                         }
                     </Grid>
                 </Card>
+                <ConfirmDialog 
+                    handleClick={handleClickModalEdit}
+                    title='Edit'
+                    handleClose={() => setModalConfirmEdit(false)}
+                    open={modalConfirmEdit}
+                />
             </Box>
-
         </Stack>
     )
 }

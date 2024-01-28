@@ -6,10 +6,13 @@ import useDeletePOSupplierCatering from '@hooks/po-supplier-catering/useDeletePO
 import useUpdateStatusPOSupplierCatering from '@hooks/po-supplier-catering/useUpdateStatusPOSupplierCatering'
 import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import { Chip, TableCell, TableRow } from '@mui/material'
+import { authentication } from '@recoil/Authentication'
 import moment from 'moment'
 import { useMemo, useState } from 'react'
+import { useRecoilValue } from 'recoil'
 
 const TableDataRow = ({ i, value, rows, refetch }) => {
+    const { user } = useRecoilValue(authentication)
     const [form, setForm] = useState({
         status: '',
         note: ''
@@ -126,7 +129,7 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                     approve={value.status !== 'submit'}
                     handleApprove={() => handleCloseUpdateStatus(value)}
 
-                    canDelete={value.status !== 'submit'}
+                    canDelete={value.status !== 'submit' || (!!user?.role ? user.role[0] === 'super-admin' : false) }
                     handleDelete={() => handleClose(value.id)}
                 />
                 <DeleteDialog 

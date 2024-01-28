@@ -1,9 +1,10 @@
+import ConfirmDialog from '@components/ConfirmDialog'
 import CustomAutocomplete from '@components/CustomAutocomplete'
 import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import Iconify from '@components/Iconify'
-import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
+import DeletedTableRow from '@components/po-catering/DeletedTableRow'
 import TableInputRow from '@components/quotation/TableInputRow'
 import useFetchCustomer from '@hooks/customer/useFetchCustomer'
 import useFetchPRCustomer from '@hooks/pr-customer/useFetchPRCustomer'
@@ -19,10 +20,6 @@ import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
-    const isApproved = useMemo(() => {
-        if(!!!data) return false
-        return data.status === 'finish'
-    }, [data])
     const approvalMemo = useMemo(() => {
         return {
             isChecked: !!data?.checked_date,
@@ -32,6 +29,27 @@ const Form = (props) => {
 
     const navigate = useNavigate()
     const [item, setItem] = useState([])
+    const [isEdit, setIsEdit] = useState(false)
+ 
+    const isApproved = useMemo(() => {
+        if(!data) return false
+        if(!data.checked_date) return false
+
+        return !isEdit
+    }, [data, isEdit])
+
+    const [modalConfirmEdit, setModalConfirmEdit] = useState(false)
+    const handleEditButton = () => {
+        if(!isEdit){
+            setModalConfirmEdit(true)
+            return
+        }
+        setIsEdit(false)
+    }
+    const handleClickModalEdit = () => {
+        setModalConfirmEdit(false)
+        setIsEdit(true)
+    }
 
     // Handle PR Customer
     const [prCustomerState, setPRCustomerState] = useState({
@@ -105,19 +123,43 @@ const Form = (props) => {
     }
     const { data: dataUser, isLoading: loadingUser } = useFetchUser({ paginate: 0 })
 
-    // Handle Import
-    const [modalImport, setModalImport] = useState(false)
-    const handleModalImport = () => setModalImport(!modalImport)
-    const onSuccessImport = (data) => {
-        setItem(data.data)
-    }
+    // Get product that exist in PR but not exist in PO
+    const differenceProductPRtoPO = useMemo(() => {
+        if(!dataPRCustomerById) return []
+
+        const tempIdProductPRCustomer = item.map(v => v.item_product.id)
+        return dataPRCustomerById.item_product.filter(v => !tempIdProductPRCustomer.includes(v.item_product.id))
+    }, [dataPRCustomerById, item])
+
+    // Get product that exist in PO but not exist in PR (deleted)
+    const differenceProductPOtoPR = useMemo(() => {
+        if(!dataPRCustomerById) return []
+
+        // get all product id from PR
+        const tempIdProductPRCustomer = dataPRCustomerById.item_product.map(v => v.item_product.id)
+
+        return item.filter(v => !tempIdProductPRCustomer.includes(v.item_product.id))
+    }, [dataPRCustomerById, item])
+    
+    const [currentItem, setCurrentItem] = useState([])
+    const itemFiltered = useMemo(() => {
+        if(!data) return item
+        if(!dataPRCustomerById) return []
+
+        // get all product id from PR
+        const tempIdProductPRCustomer = dataPRCustomerById.item_product.map(v => v.item_product.id)
+    
+        const temp = [...item.filter(v => tempIdProductPRCustomer.includes(v.item_product.id)), ...differenceProductPRtoPO]
+        setCurrentItem(temp)
+        return temp
+    }, [dataPRCustomerById, item, differenceProductPRtoPO])
 
     const deleteItemTable = (e, index) => {
-        setItem([...item.filter((v, i) => i !== index)])
+        setCurrentItem([...currentItem.filter((v, i) => i !== index)])
     }
 
     const onChangeByIndex = (index, object) => {
-        const temp = item.map((v, i) => {
+        const temp = currentItem.map((v, i) => {
             if(i === index){
                 return {
                     ...v,
@@ -126,7 +168,7 @@ const Form = (props) => {
             }
             return v
         })
-        setItem([...temp])
+        setCurrentItem([...temp])
     }
 
     const { mutate: save, isLoading: loadingSave, error } = useSaveQuotation({
@@ -144,7 +186,7 @@ const Form = (props) => {
         formData.append('approved1_by', userState.approved1_by.selected?.id)
         formData.append('approved2_by', userState.approved2_by.selected?.id)
         formData.append('mark_up', 0)
-        item.forEach((v, i) => {
+        itemFiltered.forEach((v, i) => {
             const size = v?.size || v?.item_product?.size
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
             const unit = v.item_product?.unit?.param || v?.unit?.param 
@@ -281,8 +323,8 @@ const Form = (props) => {
     }
 
     const renderItemDetails = useMemo(() => {
-        if(item.length === 0) return null
-        return item.map((v, i) => 
+        if(currentItem.length === 0) return null
+        return currentItem.map((v, i) => 
             <TableInputRow  
                 isApproved={isApproved} 
                 key={i} i={i} v={v} 
@@ -292,7 +334,7 @@ const Form = (props) => {
                 isItemSelected={isSelected(i)}
             /> 
         )
-    }, [item, isApproved, errors, selected])
+    }, [currentItem, isApproved, errors, selected])
 
     if(loadingCustomer || loadingUser){
         return <Loading />
@@ -302,14 +344,24 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Typography variant='h5'>
-                        {props.title === 'add' ? 'Form Input Quotation' : 'Form Edit Quotation' }
-                    </Typography>
-                    {!!data ? 
-                        <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
-                            {data?.quotation_number}
-                        </Typography>
-                    : null}
+                    <Stack direction='row' justifyContent='space-between'>
+                        <Stack>
+                            <Typography variant='h5'>
+                                {props.title === 'add' ? 'Form Input Quotation' : 'Form Edit Quotation' }
+                            </Typography>
+                            {!!data ? 
+                                <Typography fontStyle='italic' variant='body2' fontWeight='bold'>
+                                    {data?.quotation_number}
+                                </Typography>
+                            : null}
+                        </Stack>
+                        {!!data && !!data.checked_date ?
+                            <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
+                                {isEdit ? 'Cancel Edit' : 'Edit Data Quotation'}
+                            </Button>
+                        : null
+                        }
+                    </Stack>
                 </Grid>
             </Grid>
 
@@ -468,10 +520,53 @@ const Form = (props) => {
                                     error={!!errors?.term_condition}
                                 />
                             </Grid>
+
+                            {/* Deleted item */}
+                            {(!!data && differenceProductPOtoPR.length > 0) ?
+                            <Grid item xs={12} md={12}>
+                                <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', my: 2 }}>Deleted Item Product</Typography>
+                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                    <Table stickyHeader aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow
+                                                sx={{
+                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                    bgcolor: '#d6e9ff'
+                                                }}
+                                            >
+
+                                                {props.type === 'approval' ? 
+                                                <TableCell></TableCell>
+                                                : null
+                                                }
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>No.</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Item Name</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Item Brand</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Description</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Size</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Unit</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Quantity</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>VAT</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Total Tax</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Total Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Grand Total</TableCellHeaderColor>
+                                                <TableCellHeaderColor bgcolor='#ffd3d3'>Remarks</TableCellHeaderColor>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {differenceProductPOtoPR.map((v, i) => <DeletedTableRow isApproved={true} errors={errors} key={i} i={i} v={v} deleteItemTable={deleteItemTable} onChangeByIndex={onChangeByIndex} /> )}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                            : null
+                            }
                             
                             {/* Markup */}
                             <Grid item xs={12} md={12}>
-                                <Stack direction='row' alignItems='center' spacing={2}>
+                                <Stack direction='row' alignItems='center' spacing={2} mt={2}>
                                     <TextField
                                         disabled={isApproved}
                                         fullWidth 
@@ -513,58 +608,59 @@ const Form = (props) => {
                             </Grid>
                             
                             <Grid item xs={12} md={12}>
-                                {item.length > 0 ?
-                                <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
-                                    <Table stickyHeader aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow
-                                                sx={{
-                                                    "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
-                                                    "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
-                                                    bgcolor: '#d6e9ff'
-                                                }}
-                                            >
-                                                <TableCellHeaderColor padding="checkbox">
-                                                    <Checkbox
-                                                        disabled={isApproved}
-                                                        color="primary"
-                                                        indeterminate={selected.length > 0 && selected.length < item.length}
-                                                        checked={item.length > 0 && selected.length === item.length}
-                                                        onChange={handleSelectAllClick}
-                                                        inputProps={{
-                                                            'aria-label': 'select all desserts',
-                                                        }}
-                                                    />
-                                                </TableCellHeaderColor>
-                                                <TableCellHeaderColor>No.</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Item Name</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Size</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Unit</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Quantity</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
-                                                <TableCellHeaderColor>VAT Buy</TableCellHeaderColor>
-                                                <TableCellHeaderColor>New Price</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Markup Percentage</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Sell Price</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Amount</TableCellHeaderColor>
-                                                <TableCellHeaderColor>T/NT</TableCellHeaderColor>
-                                                <TableCellHeaderColor>VAT</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Total</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Remarks</TableCellHeaderColor>
-                                                <TableCellHeaderColor>Action</TableCellHeaderColor>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {renderItemDetails}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                                : null
+                                {currentItem.length > 0 ?
+                                    <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
+                                        <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', }}>Current Item Product</Typography>
+                                        <Table stickyHeader aria-label="simple table">
+                                            <TableHead>
+                                                <TableRow
+                                                    sx={{
+                                                        "& th:first-of-type": { borderRadius: "0.5em 0 0 0.5em" },
+                                                        "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
+                                                        bgcolor: '#d6e9ff'
+                                                    }}
+                                                >
+                                                    <TableCellHeaderColor padding="checkbox">
+                                                        <Checkbox
+                                                            disabled={isApproved}
+                                                            color="primary"
+                                                            indeterminate={selected.length > 0 && selected.length < item.length}
+                                                            checked={item.length > 0 && selected.length === item.length}
+                                                            onChange={handleSelectAllClick}
+                                                            inputProps={{
+                                                                'aria-label': 'select all desserts',
+                                                            }}
+                                                        />
+                                                    </TableCellHeaderColor>
+                                                    <TableCellHeaderColor>No.</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Item Name</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Size</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Unit</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Quantity</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>VAT Buy</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>New Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Markup Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Markup Percentage</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Sell Price</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Amount</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>T/NT</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>VAT</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Total</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Remarks</TableCellHeaderColor>
+                                                    <TableCellHeaderColor>Action</TableCellHeaderColor>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {renderItemDetails}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                    : null
                                 }
                             </Grid>
                             <Grid item xs={12} md={12}>
-                                <CustomGrandTotalComponent item={item} markup={true} />
+                                <CustomGrandTotalComponent item={currentItem} markup={true} />
                             </Grid>
                             <Grid item xs={12} md={12}>
                                 <Stack direction='row' justifyContent='end' spacing={2}>
@@ -585,12 +681,11 @@ const Form = (props) => {
                     </Grid>
                 </Card>
             </Box>
-            <ImportModal 
-                handleClose={handleModalImport}
-                open={modalImport}
-                title='Product Quotation'
-                url={'read-excel/product-price'}
-                onSuccessImport={onSuccessImport}
+            <ConfirmDialog 
+                handleClick={handleClickModalEdit}
+                title='Edit'
+                handleClose={() => setModalConfirmEdit(false)}
+                open={modalConfirmEdit}
             />
         </Stack>
     )

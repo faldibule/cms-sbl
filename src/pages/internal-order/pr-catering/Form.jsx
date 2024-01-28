@@ -156,7 +156,7 @@ const Form = (props) => {
         <Stack>
             <Grid container>
                 <Grid item xs={12} md={12}>
-                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <Stack direction={{ xs: 'column', md: 'row' }} justifyContent='space-between'>
                         <Stack>
                             <Typography variant='h5'>
                                 {props.title === 'add' ? 'Form Input PR Catering' : 'Form Edit PR Catering' }
@@ -168,7 +168,7 @@ const Form = (props) => {
                             : null}
                         </Stack>
                         {!!data ?
-                        <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
+                        <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
                             {isEdit ? 'Cancel Edit' : 'Edit Data PR Catering'}
                         </Button>
                         : null
