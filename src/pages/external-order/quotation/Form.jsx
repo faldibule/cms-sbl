@@ -143,7 +143,9 @@ const Form = (props) => {
     
     const [currentItem, setCurrentItem] = useState([])
     const itemFiltered = useMemo(() => {
-        if(!data) return item
+        if(!data) {
+            setCurrentItem([...item])
+        }
         if(!dataPRCustomerById) return []
 
         // get all product id from PR

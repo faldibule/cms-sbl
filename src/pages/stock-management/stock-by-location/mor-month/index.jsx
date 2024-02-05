@@ -1,15 +1,27 @@
-import { useCallback, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import CustomSearchComponent from '@components/CustomSearchComponent';
-import Loading from '@components/Loading';
-import TableDataRow from '@components/quotation/TableDataRow';
 import CustomLinkComponent from '@components/CustomLinkComponent';
-import { NumberFormat } from '@utils/Format';
-import useFetchMOR from '@hooks/mor/useFetchMOR';
+import CustomSearchComponent from '@components/CustomSearchComponent';
 import Iconify from '@components/Iconify';
-import moment from 'moment';
+import Loading from '@components/Loading';
+import Page from '@components/Page';
+import useFetchMORMonth from '@hooks/mor-month/useFetchMORMonth';
+import { Button, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
+const dataMonth = [
+    { month: 'Januari', value: 1 },
+    { month: 'Februari', value: 2 },
+    { month: 'Maret', value: 3 },
+    { month: 'April', value: 4 },
+    { month: 'Mei', value: 5 },
+    { month: 'Juni', value: 6 },
+    { month: 'Juli', value: 7 },
+    { month: 'Agustus', value: 8 },
+    { month: 'September', value: 9 },
+    { month: 'Oktober', value: 10 },
+    { month: 'November', value: 11 },
+    { month: 'Desember', value: 12 },
+];
 
 const index = () => {
     const navigate = useNavigate()
@@ -21,7 +33,7 @@ const index = () => {
         paginate: 1,
         location_id,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchMOR(params)
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchMORMonth(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -93,6 +105,7 @@ const index = () => {
             )
         }
         return rows.data.map((value, key) => {
+            const month = dataMonth.find(v => v.value === value.month).month
             return (
                 <TableRow key={key}>
                     <TableCell
@@ -103,26 +116,26 @@ const index = () => {
                         {rows.meta.from+key}.
                     </TableCell>
                     <TableCell>
-                        <CustomLinkComponent label={`${moment(value.date).format('LL')}`} url={`/stock-management/stock-by-location/${location_id}/mor/edit/${value.date}`} />
+                        <CustomLinkComponent label={month} url={`/stock-management/stock-by-location/${location_id}/mor-month/detail/${value.id}`} />
                     </TableCell>
-                    {/* <TableCell>
-                        {moment(value.date).format('LL')}
-                    </TableCell> */}
+                    <TableCell>
+                        {value.year}
+                    </TableCell>
                 </TableRow>
             )
         })
     }, [rows])
 
     return (
-        <Page title='MOR'>
+        <Page title='MOR Month'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                MOR
+                                MOR Monthly
                             </Typography>
-                            <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mor/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mor-month/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>
@@ -147,7 +160,8 @@ const index = () => {
                                         }}
                                     >
                                         <TableCell>No.</TableCell>
-                                        <TableCell>Date</TableCell>
+                                        <TableCell>Month</TableCell>
+                                        <TableCell>Year</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

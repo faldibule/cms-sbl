@@ -201,10 +201,10 @@ const index = () => {
                         : null
                     } 
                     <TableCell>
-                        {value.purchase_order}
+                        {value?.purchase_order || '-'}
                     </TableCell>
                     <TableCell>
-                        {moment(value.delivery_date).format('LL')}
+                        {!!value.delivery_date ? moment(value.delivery_date).format('LL') : '-'}
                     </TableCell>
                     <TableCell>
                         {value.description}

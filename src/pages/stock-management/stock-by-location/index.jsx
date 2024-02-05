@@ -3,11 +3,13 @@ import Page from '@components/Page';
 import { Box, Breadcrumbs, Card, CardContent, Container, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 
-import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent';
 import StockMor from '@pages/stock-management/stock-by-location/mor';
+import StockMorMonth from '@pages/stock-management/stock-by-location/mor-month';
 import StockProduct from '@pages/stock-management/stock-by-location/product';
-import useFetchLocationById from '@hooks/location/useFetchLocationById';
+
+import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent';
 import Loading from '@components/Loading';
+import useFetchLocationById from '@hooks/location/useFetchLocationById';
 
 const index = () => {
     const { location_id } = useParams()
@@ -60,9 +62,17 @@ const index = () => {
                                             icon={<Iconify icon='carbon:report' />} 
                                             iconPosition='start' 
                                             value='mor' 
-                                            label="MOR" 
+                                            label="MOR Daily" 
                                             component={RouterLink}
                                             to={`/stock-management/stock-by-location/${location_id}/mor`}
+                                        />
+                                        <Tab 
+                                            icon={<Iconify icon='carbon:report' />} 
+                                            iconPosition='start' 
+                                            value='mor-month' 
+                                            label="MOR Monthly" 
+                                            component={RouterLink}
+                                            to={`/stock-management/stock-by-location/${location_id}/mor-month`}
                                         />
                                     </Tabs>
                                 </Box>
@@ -72,6 +82,10 @@ const index = () => {
                                 }
                                 {lastSegment === 'mor' ?
                                     <StockMor />
+                                : null
+                                }
+                                {lastSegment === 'mor-month' ?
+                                    <StockMorMonth />
                                 : null
                                 }
                             </CardContent>

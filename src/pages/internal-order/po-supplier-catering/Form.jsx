@@ -128,14 +128,16 @@ const Form = (props) => {
     // Get product that exist in PR but not exist in PO
     const differenceProductPRtoPO = useMemo(() => {
         if(!dataPOCateringById) return []
+        if(!supplierState.selected?.id) return []
 
-        const tempIdProductPOCatering = getProductIdList.itemFilteredBySupplier.map(v => v.item_product.id)
+        const tempIdProductPOCatering = getProductIdList?.itemFilteredBySupplier.map(v => v.item_product.id)
         return getProductIdList.dataPOCateringByIdFilteredBySupplier.filter(v => !tempIdProductPOCatering.includes(v.item_product.id))
     }, [getProductIdList])
 
     // Get product that exist in PO but not exist in PR (deleted)
     const differenceProductPOtoPR = useMemo(() => {
         if(!dataPOCateringById) return []
+        if(!supplierState.selected?.id) return []
 
         // get all product id from PR
         const tempIdProductPOCatering = getProductIdList.dataPOCateringByIdFilteredBySupplier.map(v => v.item_product.id)
@@ -146,6 +148,7 @@ const Form = (props) => {
     const itemFiltered = useMemo(() => {
         if(!data) return item
         if(!dataPOCateringById) return []
+        if(!supplierState.selected?.id) return []
 
         // get all product id from PR
         const tempIdProductPOCatering = getProductIdList.dataPOCateringByIdFilteredBySupplier.map(v => v.item_product.id)

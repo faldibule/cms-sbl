@@ -2,7 +2,6 @@ import Iconify from "@components/Iconify"
 import useValueConverter from "@hooks/useValueConverter"
 import { Stack, TableCell, TableRow, Typography } from "@mui/material"
 import { NumberFormat } from "@utils/Format"
-import moment from "moment"
 import { useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 
@@ -16,14 +15,13 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
         <TableRow key={i}>
             <TableCell>{i + 1}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>
-                {!!v?.date ? moment(v?.date).format('LL') : ''}
-                {!!errors[`item_product.${i}.date`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem', fontWeight: 'bold' }}>(Date not Valid/Required!)</Typography> : ''}
+                {valueMemo.name}
+                {!!errors[`product.${i}.item_product_id`] ? <Typography sx={{ color: 'red', fontSize: '0.6rem', fontWeight: 'bold' }}>(Product ID not Valid/Duplicate!)</Typography> : ''}
             </TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{valueMemo.name}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{valueMemo.brand}</TableCell>
             <TableCell sx={{ minWidth: 150 }} align="left">{valueMemo.description}</TableCell>
             <TableCell>
-                {v.quantity || 0}
+                {v.last_stock || 0}
             </TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
             <TableCell>

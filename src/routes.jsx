@@ -115,6 +115,10 @@ import StockByLocation from './pages/stock-management/stock-by-location';
 
 import AddMOR from './pages/stock-management/stock-by-location/mor/Add';
 import EditMORDaily from './pages/stock-management/stock-by-location/mor/Edit';
+
+import AddMORMonthly from './pages/stock-management/stock-by-location/mor-month/Add';
+import DetailMORMonthly from './pages/stock-management/stock-by-location/mor-month/Detail';
+
 import StockDetailProduct from './pages/stock-management/stock-by-location/product/detail';
 
 // File Management
@@ -342,6 +346,20 @@ export default function Router() {
                 {
                     path: "stock-by-location/:location_id/mor/edit/:date",
                     element: <EditMORDaily />,
+                },
+
+                // MOR Month
+                {
+                    path: "stock-by-location/:location_id/mor-month",
+                    element: <StockByLocation />,
+                },
+                {
+                    path: "stock-by-location/:location_id/mor-month/add",
+                    element: <AddMORMonthly />,
+                },
+                {
+                    path: "stock-by-location/:location_id/mor-month/detail/:id",
+                    element: <DetailMORMonthly />,
                 },
             ],
         },

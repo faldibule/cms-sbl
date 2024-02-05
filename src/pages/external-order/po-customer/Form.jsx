@@ -279,7 +279,7 @@ const Form = (props) => {
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
-                                disabled={isApproved || !isEdit}
+                                disabled={isApproved}
                                 options={dataQuotationList?.data || []}
                                 getOptionLabel={(option) => `${option.quotation_number}`}
                                 label='Quotation Number'
@@ -318,7 +318,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <TextField
-                                disabled={isApproved || !isEdit}
+                                disabled={isApproved}
                                 fullWidth
                                 label='Discount'
                                 name='discount_id'
@@ -334,7 +334,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                disabled={isApproved || !isEdit}
+                                disabled={isApproved}
                                 fullWidth 
                                 label='Term & Conditions'
                                 multiline
@@ -348,7 +348,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField
-                                disabled={isApproved || !isEdit}
+                                disabled={isApproved}
                                 fullWidth 
                                 label='Term of Payment'
                                 multiline
@@ -362,7 +362,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <CustomAutocomplete 
-                                disabled={isApproved || !isEdit}
+                                disabled={isApproved}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Prepared By'
@@ -375,7 +375,7 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={approvalMemo.isApproved1 ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved || !isEdit || approvalMemo.isApproved1}
+                                disabled={isApproved || approvalMemo.isApproved1}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Approved By 1'
@@ -399,7 +399,7 @@ const Form = (props) => {
                         }
                         <Grid item xs={12} md={approvalMemo.isApproved2 ? 3 : 6}>
                             <CustomAutocomplete 
-                                disabled={isApproved || !isEdit || approvalMemo.isApproved2}
+                                disabled={isApproved || approvalMemo.isApproved2}
                                 getOptionLabel={(opt) => `${opt.name}`}
                                 options={dataUser.data}
                                 label='Approved By 2'
