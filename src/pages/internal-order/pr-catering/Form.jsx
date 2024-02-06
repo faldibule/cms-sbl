@@ -167,7 +167,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data ?
+                        {!!data && data?.po_catering ?
                         <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
                             {isEdit ? 'Cancel Edit' : 'Edit Data PR Catering'}
                         </Button>
