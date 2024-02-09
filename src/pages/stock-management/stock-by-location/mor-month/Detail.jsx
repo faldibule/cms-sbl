@@ -40,6 +40,9 @@ const DataList = ({ v, i }) => {
             <TableCell>
                 {v.last_stock || 0}
             </TableCell>
+            <TableCell>
+                {v.actual_stock || 0}
+            </TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
         </TableRow>
     )
@@ -203,6 +206,7 @@ const index = () => {
                                             <TableCell>Item Brand</TableCell>
                                             <TableCell>Description</TableCell>
                                             <TableCell>Last Stock</TableCell>
+                                            <TableCell>Actual Stock</TableCell>
                                             <TableCell>Unit Price</TableCell>
                                         </TableRow>
                                     </TableHead>

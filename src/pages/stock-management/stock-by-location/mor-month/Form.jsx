@@ -90,12 +90,14 @@ const Form = (props) => {
         formData.append('location_id', location_id)
         item.forEach((v, i) => {
             const last_stock = v?.last_stock || 0
+            const actual_stock = v?.actual_stock || 0
             const item_product_id = v?.item_product?.id || v?.id
             const price = parseInt(v?.price) || parseInt(v?.item_price) || parseInt(v?.item_product?.price)
 
             formData.append(`product[${i}][item_product_id]`, item_product_id)
             formData.append(`product[${i}][price]`, price)
             formData.append(`product[${i}][last_stock]`, last_stock)
+            formData.append(`product[${i}][actual_stock]`, actual_stock)
         })
         const temp = Object.fromEntries(formData)
         save({ formData })
@@ -219,6 +221,7 @@ const Form = (props) => {
                                                             <TableCellHeaderColor>Item Brand</TableCellHeaderColor>
                                                             <TableCellHeaderColor>Description</TableCellHeaderColor>
                                                             <TableCellHeaderColor>Last Stock</TableCellHeaderColor>
+                                                            <TableCellHeaderColor>Actual Stock</TableCellHeaderColor>
                                                             <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
                                                             <TableCellHeaderColor>Action</TableCellHeaderColor>
                                                         </TableRow>

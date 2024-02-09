@@ -39,6 +39,15 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i }) => {
                     <Grid item xs={12} md={12}>
                         <TextField
                             fullWidth 
+                            label='Actual Stock'
+                            type='number'
+                            name='actual_stock'
+                            defaultValue={v?.actual_stock || 0}
+                        />  
+                    </Grid>
+                    <Grid item xs={12} md={12}>
+                        <TextField
+                            fullWidth 
                             label='Price'
                             name='price'
                             value={price}

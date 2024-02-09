@@ -23,6 +23,9 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
             <TableCell>
                 {v.last_stock || 0}
             </TableCell>
+            <TableCell>
+                {v.actual_stock || 0}
+            </TableCell>
             <TableCell>{NumberFormat(valueMemo.price, 'Rp')}</TableCell>
             <TableCell>
             {isApproved ?
