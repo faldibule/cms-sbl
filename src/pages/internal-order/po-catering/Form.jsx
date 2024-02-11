@@ -10,6 +10,7 @@ import useFetchDiscount from '@hooks/discount/useFetchDiscount'
 import useSavePOCatering from '@hooks/po-catering/useSavePOCatering'
 import useFetchPRCatering from '@hooks/pr-catering/useFetchPRCatering'
 import useFetchPRCateringById from '@hooks/pr-catering/useFetchPRCateringById'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
@@ -32,6 +33,7 @@ const Form = (props) => {
         }
     }, [data])
 
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(false)
@@ -272,7 +274,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && data?.status === 'finish' ?
+                        {!!data && data?.status === 'finish' && isUserStoreKeeper ?
                             <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
                                 {isEdit ? 'Cancel Edit' : 'Edit Data PO Catering'}
                             </Button>

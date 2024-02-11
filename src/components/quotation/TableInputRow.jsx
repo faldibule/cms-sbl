@@ -1,7 +1,7 @@
 import Iconify from "@components/Iconify"
 import useValueConverter from "@hooks/useValueConverter"
 import { Checkbox, Stack, TableCell, TableRow, Typography } from "@mui/material"
-import { NumberFormat } from "@utils/Format"
+import { IntegerFormat, NumberFormat } from "@utils/Format"
 import { useState } from "react"
 import DialogInputRow from "./DialogInputRow"
 
@@ -9,6 +9,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
     const [open, setOpen] = useState(false)
     const handleClose = () => setOpen(!open)
     const { valueMemo, markUpMemo, eachTax, newPrice, amount, vatAmmount } = useValueConverter(v) 
+    
     return (
         <TableRow 
             key={i}
@@ -46,7 +47,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                 {valueMemo.tax !== 'yes' ? 'No' : `${NumberFormat(eachTax, 'Rp')}(11%)`}
             </TableCell>
             <TableCell>{valueMemo.tax !== 'yes' ? 'No' : NumberFormat(newPrice, 'Rp')}</TableCell>
-            <TableCell sx={{ minWidth: 150 }}>{NumberFormat(valueMemo.markupPrice, 'Rp')}</TableCell>
+            <TableCell sx={{ minWidth: 150 }}>{valueMemo.markupPrice}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{parseFloat(valueMemo.markupPercentage).toFixed(2)}%</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{NumberFormat(markUpMemo.markupValue, 'Rp')}</TableCell>
             <TableCell sx={{ minWidth: 150 }}>{NumberFormat(amount, 'Rp')}</TableCell>
@@ -79,7 +80,7 @@ const TableInputRow = ({ v, i, deleteItemTable, onChangeByIndex, errors = {}, is
                     onChangeByIndex={onChangeByIndex}
                     i={i}
                     priceProps={valueMemo.price}
-                    markupProps={{ percentage: valueMemo.markupPercentage, price: valueMemo.markupPrice }}
+                    markupProps={{ percentage: valueMemo.markupPercentage, price: IntegerFormat(valueMemo.markupPrice)}}
                 />
             </TableCell>
         </TableRow>

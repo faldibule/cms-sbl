@@ -10,6 +10,7 @@ import useFetchDiscount from '@hooks/discount/useFetchDiscount'
 import useSavePOCustomer from '@hooks/po-customer/useSavePOCustomer'
 import useFetchQuotation from '@hooks/quotation/useFetchQuotation'
 import useFetchQuotationById from '@hooks/quotation/useFetchQuotationById'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
@@ -30,7 +31,9 @@ const Form = (props) => {
         }
     }, [data])
 
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
+
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(false)
  
@@ -264,7 +267,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && data?.status === 'finish' ?
+                        {!!data && data?.status === 'finish' && isUserStoreKeeper ?
                             <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
                                 {isEdit ? 'Cancel Edit' : 'Edit Data PO Customer'}
                             </Button>

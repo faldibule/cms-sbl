@@ -10,7 +10,7 @@ const useValueConverter = (v) => {
         const taxPrice = price * taxValue / 100
         const newPrice = price + taxPrice
 
-        const markupPrice = !!v?.markupPrice && !isNaN(v?.markupPrice) ? 
+        const markupPrice = !!v?.markupPrice ? 
                                 v?.markupPrice : 
                                     !!v?.markup_value ? 
                                         NumberFormat(v?.markup_value, 'Rp') : 
@@ -29,7 +29,7 @@ const useValueConverter = (v) => {
             markupPercentage,
             tnt: v?.tnt || 'T',
         }
-    }, [v]) 
+    }, [v, v?.markupPrice]) 
 
     const total = useMemo(() => (valueMemo.price * (v?.quantity || 0)), [valueMemo.price, v?.quantity])
 

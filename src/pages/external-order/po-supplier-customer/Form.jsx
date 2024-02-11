@@ -12,6 +12,7 @@ import useFetchPOCustomer from '@hooks/po-customer/useFetchPOCustomer'
 import useFetchPOCustomerById from '@hooks/po-customer/useFetchPOCustomerById'
 import useSavePOSupplierCustomer from '@hooks/po-supplier-customer/useSavePOSupplierCustomer'
 import useFetchSupplier from '@hooks/supplier/useFetchSupplier'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import moment from 'moment'
@@ -20,8 +21,10 @@ import { useNavigate } from 'react-router-dom'
 
 const Form = (props) => {
     const { data } = props
-
+    
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
+
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(false)
 
@@ -250,7 +253,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && data?.status === 'submit' ?
+                        {!!data && data?.status === 'submit' && isUserStoreKeeper ?
                             <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
                                 {isEdit ? 'Cancel Edit' : 'Edit Data PO Supplier Customer'}
                             </Button>

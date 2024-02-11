@@ -45,6 +45,7 @@ const Form = (props) => {
         e.preventDefault()
         const formData = new FormData(e.target)
         formData.append('po_supplier_catering_id', data.po_supplier_catering.id)
+        formData.append('hard_edit', 'yes')
         item.forEach((v, i) => {
             const price = parseInt(v?.price) || parseInt(v?.item_price)
             const item_product_id = v.item_product?.id

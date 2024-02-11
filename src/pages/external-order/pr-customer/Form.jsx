@@ -9,6 +9,7 @@ import TableInputRow from '@components/pr-customer/TableInputRow'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import useSavePRcustomer from '@hooks/pr-customer/useSavePRCustomer'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, InputAdornment, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
@@ -21,8 +22,10 @@ const Form = (props) => {
         if(!!!data) return false
         return data.status === 'finish'
     }, [data])
-
+    
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
+
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(!data?.quotation)
 
@@ -167,7 +170,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && data?.quotation ?
+                        {!!data && data?.quotation && isUserStoreKeeper ?
                             <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
                                 {isEdit ? 'Cancel Edit' : 'Edit Data PR Customer'}
                             </Button>
@@ -311,9 +314,15 @@ const Form = (props) => {
                         </Grid>
                         <Grid item xs={12} md={12}>
                             <Stack direction='row' justifyContent='end' spacing={2}>
-                                <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
-                                    Next
-                                </LoadingButton>
+                                {isApproved || !isEdit ?
+                                    <Button onClick={() => navigate(`/file/${data?.id}/pr_customer`)} variant='contained' startIcon={<Iconify icon='carbon:next-filled'  />}>
+                                        Next
+                                    </Button>
+                                :
+                                    <LoadingButton endIcon={<Iconify icon='carbon:next-filled' />} loading={loadingSave} variant='contained' type='submit'>
+                                        Next
+                                    </LoadingButton>
+                                }
                             </Stack>
                         </Grid>
                     </Grid>

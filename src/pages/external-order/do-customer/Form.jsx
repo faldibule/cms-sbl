@@ -9,6 +9,7 @@ import DeletedTableRow from '@components/po-catering/DeletedTableRow'
 import useSaveDOCustomer from '@hooks/do-customer/useSaveDOCustomer'
 import useFetchPOCustomer from '@hooks/po-customer/useFetchPOCustomer'
 import useFetchPOCustomerById from '@hooks/po-customer/useFetchPOCustomerById'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
@@ -25,7 +26,9 @@ const Form = (props) => {
         }
     }, [data])
 
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
+
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(false)
  
@@ -206,7 +209,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && data?.status === 'finish' ?
+                        {!!data && data?.status === 'finish' && isUserStoreKeeper ?
                             <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
                                 {isEdit ? 'Cancel Edit' : 'Edit Data DO Customer'}
                             </Button>

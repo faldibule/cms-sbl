@@ -5,14 +5,14 @@ import UpdateStatusDialog from '@components/UpdateStatusDialog'
 import useDeletePOSupplierCustomer from '@hooks/po-supplier-customer/useDeletePOSupplierCustomer'
 import useUpdateStatusPOSupplierCustomer from '@hooks/po-supplier-customer/useUpdateStatusPOSupplierCustomer'
 import useCustomSnackbar from '@hooks/useCustomSnackbar'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import { Chip, TableCell, TableRow } from '@mui/material'
-import { authentication } from '@recoil/Authentication'
 import moment from 'moment'
 import { useMemo, useState } from 'react'
-import { useRecoilValue } from 'recoil'
 
 const TableDataRow = ({ i, value, rows, refetch }) => {
-    const { user } = useRecoilValue(authentication)
+    const isUserStoreKeeper = useIsStoreKeeper()
+
     const [form, setForm] = useState({
         status: '',
         note: ''
@@ -129,7 +129,7 @@ const TableDataRow = ({ i, value, rows, refetch }) => {
                     approve={value.status !== 'submit'}
                     handleApprove={() => handleCloseUpdateStatus(value)}
 
-                    canDelete={value.status !== 'submit' || (!!user?.role ? user.role[0] === 'super-admin' : false)}
+                    canDelete={value.status !== 'submit' || isUserStoreKeeper}
                     handleDelete={() => handleClose(value.id)}
                 />
                 <DeleteDialog 

@@ -10,6 +10,7 @@ import useFetchCustomer from '@hooks/customer/useFetchCustomer'
 import useFetchPRCustomer from '@hooks/pr-customer/useFetchPRCustomer'
 import useFetchPRCustomerById from '@hooks/pr-customer/useFetchPRCustomerById'
 import useSaveQuotation from '@hooks/quotation/useSaveQuotation'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Checkbox, Grid, InputAdornment, MenuItem, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
@@ -26,8 +27,10 @@ const Form = (props) => {
             checked_date: data?.checked_date,
         }
     }, [data])
-
+    
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
+
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(false)
  
@@ -141,27 +144,23 @@ const Form = (props) => {
         return item.filter(v => !tempIdProductPRCustomer.includes(v.item_product.id))
     }, [dataPRCustomerById, item])
     
-    const [currentItem, setCurrentItem] = useState([])
     const itemFiltered = useMemo(() => {
-        if(!data) {
-            setCurrentItem([...item])
-        }
+        if(!data) return [...item]
         if(!dataPRCustomerById) return []
 
         // get all product id from PR
         const tempIdProductPRCustomer = dataPRCustomerById.item_product.map(v => v.item_product.id)
     
         const temp = [...item.filter(v => tempIdProductPRCustomer.includes(v.item_product.id)), ...differenceProductPRtoPO]
-        setCurrentItem(temp)
         return temp
     }, [dataPRCustomerById, item, differenceProductPRtoPO])
 
     const deleteItemTable = (e, index) => {
-        setCurrentItem([...currentItem.filter((v, i) => i !== index)])
+        setItem([...itemFiltered.filter((v, i) => i !== index)])
     }
 
     const onChangeByIndex = (index, object) => {
-        const temp = currentItem.map((v, i) => {
+        const temp = itemFiltered.map((v, i) => {
             if(i === index){
                 return {
                     ...v,
@@ -170,7 +169,7 @@ const Form = (props) => {
             }
             return v
         })
-        setCurrentItem([...temp])
+        setItem([...temp])
     }
 
     const { mutate: save, isLoading: loadingSave, error } = useSaveQuotation({
@@ -325,8 +324,8 @@ const Form = (props) => {
     }
 
     const renderItemDetails = useMemo(() => {
-        if(currentItem.length === 0) return null
-        return currentItem.map((v, i) => 
+        if(itemFiltered.length === 0) return null
+        return itemFiltered.map((v, i) => 
             <TableInputRow  
                 isApproved={isApproved} 
                 key={i} i={i} v={v} 
@@ -336,7 +335,7 @@ const Form = (props) => {
                 isItemSelected={isSelected(i)}
             /> 
         )
-    }, [currentItem, isApproved, errors, selected])
+    }, [itemFiltered, isApproved, errors, selected])
 
     if(loadingCustomer || loadingUser){
         return <Loading />
@@ -357,7 +356,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && !!data.checked_date ?
+                        {!!data && !!data.checked_date && isUserStoreKeeper ?
                             <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh' }}>
                                 {isEdit ? 'Cancel Edit' : 'Edit Data Quotation'}
                             </Button>
@@ -610,7 +609,7 @@ const Form = (props) => {
                             </Grid>
                             
                             <Grid item xs={12} md={12}>
-                                {currentItem.length > 0 ?
+                                {itemFiltered.length > 0 ?
                                     <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
                                         <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', }}>Current Item Product</Typography>
                                         <Table stickyHeader aria-label="simple table">
@@ -662,7 +661,7 @@ const Form = (props) => {
                                 }
                             </Grid>
                             <Grid item xs={12} md={12}>
-                                <CustomGrandTotalComponent item={currentItem} markup={true} />
+                                <CustomGrandTotalComponent item={itemFiltered} markup={true} />
                             </Grid>
                             <Grid item xs={12} md={12}>
                                 <Stack direction='row' justifyContent='end' spacing={2}>

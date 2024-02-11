@@ -9,6 +9,7 @@ import TableInputRow from '@components/pr-catering/TableInputRow'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import useSavePRCatering from '@hooks/pr-catering/useSavePRCatering'
+import useIsStoreKeeper from '@hooks/useIsStoreKeeper'
 import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Button, Card, Grid, InputAdornment, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
@@ -22,7 +23,9 @@ const Form = (props) => {
         return data.status === 'finish'
     }, [data])
 
+    const isUserStoreKeeper = useIsStoreKeeper()
     const navigate = useNavigate()
+    
     const [item, setItem] = useState([])
     const [isEdit, setIsEdit] = useState(!data?.po_catering)
 
@@ -167,7 +170,7 @@ const Form = (props) => {
                                 </Typography>
                             : null}
                         </Stack>
-                        {!!data && data?.po_catering ?
+                        {!!data && data?.po_catering && isUserStoreKeeper ?
                         <Button onClick={() => handleEditButton()} variant='contained' color='primary' sx={{ height: '5dvh', mt: { xs: 2, md: 0 } }}>
                             {isEdit ? 'Cancel Edit' : 'Edit Data PR Catering'}
                         </Button>

@@ -37,7 +37,7 @@ const DialogInputRow = ({ open, handleClose, v, onChangeByIndex, i, priceProps, 
             setMarkup({
                 ...markup,
                 percentage: parseFloat(markupProps.percentage).toFixed(2),
-                price: NumberFormat(( markupProps.price * newPrice / 100), 'Rp') 
+                price: NumberFormat(markupProps.price) 
             })
         }
         

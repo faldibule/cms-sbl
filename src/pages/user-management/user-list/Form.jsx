@@ -1,20 +1,15 @@
-import { Avatar, Box, Card, CardContent, Container, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, InputAdornment, MenuItem, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { dataRoleDummy } from '../user-role'
-import FormByType from '@components/FormByType'
-import { LoadingButton } from '@mui/lab'
-import http, { baseURL } from '@variable/Api'
-import { useQuery } from 'react-query'
 import Loading from '@components/Loading'
-import { useNavigate } from 'react-router-dom'
-import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import useFetchDepartment from '@hooks/department/useFetchDepartment'
+import useShowFile from '@hooks/file-management/useShowFile'
 import useFetchLocation from '@hooks/location/useFetchLocation'
 import useFetchRole from '@hooks/role/useFetchRole'
 import useSaveUser from '@hooks/user-list/useSaveUser'
-import { useRecoilState } from 'recoil'
+import { LoadingButton } from '@mui/lab'
+import { Avatar, Box, Card, CardContent, FormControl, FormControlLabel, FormHelperText, FormLabel, Grid, MenuItem, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material'
 import { authentication } from '@recoil/Authentication'
-import useShowFile from '@hooks/file-management/useShowFile'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useRecoilState } from 'recoil'
 
 const Form = (props) => {
     const navigate = useNavigate()
@@ -207,7 +202,7 @@ const Form = (props) => {
                                 >
                                     {dataRole?.map((v, i) => {
                                         return (
-                                            <MenuItem key={v.name} value={v.name}>{v.name}</MenuItem>
+                                            <MenuItem key={v.name} value={v.name}>{v.name.replaceAll('-', ' ')}</MenuItem>
                                         )
                                     })}
                                 </TextField>
