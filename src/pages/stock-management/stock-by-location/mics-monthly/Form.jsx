@@ -4,9 +4,9 @@ import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import TableInputRow from '@components/mor-month/TableInputRow'
+import TableInputRow from '@components/mics-monthly/TableInputRow'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
-import useSaveMORMonth from '@hooks/mor-month/useSaveMORMonth'
+import useSaveMICSMonthly from '@hooks/mics-monthly/useSaveMICSMonthly'
 import { LoadingButton } from '@mui/lab'
 import { Box, Breadcrumbs, Button, Card, Grid, MenuItem, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
@@ -77,9 +77,9 @@ const Form = (props) => {
         setItem([...temp])
     }
 
-    const { mutate: save, isLoading: loadingSave, error } = useSaveMORMonth({
+    const { mutate: save, isLoading: loadingSave, error } = useSaveMICSMonthly({
         onSuccess: () => {
-            navigate(`/stock-management/stock-by-location/${location_id}/mor-month`)
+            navigate(`/stock-management/stock-by-location/${location_id}/mics-monthly`)
         }
     })
     const errors = error?.response?.data?.errors
@@ -125,13 +125,13 @@ const Form = (props) => {
                 <Grid item xs={12} md={12}>
                     <Stack spacing={1}>
                         <Typography variant='h5'>                       
-                            {props.title === 'add' ? 'Form Input MOR' : 'Form Edit MOR' }
+                            {props.title === 'add' ? 'Form Input MICS' : 'Form Edit MICS' }
                         </Typography>
                         <Breadcrumbs sx={{ fontSize: '0.8rem', height: 30 }}>
                             <CustomLinkBreadcrumsComponent title='Stock Management' to="/stock-management" />
-                            <CustomLinkBreadcrumsComponent title='MOR Monthly' to={`/stock-management/stock-by-location/${location_id}/mor-month`} />
+                            <CustomLinkBreadcrumsComponent title='MICS Monthly' to={`/stock-management/stock-by-location/${location_id}/mics-monthly`} />
                             <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
-                                {props.title === 'add' ? 'Form Input MOR Monthly' : 'Form Edit MOR Monthly' }
+                                {props.title === 'add' ? 'Form Input MICS Monthly' : 'Form Edit MICS Monthly' }
                             </Typography>
                         </Breadcrumbs>
                     </Stack>
@@ -142,7 +142,7 @@ const Form = (props) => {
                 <Grid container spacing={2} justifyContent='center'>
                     <Grid item xs={12} md={12}>
                         <Card sx={{ p: 2, mt: 3 }}>
-                            <Typography py={2} fontSize='1.3rem' fontWeight='bold'>Form Input MOR</Typography>
+                            <Typography py={2} fontSize='1.3rem' fontWeight='bold'>Form Input MICS</Typography>
                             <Grid container spacing={1}>
                                 <Grid item xs={12} md={6}>
                                     <TextField
@@ -255,7 +255,7 @@ const Form = (props) => {
             <ImportModal 
                 handleClose={handleModalImport}
                 open={modalImport}
-                title='MOR'
+                title='MICS Monthly'
                 url={'read-excel/product-price'}
                 onSuccessImport={onSuccessImport}
             />

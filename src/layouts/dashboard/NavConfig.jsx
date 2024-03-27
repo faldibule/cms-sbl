@@ -201,6 +201,11 @@ const navConfig = [
         path: "/stock-management",
     },
     {
+        title: "Monthly Report",
+        path: "/report",
+        icon: getIcon("carbon:report"),
+    },
+    {
         title: "Activity Log",
         path: "/activity-log",
         icon: getIcon("material-symbols:browse-activity-sharp"),

@@ -1,7 +1,7 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchMORByDate = (params, config = {}) => {
+const useFetchMICSDailyByDate = (params, config = {}) => {
     return useQuery(['mor-by-date', params], async ({ signal }) => {
         try {
             const res = await http.get('mor', {
@@ -16,4 +16,4 @@ const useFetchMORByDate = (params, config = {}) => {
     })
 }
 
-export default useFetchMORByDate
+export default useFetchMICSDailyByDate

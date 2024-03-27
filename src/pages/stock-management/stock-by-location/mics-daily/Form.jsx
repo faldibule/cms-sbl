@@ -4,9 +4,9 @@ import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
 import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
-import TableInputRow from '@components/mor/TableInputRow'
+import TableInputRow from '@components/mics-daily/TableInputRow'
 import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
-import useSaveMOR from '@hooks/mor/useSaveMOR'
+import useSaveMICSDaily from '@hooks/mics-daily/useSaveMICSDaily'
 import { LoadingButton } from '@mui/lab'
 import { Box, Breadcrumbs, Button, Card, Grid, Stack, Table, TableBody, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
@@ -54,9 +54,9 @@ const Form = (props) => {
         setItem([...temp])
     }
 
-    const { mutate: save, isLoading: loadingSave, error } = useSaveMOR({
+    const { mutate: save, isLoading: loadingSave, error } = useSaveMICSDaily({
         onSuccess: () => {
-            navigate(`/stock-management/stock-by-location/${location_id}/mor`)
+            navigate(`/stock-management/stock-by-location/${location_id}/mics-daily`)
         }
     })
     const errors = error?.response?.data?.errors
@@ -104,9 +104,9 @@ const Form = (props) => {
                         </Typography>
                         <Breadcrumbs sx={{ fontSize: '0.8rem', height: 30 }}>
                             <CustomLinkBreadcrumsComponent title='Stock Management' to="/stock-management" />
-                            <CustomLinkBreadcrumsComponent title='MOR' to={`/stock-management/stock-by-location/${location_id}/mor`} />
+                            <CustomLinkBreadcrumsComponent title='MICS Daily' to={`/stock-management/stock-by-location/${location_id}/mics-daily`} />
                             <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
-                                {props.title === 'add' ? 'Form Input MOR' : 'Form Edit MOR' }
+                                {props.title === 'add' ? 'Form Input MICS Daily' : 'Form Edit MICS Daily' }
                             </Typography>
                         </Breadcrumbs>
                     </Stack>
@@ -186,7 +186,7 @@ const Form = (props) => {
             <ImportModal 
                 handleClose={handleModalImport}
                 open={modalImport}
-                title='MOR'
+                title='MICS Daily'
                 url={'read-excel/product-price'}
                 onSuccessImport={onSuccessImport}
             />

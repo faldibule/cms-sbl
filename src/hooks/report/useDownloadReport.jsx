@@ -2,15 +2,16 @@ import useCustomSnackbar from '@hooks/useCustomSnackbar'
 import http from '@variable/Api'
 import { useMutation } from 'react-query'
 
-const useDownloadMORMonthly = ({ onSuccess, onError }) => {
+const useDownloadReport = ({ onSuccess, onError }) => {
     const { failed } = useCustomSnackbar()
     return useMutation({
         mutationFn: async (params) => {
-            const res = await http.get(`mor/export`, {
+            const res = await http.get(params.report_type, {
                 responseType: 'blob',
                 params,
             })
             return { 
+                params,
                 data: res.data, 
             }
         },
@@ -22,4 +23,4 @@ const useDownloadMORMonthly = ({ onSuccess, onError }) => {
     })
 }
 
-export default useDownloadMORMonthly
+export default useDownloadReport

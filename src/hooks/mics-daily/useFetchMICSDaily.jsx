@@ -1,10 +1,10 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchMORMonth = (params) => {
-    return useQuery(['mor-monthly-group', params], async ({ signal }) => {
+const useFetchMICSDaily = (params) => {
+    return useQuery(['stock-by-mor', params], async ({ signal }) => {
         try {
-            const res = await http.get('mor-month/month-year-group', {
+            const res = await http.get('mor/daily', {
                 signal,
                 params
             })
@@ -14,4 +14,4 @@ const useFetchMORMonth = (params) => {
     })
 }
 
-export default useFetchMORMonth
+export default useFetchMICSDaily

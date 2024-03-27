@@ -1,7 +1,7 @@
 import http from '@variable/Api'
 import { useQuery } from 'react-query'
 
-const useFetchMORMonthById = (params, config = {}) => {
+const useFetchMICSMonthlyById = (params, config = {}) => {
     return useQuery(['mor-monthly', params], async ({ signal }) => {
         try {
             const res = await http.get(`mor-month/${params?.id}`, {
@@ -16,4 +16,4 @@ const useFetchMORMonthById = (params, config = {}) => {
     })
 }
 
-export default useFetchMORMonthById
+export default useFetchMICSMonthlyById

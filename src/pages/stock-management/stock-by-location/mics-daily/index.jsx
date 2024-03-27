@@ -7,7 +7,7 @@ import Loading from '@components/Loading';
 import TableDataRow from '@components/quotation/TableDataRow';
 import CustomLinkComponent from '@components/CustomLinkComponent';
 import { NumberFormat } from '@utils/Format';
-import useFetchMOR from '@hooks/mor/useFetchMOR';
+import useFetchMICSDaily from '@hooks/mics-daily/useFetchMICSDaily';
 import Iconify from '@components/Iconify';
 import moment from 'moment';
 
@@ -21,7 +21,7 @@ const index = () => {
         paginate: 1,
         location_id,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchMOR(params)
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchMICSDaily(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -103,7 +103,7 @@ const index = () => {
                         {rows.meta.from+key}.
                     </TableCell>
                     <TableCell>
-                        <CustomLinkComponent label={`${moment(value.date).format('LL')}`} url={`/stock-management/stock-by-location/${location_id}/mor/edit/${value.date}`} />
+                        <CustomLinkComponent label={`${moment(value.date).format('LL')}`} url={`/stock-management/stock-by-location/${location_id}/mics-daily/edit/${value.date}`} />
                     </TableCell>
                     {/* <TableCell>
                         {moment(value.date).format('LL')}
@@ -114,15 +114,15 @@ const index = () => {
     }, [rows])
 
     return (
-        <Page title='MOR'>
+        <Page title='MICS Daily'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                MOR
+                                MICS Daily
                             </Typography>
-                            <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mor/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mics-daily/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>

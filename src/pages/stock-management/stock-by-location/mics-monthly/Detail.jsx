@@ -3,8 +3,8 @@ import CustomSearchComponent from '@components/CustomSearchComponent';
 import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
 import Page from '@components/Page';
-import useDownloadMORMonthly from '@hooks/mor-month/useDownloadMORMonthly';
-import useFetchMORMonthById from '@hooks/mor-month/useFetchMORMonthById';
+import useDownloadMICSMonthly from '@hooks/mics-monthly/useDownloadMICSMonthly';
+import useFetchMICSMonthlyById from '@hooks/mics-monthly/useFetchMICSMonthlyById';
 import useValueConverter from '@hooks/useValueConverter';
 import { LoadingButton } from '@mui/lab';
 import { Breadcrumbs, Card, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
@@ -59,8 +59,8 @@ const index = () => {
         location_id,
         id,
     })
-    const { data: detailMORMonthly, isLoading } = useFetchMORMonthById(params)
-    const rows = useMemo(() => detailMORMonthly?.detail, [detailMORMonthly])
+    const { data: detailMICSMonthly, isLoading } = useFetchMICSMonthlyById(params)
+    const rows = useMemo(() => detailMICSMonthly?.detail, [detailMICSMonthly])
 
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
@@ -80,12 +80,12 @@ const index = () => {
         });
     };
 
-    const { mutate: download, isLoading: loadingDownload } = useDownloadMORMonthly({
+    const { mutate: download, isLoading: loadingDownload } = useDownloadMICSMonthly({
         onSuccess: (res) => {
             const temp = window.URL.createObjectURL(new Blob([res.data]));
             const link = document.createElement("a");
             link.href = temp;
-            link.setAttribute("download", `MOR.xlsx`); 
+            link.setAttribute("download", `mics-monthly.xlsx`); 
             document.body.appendChild(link);
             link.click();
         },
@@ -94,8 +94,8 @@ const index = () => {
         e.preventDefault()
         download({
             location_id,
-            month: detailMORMonthly?.mor_month.month,
-            year: detailMORMonthly.mor_month.year
+            month: detailMICSMonthly?.mor_month.month,
+            year: detailMICSMonthly.mor_month.year
         })
     }
 
@@ -150,10 +150,10 @@ const index = () => {
         return rows.data.map((value, key) => {
             return <DataList i={key} v={value} key={value?.id} />
         })
-    }, [detailMORMonthly])
+    }, [detailMICSMonthly])
 
-    if(!isLoading && !detailMORMonthly){
-        return 'Data MOR Monthly Tidak Ditemukan!'
+    if(!isLoading && !detailMICSMonthly){
+        return 'Data MICS Monthly Tidak Ditemukan!'
     }
     if(isLoading){
         return <Loading />
@@ -161,20 +161,20 @@ const index = () => {
 
 
     return (
-        <Page title='MOR Month'>
+        <Page title='MICS Monthly'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack mb={2} spacing={1} justifyContent='space-between' direction={{ xs: 'row', md: 'row' }} alignItems='center'>
                             <Stack>
                                 <Typography variant='h4'>
-                                    MOR Monthly - {detailMORMonthly.mor_month.location.location} ({getMonthByValue(detailMORMonthly.mor_month.month).month}/{detailMORMonthly.mor_month.year})
+                                    MICS Monthly - {detailMICSMonthly.mor_month.location.location} ({getMonthByValue(detailMICSMonthly.mor_month.month).month}/{detailMICSMonthly.mor_month.year})
                                 </Typography>
                                 <Breadcrumbs sx={{ fontSize: '0.8rem', height: 30, mt: 1 }}>
                                     <CustomLinkBreadcrumsComponent title='Stock Management' to="/stock-management" />
-                                    <CustomLinkBreadcrumsComponent title='MOR Monthly' to={`/stock-management/stock-by-location/${location_id}/mor-month`} />
+                                    <CustomLinkBreadcrumsComponent title='MICS Monthly' to={`/stock-management/stock-by-location/${location_id}/mics-monthly`} />
                                     <Typography sx={{ fontSize: '0.8rem' }}  color="text.primary">
-                                    MOR Monthy Product
+                                        MICS Monthly Product Report
                                     </Typography>
                                 </Breadcrumbs>
                             </Stack>

@@ -3,7 +3,7 @@ import CustomSearchComponent from '@components/CustomSearchComponent';
 import Iconify from '@components/Iconify';
 import Loading from '@components/Loading';
 import Page from '@components/Page';
-import useFetchMORMonth from '@hooks/mor-month/useFetchMORMonth';
+import useFetchMICSMonthly from '@hooks/mics-monthly/useFetchMICSMonthly';
 import { Button, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -33,7 +33,7 @@ const index = () => {
         paginate: 1,
         location_id,
     })
-    const { data: rows, refetch, isFetchedAfterMount } = useFetchMORMonth(params)
+    const { data: rows, refetch, isFetchedAfterMount } = useFetchMICSMonthly(params)
     const handleChangePage = (event, newPage) => {
         setParams((prev) => {
             return {
@@ -116,7 +116,7 @@ const index = () => {
                         {rows.meta.from+key}.
                     </TableCell>
                     <TableCell>
-                        <CustomLinkComponent label={month} url={`/stock-management/stock-by-location/${location_id}/mor-month/detail/${value.id}`} />
+                        <CustomLinkComponent label={month} url={`/stock-management/stock-by-location/${location_id}/mics-monthly/detail/${value.id}`} />
                     </TableCell>
                     <TableCell>
                         {value.year}
@@ -127,15 +127,15 @@ const index = () => {
     }, [rows])
 
     return (
-        <Page title='MOR Month'>
+        <Page title='MICS Month'>
             <Container>
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
                             <Typography variant='h4' mb={3}>
-                                MOR Monthly
+                                MICS Monthly
                             </Typography>
-                            <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mor-month/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
+                            <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mics-monthly/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
                                 Input
                             </Button>
                         </Stack>

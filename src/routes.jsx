@@ -12,6 +12,7 @@ import NotFound from './pages/Page404';
 
 // ----------------------------------------------------------------------
 import ActivityLog from './pages/activity-log';
+import Report from './pages/report';
 import DashboardApp from './pages/DashboardApp';
 
 // User Management
@@ -113,11 +114,11 @@ import PrintPreviewMealSheetMonthly from './pages/print-preview/meal-sheet-month
 import StockManagement from './pages/stock-management';
 import StockByLocation from './pages/stock-management/stock-by-location';
 
-import AddMOR from './pages/stock-management/stock-by-location/mor/Add';
-import EditMORDaily from './pages/stock-management/stock-by-location/mor/Edit';
+import AddMICS from './pages/stock-management/stock-by-location/mics-daily/Add';
+import EditMICSDaily from './pages/stock-management/stock-by-location/mics-daily/Edit';
 
-import AddMORMonthly from './pages/stock-management/stock-by-location/mor-month/Add';
-import DetailMORMonthly from './pages/stock-management/stock-by-location/mor-month/Detail';
+import AddMICSMonthly from './pages/stock-management/stock-by-location/mics-monthly/Add';
+import DetailMICSMonthly from './pages/stock-management/stock-by-location/mics-monthly/Detail';
 
 import StockDetailProduct from './pages/stock-management/stock-by-location/product/detail';
 
@@ -335,33 +336,43 @@ export default function Router() {
                     element: <StockDetailProduct />,
                 },
 
+                // MICS Daily
                 {
-                    path: "stock-by-location/:location_id/mor",
+                    path: "stock-by-location/:location_id/mics-daily",
                     element: <StockByLocation />,
                 },
                 {
-                    path: "stock-by-location/:location_id/mor/add",
-                    element: <AddMOR />,
+                    path: "stock-by-location/:location_id/mics-daily/add",
+                    element: <AddMICS />,
                 },
                 {
-                    path: "stock-by-location/:location_id/mor/edit/:date",
-                    element: <EditMORDaily />,
+                    path: "stock-by-location/:location_id/mics-daily/edit/:date",
+                    element: <EditMICSDaily />,
                 },
 
-                // MOR Month
+                // MICS Month
                 {
-                    path: "stock-by-location/:location_id/mor-month",
+                    path: "stock-by-location/:location_id/mics-monthly",
                     element: <StockByLocation />,
                 },
                 {
-                    path: "stock-by-location/:location_id/mor-month/add",
-                    element: <AddMORMonthly />,
+                    path: "stock-by-location/:location_id/mics-monthly/add",
+                    element: <AddMICSMonthly />,
                 },
                 {
-                    path: "stock-by-location/:location_id/mor-month/detail/:id",
-                    element: <DetailMORMonthly />,
+                    path: "stock-by-location/:location_id/mics-monthly/detail/:id",
+                    element: <DetailMICSMonthly />,
                 },
             ],
+        },
+        {
+            path: "/report",
+            element: (
+                <Middleware.After>
+                    <DashboardLayout />,
+                </Middleware.After>
+            ),
+            children: [{ path: "", element: <Report /> }],
         },
         {
             path: "/logout",
