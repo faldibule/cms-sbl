@@ -1,15 +1,13 @@
-import { useCallback, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import CustomSearchComponent from '@components/CustomSearchComponent';
-import Loading from '@components/Loading';
-import TableDataRow from '@components/quotation/TableDataRow';
 import CustomLinkComponent from '@components/CustomLinkComponent';
-import { NumberFormat } from '@utils/Format';
-import useFetchMICSDaily from '@hooks/mics-daily/useFetchMICSDaily';
+import CustomSearchComponent from '@components/CustomSearchComponent';
 import Iconify from '@components/Iconify';
+import Loading from '@components/Loading';
+import Page from '@components/Page';
+import useFetchMICSDaily from '@hooks/mics-daily/useFetchMICSDaily';
+import { Button, Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import moment from 'moment';
+import { useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const index = () => {
     const navigate = useNavigate()
@@ -95,19 +93,12 @@ const index = () => {
         return rows.data.map((value, key) => {
             return (
                 <TableRow key={key}>
-                    <TableCell
-                        component="th"
-                        scope="row"
-                        align="center"
-                    >
-                        {rows.meta.from+key}.
+                    <TableCell>
+                        {moment(value.date).format('LL')}
                     </TableCell>
                     <TableCell>
-                        <CustomLinkComponent label={`${moment(value.date).format('LL')}`} url={`/stock-management/stock-by-location/${location_id}/mics-daily/edit/${value.date}`} />
+                        <CustomLinkComponent label='View' url={`/stock-management/stock-by-location/${location_id}/mics-daily/edit/${value.date}`} />
                     </TableCell>
-                    {/* <TableCell>
-                        {moment(value.date).format('LL')}
-                    </TableCell> */}
                 </TableRow>
             )
         })
@@ -123,7 +114,7 @@ const index = () => {
                                 MICS Daily
                             </Typography>
                             <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mics-daily/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
-                                Input
+                                Add
                             </Button>
                         </Stack>
                     </Grid>
@@ -146,8 +137,8 @@ const index = () => {
                                             "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
                                         }}
                                     >
-                                        <TableCell>No.</TableCell>
                                         <TableCell>Date</TableCell>
+                                        <TableCell>Action</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>

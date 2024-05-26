@@ -54,7 +54,7 @@ const index = () => {
                                             icon={<Iconify icon='carbon:report' />} 
                                             iconPosition='start' 
                                             value='product' 
-                                            label="Manual Stock" 
+                                            label="Stock Per Item" 
                                             component={RouterLink}
                                             to={`/stock-management/stock-by-location/${location_id}/product`}
                                         />

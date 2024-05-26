@@ -1,12 +1,12 @@
-import { useCallback, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CardContent, Chip, Container, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
+import CustomLinkComponent from '@components/CustomLinkComponent';
 import CustomSearchComponent from '@components/CustomSearchComponent';
 import Loading from '@components/Loading';
+import Page from '@components/Page';
 import useFetchStockByLocation from '@hooks/stock-by-location/useFetchStockByLocation';
-import CustomLinkComponent from '@components/CustomLinkComponent';
+import { Container, Grid, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Typography } from '@mui/material';
 import { NumberFormat } from '@utils/Format';
+import { useCallback, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const index = () => {
     const navigate = useNavigate()
@@ -126,9 +126,7 @@ const index = () => {
                 <Grid container>
                     <Grid item xs={12} md={12}>
                         <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                            <Typography variant='h4' mb={3}>
-                                Manual Stock
-                            </Typography>
+                            <Typography variant='h4' mb={3}>Stock Per Item</Typography>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={12}>

@@ -1,18 +1,17 @@
-import { useCallback, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-import { Breadcrumbs, Button, Card, CardContent, Checkbox, Container, FormControlLabel, FormGroup, Grid, IconButton, InputAdornment, Link, MenuItem, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
-import Page from '@components/Page';
-import moment from 'moment/moment';
-import CustomSearchComponent from '@components/CustomSearchComponent';
-import { LoadingButton } from '@mui/lab';
 import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import CustomLinkComponent from '@components/CustomLinkComponent';
-import useFetchMealSheetDaily from '@hooks/meal-sheet-daily/useFetchMealSheetDaily';
-import useDeleteMealSheetDaily from '@hooks/meal-sheet-daily/useDeleteMealSheetDaily';
-import useSaveMealSheetDaily from '@hooks/meal-sheet-daily/useSaveMealSheetDaily';
-import Loading from '@components/Loading';
+import CustomSearchComponent from '@components/CustomSearchComponent';
 import DeleteDialog from '@components/DeleteDialog';
 import ImportModal from '@components/ImportModal';
+import Loading from '@components/Loading';
+import useDeleteMealSheetDaily from '@hooks/meal-sheet-daily/useDeleteMealSheetDaily';
+import useFetchMealSheetDaily from '@hooks/meal-sheet-daily/useFetchMealSheetDaily';
+import useSaveMealSheetDaily from '@hooks/meal-sheet-daily/useSaveMealSheetDaily';
+import { LoadingButton } from '@mui/lab';
+import { Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import moment from 'moment/moment';
+import { useCallback, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 const index = () => {
     const { group_id } = useParams()
@@ -189,27 +188,44 @@ const index = () => {
             <Grid item xs={12} md={8} p={2}>
                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
                     <Grid item xs={12} md={12}>
-                        <Stack direction='row' spacing={1}>
+                        <Stack spacing={2}>
                             <CustomSearchComponent 
                                 search={params.search}
                                 params={params}
                                 setParams={setParams}
                             />
-                            <TextField
-                                type='date'
-                                label="Date"
-                                fullWidth
-                                InputProps={{
-                                    startAdornment: <InputAdornment position="start"></InputAdornment>,
-                                }}
-                                value={moment(params.meal_sheet_date).format('yyyy-MM-DD')}
-                                onChange={(e) => {
-                                    setParams({
-                                        ...params,
-                                        meal_sheet_date: e.target.value
-                                    })
-                                }}
-                            />
+                            <Stack direction='row' spacing={1}>
+                                <TextField
+                                    type='date'
+                                    label="Start Date"
+                                    fullWidth
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                    }}
+                                    value={moment(params.meal_sheet_date).format('yyyy-MM-DD')}
+                                    onChange={(e) => {
+                                        setParams({
+                                            ...params,
+                                            meal_sheet_date: e.target.value
+                                        })
+                                    }}
+                                />
+                                <TextField
+                                    type='date'
+                                    label="Until Date"
+                                    fullWidth
+                                    InputProps={{
+                                        startAdornment: <InputAdornment position="start"></InputAdornment>,
+                                    }}
+                                    value={moment(params.meal_sheet_date).format('yyyy-MM-DD')}
+                                    onChange={(e) => {
+                                        setParams({
+                                            ...params,
+                                            meal_sheet_date: e.target.value
+                                        })
+                                    }}
+                                />
+                            </Stack>
                         </Stack>
                     </Grid>
                 </Grid>

@@ -304,7 +304,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Acknowladge Name'
+                                label='Acknowledge Name'
                                 name='acknowladge_by[name]'
                                 defaultValue={data?.acknowladge_by?.name || ''}
                                 helperText={!!errors?.['acknowladge_by.name'] && errors?.['acknowladge_by.name'][0]}
@@ -314,7 +314,7 @@ const Form = (props) => {
                         <Grid item xs={12} md={6}>
                             <TextField
                                 fullWidth 
-                                label='Acknowladge Position'
+                                label='Acknowledge Position'
                                 name='acknowladge_by[position]'
                                 defaultValue={data?.acknowladge_by?.position || ''}
                                 helperText={!!errors?.['acknowladge_by.position'] && errors?.['acknowladge_by.position'][0]}

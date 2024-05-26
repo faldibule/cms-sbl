@@ -116,30 +116,38 @@ const Form = (props) => {
             <Box component='form' onSubmit={onSubmit}>
                 <Grid container spacing={2} justifyContent='center'>
                     <Grid item xs={12} md={10}>
-                        <Card sx={{ p: 2, mt: 3 }}>
-                            <Typography fontSize='1.3rem' textAlign='center' fontWeight='bold'>Form Input MOR</Typography>
-                            <Stack mt={2} width='100%' direction='row' spacing={1} justifyContent='space-between'>
-                                <CustomAutocomplete 
-                                    disabled={isApproved}
-                                    getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
-                                    options={dataItemProduct.data}
-                                    label='Item'
-                                    inputValue={itemState.input}
-                                    setInputValue={handleInputItem}
-                                    selectedValue={null}
-                                    setSelectedValue={handleSelectedItem}
-                                    isAutoCompleteItem={true}
-                                    size='small'
-                                />
-                                <Button disabled={isApproved} onClick={handleModalImport} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
-                                    Import
-                                </Button>
-                            </Stack>
-                        </Card>
+                        {!isApproved ? 
+                            <Card sx={{ p: 2, mt: 3 }}>
+                                <Typography fontSize='1.3rem' textAlign='center' fontWeight='bold'>Form Input MOR</Typography>
+                                <Stack mt={2} width='100%' direction='row' spacing={1} justifyContent='space-between'>
+                                    <CustomAutocomplete 
+                                        disabled={isApproved}
+                                        getOptionLabel={(opt) => `${opt.code} - ${opt.name}`}
+                                        options={dataItemProduct.data}
+                                        label='Item'
+                                        inputValue={itemState.input}
+                                        setInputValue={handleInputItem}
+                                        selectedValue={null}
+                                        setSelectedValue={handleSelectedItem}
+                                        isAutoCompleteItem={true}
+                                        size='small'
+                                    />
+                                    <Button disabled={isApproved} onClick={handleModalImport} variant='contained' startIcon={<Iconify icon='material-symbols:upload-rounded' />}>
+                                        Import
+                                    </Button>
+                                </Stack>
+                            </Card>
+                        :
+                            null
+                        }
                     </Grid>
                     <Grid item xs={12} md={10}>
                         {item.length > 0 ? 
-                            <Card sx={{ p: 2, mt: 1 }}>
+                            <Card sx={{ p: 2 }}>
+                                {isApproved ?
+                                    <Typography my={1} fontSize='1.3rem' textAlign='center' fontWeight='bold'>Detail Item </Typography>
+                                : null
+                                }
                                 <TableContainer sx={{ maxHeight: 400, overflowY: 'auto' }}>
                                     <Table stickyHeader aria-label="simple table">
                                         <TableHead>

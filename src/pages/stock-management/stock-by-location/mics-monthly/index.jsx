@@ -136,7 +136,7 @@ const index = () => {
                                 MICS Monthly
                             </Typography>
                             <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mics-monthly/add`)} variant='contained' startIcon={<Iconify icon='ic:baseline-plus'  />}>
-                                Input
+                                Add
                             </Button>
                         </Stack>
                     </Grid>
