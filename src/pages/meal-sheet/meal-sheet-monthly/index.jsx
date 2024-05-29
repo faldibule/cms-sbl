@@ -307,7 +307,7 @@ const index = () => {
             </Grid>
             <Grid item xs={12} md={4} p={2}>
                 <Typography mb={3} variant='h6'>
-                    {!!staging.id ? 'Edit' : 'Add'} Summary Meal Sheet
+                   Summary Meal Sheet
                 </Typography>
                 {!loading ?
                 <Grid container spacing={2} component='form' onSubmit={onSubmit}>

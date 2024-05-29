@@ -21,7 +21,9 @@ const index = () => {
         search: '',
         paginate: 1,
         meal_sheet_group_id: group_id,
-        meal_sheet_date: ''
+        meal_sheet_date: '',
+        start_date: '',
+        end_date: '',
     })
     const { data: rows, refetch, isFetchedAfterMount } = useFetchMealSheetDaily(params)
     const handleChangePage = (event, newPage) => {
@@ -202,11 +204,11 @@ const index = () => {
                                     InputProps={{
                                         startAdornment: <InputAdornment position="start"></InputAdornment>,
                                     }}
-                                    value={moment(params.meal_sheet_date).format('yyyy-MM-DD')}
+                                    value={moment(params.start_date).format('yyyy-MM-DD')}
                                     onChange={(e) => {
                                         setParams({
                                             ...params,
-                                            meal_sheet_date: e.target.value
+                                            start_date: e.target.value
                                         })
                                     }}
                                 />
@@ -217,14 +219,28 @@ const index = () => {
                                     InputProps={{
                                         startAdornment: <InputAdornment position="start"></InputAdornment>,
                                     }}
-                                    value={moment(params.meal_sheet_date).format('yyyy-MM-DD')}
+                                    value={moment(params.end_date).format('yyyy-MM-DD')}
                                     onChange={(e) => {
                                         setParams({
                                             ...params,
-                                            meal_sheet_date: e.target.value
+                                            end_date: e.target.value
                                         })
                                     }}
                                 />
+                                <Button 
+                                    onClick={() => setParams({ 
+                                        page: 1,
+                                        limit: 5,
+                                        search: '',
+                                        paginate: 1,
+                                        meal_sheet_group_id: group_id,
+                                        meal_sheet_date: '',
+                                        start_date: '',
+                                        end_date: '', 
+                                    })}
+                                >
+                                    Clear
+                                </Button>
                             </Stack>
                         </Stack>
                     </Grid>

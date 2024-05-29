@@ -1,4 +1,5 @@
 import CustomAutocomplete from '@components/CustomAutocomplete'
+import CustomGrandTotalComponent from '@components/CustomGrandTotalComponent'
 import CustomLinkBreadcrumsComponent from '@components/CustomLinkBreadcrumsComponent'
 import Iconify from '@components/Iconify'
 import ImportModal from '@components/ImportModal'
@@ -13,6 +14,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 const Form = (props) => {
+    const { date } = useParams()
     const { data } = props
     const isApproved = useMemo(() => {
         return props.title === 'edit'
@@ -160,11 +162,13 @@ const Form = (props) => {
                                             >
                                                 <TableCellHeaderColor>No.</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Date</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Item Code</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Item Name</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Item Brand</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Description</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Quantity</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Unit Price</TableCellHeaderColor>
+                                                <TableCellHeaderColor>Total Price</TableCellHeaderColor>
                                                 <TableCellHeaderColor>Action</TableCellHeaderColor>
                                             </TableRow>
                                         </TableHead>
@@ -173,10 +177,16 @@ const Form = (props) => {
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
+                                <Stack mt={3}>
+                                    <CustomGrandTotalComponent onlyTotal={true} item={item} />
+                                </Stack>
                                 <Stack direction='row' spacing={2} mt={2}>
-                                    <LoadingButton disabled={isApproved} loading={loadingSave} variant='contained' type='submit'>
-                                        Submit
-                                    </LoadingButton>
+                                    {!isApproved ? 
+                                        <LoadingButton disabled={isApproved} loading={loadingSave} variant='contained' type='submit'>
+                                            Submit
+                                        </LoadingButton>
+                                    : null
+                                    }
                                     {props.title == 'edit' ? ''
                                         // <LoadingButton startIcon={<Iconify icon='material-symbols:print' />} variant='contained' type='button' sx={{ ml: 'auto' }}>
                                         //     Print
@@ -186,7 +196,15 @@ const Form = (props) => {
                                 </Stack>
                             </Card>
                         : 
-                        null
+                            <Stack spacing={2}>
+                                {!!data ?
+                                <>
+                                    <Typography textAlign='center' variant='h6'>Data on {date} is empty!</Typography>
+                                    <Button onClick={() => navigate(`/stock-management/stock-by-location/${location_id}/mics-daily`)}>Back</Button>
+                                </>
+                                : null
+                                }
+                            </Stack>
                         }
                     </Grid>
                 </Grid>

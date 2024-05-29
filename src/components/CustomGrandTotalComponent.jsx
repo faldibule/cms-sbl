@@ -2,7 +2,7 @@ import { Stack, Typography } from '@mui/material'
 import { IntegerFormat, NumberFormat } from '@utils/Format'
 import { useMemo } from 'react'
 
-const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
+const CustomGrandTotalComponent = ({ item, discount = 0, markup = false, onlyTotal = false }) => {
 
     const getTotal = useMemo(() => {
       let totalAmount = 0
@@ -48,18 +48,27 @@ const CustomGrandTotalComponent = ({ item, discount = 0, markup = false }) => {
             </Stack>
             : null
           }
-          <Stack>
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>Total</Typography>
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>{NumberFormat(getTotal.totalAmount, 'Rp')}</Typography>
-          </Stack>
-          <Stack>
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'green' }}>Total VAT</Typography>
-              <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'green' }}>{NumberFormat(getTotal.totalVAT, 'Rp')}</Typography>
-          </Stack>
-          <Stack>
-              <Typography variant='h6' fontWeight='bold'>Grand Total</Typography>
-              <Typography variant='h6' fontWeight='bold'>{NumberFormat(getTotal.totalAmount + getTotal.totalVAT - getDiscount, 'Rp')}</Typography>
-          </Stack>
+          {onlyTotal ?
+            <Stack>
+                <Typography variant='h6' fontWeight='bold'>Grand Total</Typography>
+                <Typography variant='h6' fontWeight='bold'>{NumberFormat(getTotal.totalAmount, 'Rp')}</Typography>
+            </Stack>
+            :
+            <>
+              <Stack>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>Total</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'blue' }}>{NumberFormat(getTotal.totalAmount, 'Rp')}</Typography>
+              </Stack>
+              <Stack>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'green' }}>Total VAT</Typography>
+                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'green' }}>{NumberFormat(getTotal.totalVAT, 'Rp')}</Typography>
+              </Stack>
+              <Stack>
+                  <Typography variant='h6' fontWeight='bold'>Grand Total</Typography>
+                  <Typography variant='h6' fontWeight='bold'>{NumberFormat(getTotal.totalAmount + getTotal.totalVAT - getDiscount, 'Rp')}</Typography>
+              </Stack>
+            </>
+          }
       </Stack>
     )
 }

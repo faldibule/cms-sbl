@@ -1,8 +1,7 @@
-import Page from '@components/Page'
-import useDownloadReport from '@hooks/report/useDownloadReport'
+import Page from '@components/Page';
+import useDownloadReport from '@hooks/report/useDownloadReport';
 import { LoadingButton } from '@mui/lab';
-import { Card, CardContent, Container, Grid, MenuItem, TextField, Typography } from '@mui/material'
-import React from 'react'
+import { Card, CardContent, Container, Grid, MenuItem, TextField, Typography } from '@mui/material';
 
 const dataMonth = [
     { month: 'Januari', value: 1 },
@@ -22,11 +21,11 @@ const dataMonth = [
 const reportType = [
     {
         label: 'SUMMARY PHYSICAL INVENTORY',
-        url: 'export/summary',
+        url: 'export/summary-excel',
     },
     {
         label: 'REALISASI PURCHASE RECORD',
-        url: 'export/realisasi-purchase-record',
+        url: 'export/realisasi-purchase-record-excel',
     },
 ]
 
@@ -43,7 +42,7 @@ const index = () => {
             const temp = window.URL.createObjectURL(new Blob([res.data]));
             const link = document.createElement("a");
             link.href = temp;
-            link.setAttribute("download", `${res.params.label}.pdf`); 
+            link.setAttribute("download", `${res.params.label}.xlsx`); 
             document.body.appendChild(link);
             link.click();
         },
