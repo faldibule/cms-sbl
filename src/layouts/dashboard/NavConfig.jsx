@@ -67,6 +67,14 @@ const navConfig = [
                 title: "Discount",
                 path: "discount",
             },
+            {
+                title: "Formula",
+                path: "formula",
+            },
+            {
+                title: "Meal Rate",
+                path: "meal-rate",
+            },
         ],
     },
 

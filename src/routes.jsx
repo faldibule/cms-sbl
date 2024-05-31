@@ -34,6 +34,14 @@ import ItemCategory from './pages/master-data/item-category';
 import SiteLocation from './pages/master-data/site-location';
 import Supplier from './pages/master-data/supplier';
 
+import Formula from './pages/master-data/formula';
+import AddFormula from './pages/master-data/formula/Add';
+import EditFormula from './pages/master-data/formula/Edit';
+
+import MealRate from './pages/master-data/meal-rate';
+import AddMealRate from './pages/master-data/meal-rate/Add';
+import EditMealRate from './pages/master-data/meal-rate/Edit';
+
 // Internal Order -------------------------------------------------------
 
 // ----- PR Catering -----
@@ -189,6 +197,14 @@ export default function Router() {
                 { path: "supplier", element: <Supplier /> },
                 { path: "discount", element: <Discount /> },
                 { path: "customer", element: <Customer /> },
+
+                { path: "formula", element: <Formula /> },
+                { path: "formula/add", element: <AddFormula /> },
+                { path: "formula/edit/:id", element: <EditFormula /> },
+                
+                { path: "meal-rate", element: <MealRate /> },
+                { path: "meal-rate/add", element: <AddMealRate /> },
+                { path: "meal-rate/edit/:id", element: <EditMealRate /> },
             ],
         },
 
