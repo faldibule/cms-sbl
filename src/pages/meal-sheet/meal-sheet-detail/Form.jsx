@@ -6,10 +6,9 @@ import Loading from '@components/Loading'
 import TableCellHeaderColor from '@components/TableCellHeaderColor'
 import DialogInputRow from '@components/meal-sheet-detail/DialogInputRow'
 import TableInputRow from '@components/meal-sheet-detail/TableInputRow'
-import useFetchItemProduct from '@hooks/item-product/useFetchItemProduct'
+import useFetchFormula from '@hooks/formula/useFetchFormula'
 import useFetchMealSheetDailyById from '@hooks/meal-sheet-daily/useFetchMealSheetDailyById'
 import useSaveMealSheetDetail from '@hooks/meal-sheet-detail/useSaveMealSheetDetail'
-import useFetchUser from '@hooks/user-list/useFetchUser'
 import { LoadingButton } from '@mui/lab'
 import { Box, Breadcrumbs, Button, Card, Grid, Stack, Table, TableBody, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
@@ -30,45 +29,14 @@ const Form = (props) => {
     const handleInputClient = (value) => setClientState({ ...clientState, input: value })
     const { data: dataClient, isLoading: loadingClient } = useFetchMealSheetDailyById(daily_id)
 
-    const [userState, setUserState] = useState({
-        prepared_by: {
-            input: '',
-            selected: null
-        },
-        checked_by: {
-            input: '',
-            selected: null
-        },
-        approved1_by: {
-            input: '',
-            selected: null
-        },
-        approved2_by: {
-            input: '',
-            selected: null
-        },
-    })
-    const handleUser = (name, type) => {
-        return (value) => {
-            setUserState({
-                ...userState,
-                [name]: {
-                    ...userState[name],
-                    [type]: value
-                }
-            })
-        }
-    }
-    const { data: dataUser, isLoading: loadingUser } = useFetchUser({ paginate: 0 })
-
-    const [itemState, setItemState] = useState({
+    const [formulaState, setFormulaState] = useState({
         input: '',
         selected: null
     })
-    const handleSelectedItem = (value) => setItem([...item, value])
-    const handleInputItem = (value) => setItemState({ ...itemState, input: value })
-    const { data: dataItemProduct, isLoading: loadingItemProduct } = useFetchItemProduct({ paginate: 0 })
-
+    const handleSelectedFormula = (value) => setFormulaState({ ...formulaState, selected: value })
+    const handleInputFormula = (value) => setFormulaState({ ...formulaState, input: value })
+    const { data: dataFormula, isLoading: loadingFormula } = useFetchFormula({ paginate: 0 })
+    
     // Handle Import
     const [modalImport, setModalImport] = useState(false)
     const handleModalImport = () => setModalImport(!modalImport)
@@ -113,6 +81,7 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         formData.append('meal_sheet_daily_id', daily_id)
         formData.append('client_id', clientState.selected?.id)
+        formData.append('formula_id', formulaState.selected?.id)
         const objectTemp = Object.fromEntries(formData)
         if(objectTemp['acknowladge_by[name]'] === '' && objectTemp['acknowladge_by[position]'] === '' ){
             formData.delete('acknowladge_by[name]')
@@ -144,6 +113,10 @@ const Form = (props) => {
                     input: data.client.client_name,
                     selected: data.client
                 })
+                setFormulaState({
+                    input: data.formula.name,
+                    selected: data.formula
+                })
                 setItem([...data.meal_sheet_record])
             }
         }
@@ -152,7 +125,7 @@ const Form = (props) => {
 
     }, [props?.id])
 
-    if(loadingClient || loadingUser || loadingItemProduct){
+    if(loadingClient || loadingFormula){
         return <Loading />
     }
 
@@ -183,7 +156,7 @@ const Form = (props) => {
                             <CustomAutocomplete 
                                 getOptionLabel={(opt) => opt.client_name}
                                 options={dataClient?.meal_sheet_group?.client}
-                                label='Customer'
+                                label='Client Meal Sheet'
                                 inputValue={clientState.input}
                                 setInputValue={handleInputClient}
                                 selectedValue={clientState.selected}
@@ -191,49 +164,17 @@ const Form = (props) => {
                                 errors={errors?.client_id}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Mandays'
-                                name='mandays'
-                                defaultValue={data?.mandays}
-                                required
-                                helperText={!!errors?.mandays && errors?.mandays[0]}
-                                error={!!errors?.mandays}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Casual Break Fast'
-                                name='casual_breakfast'
-                                defaultValue={data?.casual_breakfast}
-                                required
-                                helperText={!!errors?.casual_breakfast && errors?.casual_breakfast[0]}
-                                error={!!errors?.casual_breakfast}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Casual Lunch'
-                                name='casual_lunch'
-                                defaultValue={data?.casual_lunch}
-                                required
-                                helperText={!!errors?.casual_lunch && errors?.casual_lunch[0]}
-                                error={!!errors?.casual_lunch}
-                            /> 
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <TextField
-                                fullWidth 
-                                label='Casual Dinner'
-                                name='casual_dinner'
-                                defaultValue={data?.casual_dinner}
-                                required
-                                helperText={!!errors?.casual_dinner && errors?.casual_dinner[0]}
-                                error={!!errors?.casual_dinner}
-                            /> 
+                        <Grid item xs={12} md={12}>
+                            <CustomAutocomplete 
+                                getOptionLabel={(opt) => opt.title}
+                                options={dataFormula?.data || []}
+                                label='Formula Meal Sheet'
+                                inputValue={formulaState.input}
+                                setInputValue={handleInputFormula}
+                                selectedValue={formulaState.selected}
+                                setSelectedValue={handleSelectedFormula}
+                                errors={errors?.formula_id}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <TextField

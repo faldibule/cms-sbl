@@ -39,8 +39,7 @@ const DialogRunCode = ({ open, handleOpen, code }) => {
             color: 'primary',
             message: '',
         })
-        const formElem = document.querySelector('#formElement') 
-        const formData = new FormData(formElem)
+        const formData = new FormData(e.target)
         formData.append('formula', code)
         formData.append('title', '-')
         formData.append('active', '1')
@@ -56,58 +55,60 @@ const DialogRunCode = ({ open, handleOpen, code }) => {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle>Run Your Code</DialogTitle>
-            <DialogContent>
-                <Grid container id='formElement' component='form' spacing={2} p={1}>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
-                            label='Total of breakfast/lunch/dinner/supper'
-                            type='number'
-                            name='total'
-                            helperText={!!errors?.total && errors?.total[0]}
-                            error={!!errors?.total}
-                        />  
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <TextField
-                            fullWidth 
-                            label='Accomodation'
-                            name='accomodation'
-                            select
-                            helperText={!!errors?.accomodation && errors?.accomodation[0]}
-                            error={!!errors?.accomodation}
-                        >  
-                            <MenuItem value='1'>Yes</MenuItem>
-                            <MenuItem value='0'>No</MenuItem>
-                        </TextField>
-                    </Grid>
-                    <Grid item xs={12} md={12}>
-                        <FormControl fullWidth>
-                            <Typography pl={0.5} mb={2} variant='body2'>Output : </Typography>
+            <Box component='form' onSubmit={onSubmit}>
+                <DialogTitle>Run Your Code</DialogTitle>
+                <DialogContent>
+                    <Grid container spacing={2} p={1}>
+                        <Grid item xs={12} md={12}>
                             <TextField
-                                focused
-                                color={output.color}
-                                aria-readonly={true}  
                                 fullWidth 
-                                value={loadingTest ? 'Loading.....' : output.message}
-                                multiline
-                                rows={3}
+                                label='Total of breakfast/lunch/dinner/supper'
+                                type='number'
+                                name='total'
+                                helperText={!!errors?.total && errors?.total[0]}
+                                error={!!errors?.total}
                             />  
-                        </FormControl>
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <TextField
+                                fullWidth 
+                                label='Accomodation'
+                                name='accomodation'
+                                select
+                                helperText={!!errors?.accomodation && errors?.accomodation[0]}
+                                error={!!errors?.accomodation}
+                            >  
+                                <MenuItem value='1'>Yes</MenuItem>
+                                <MenuItem value='0'>No</MenuItem>
+                            </TextField>
+                        </Grid>
+                        <Grid item xs={12} md={12}>
+                            <FormControl fullWidth>
+                                <Typography pl={0.5} mb={2} variant='body2'>Output : </Typography>
+                                <TextField
+                                    focused
+                                    color={output.color}
+                                    aria-readonly={true}  
+                                    fullWidth 
+                                    value={loadingTest ? 'Loading.....' : output.message}
+                                    multiline
+                                    rows={3}
+                                />  
+                            </FormControl>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </DialogContent>
-            <DialogActions>
-                <Stack direction='row' justifyContent='end'>
-                    <Button color='error' variant="text" onClick={handleOpen}>
-                        Cancel
-                    </Button>
-                    <LoadingButton loading={loadingTest} variant="text" onClick={onSubmit}>
-                        Save
-                    </LoadingButton>
-                </Stack>
-            </DialogActions>
+                </DialogContent>
+                <DialogActions>
+                    <Stack direction='row' justifyContent='end'>
+                        <Button color='error' variant="text" onClick={handleOpen}>
+                            Cancel
+                        </Button>
+                        <LoadingButton type='submit' loading={loadingTest} variant="text">
+                            Test
+                        </LoadingButton>
+                    </Stack>
+                </DialogActions>
+            </Box>
         </Dialog>
     )
 }
