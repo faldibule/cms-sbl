@@ -1,24 +1,12 @@
-import CustomAutocomplete from '@components/CustomAutocomplete'
-import Loading from '@components/Loading'
-import useFetchLocation from '@hooks/location/useFetchLocation'
 import useSaveMealRate from '@hooks/meal-rate/useSaveMealRate'
 import { LoadingButton } from '@mui/lab'
 import { Box, Card, Grid, InputAdornment, Stack, TextField, Typography } from '@mui/material'
 import { IntegerFormat } from '@utils/Format'
-import { useEffect, useState } from 'react'
 import { NumericFormat } from 'react-number-format'
 
 
 const Form = (props) => {
     const { data } = props
-
-    const [locationState, setLocationState] = useState({
-        input: '',
-        selected: null
-    })
-    const handleSelectedLocation = (value) => setLocationState({...locationState, selected: value})
-    const handleInputLocation = (value) => setLocationState({...locationState, input: value})
-    const { data: dataLocation, isLoading: loadingLocation } = useFetchLocation({ paginate: 0 })
 
     // HandleSubmit
     const { mutate: save, isLoading: loadingSave, error } = useSaveMealRate({
@@ -31,30 +19,15 @@ const Form = (props) => {
         const formData = new FormData(e.target)
         const temp = Object.fromEntries(formData)
         for(const item in temp){
-            formData.append(item, IntegerFormat(temp[item]))
+            if(item === 'name'){
+                formData.append(item, temp[item])
+            }else{
+                formData.append(item, IntegerFormat(temp[item]))
+            }
         }
-        formData.append('location_id', locationState.selected?.id)
         save({ formData, id: data?.id })
     }
 
-    useEffect(() => {
-        let mounted = true
-        if(mounted){
-            if(!!props.data){
-                setLocationState({
-                    input: `${data.location.location_code} - ${data.location.location}`,
-                    selected: data.location
-                })
-            }
-        }
-
-        return () => mounted = false
-
-    }, [props?.id])
-
-    if(loadingLocation){
-        return <Loading />
-    }
     return (
         <Stack>
             <Grid container>
@@ -68,17 +41,25 @@ const Form = (props) => {
             <Box>
                 <Card sx={{ p: 2, mt: 3 }}>
                     <Grid container component='form' onSubmit={onSubmit} spacing={2}>
-                        <Grid item xs={12} md={12}>
-                            <CustomAutocomplete 
-                                options={dataLocation.data}
-                                getOptionLabel={(option) => `${option.location_code} - ${option.location}`}
-                                label='Location'
-                                inputValue={locationState.input}
-                                setInputValue={handleInputLocation}
-                                selectedValue={locationState.selected}
-                                setSelectedValue={handleSelectedLocation}
-                                errors={errors?.location_id}
-                            />
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Name'
+                                name='name'
+                                defaultValue={data?.name}
+                                helperText={!!errors?.name && errors?.name[0]}
+                                error={!!errors?.name}
+                            />  
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                fullWidth 
+                                label='Minimum'
+                                name='minimum'
+                                defaultValue={data?.minimum}
+                                helperText={!!errors?.minimum && errors?.minimum[0]}
+                                error={!!errors?.minimum}
+                            />  
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <NumericFormat 

@@ -210,7 +210,7 @@ const navConfig = [
     },
     {
         title: "Monthly Report",
-        path: "/report",
+        path: "/report/report-monthly",
         icon: getIcon("carbon:report"),
     },
     {

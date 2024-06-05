@@ -12,8 +12,12 @@ import NotFound from './pages/Page404';
 
 // ----------------------------------------------------------------------
 import ActivityLog from './pages/activity-log';
-import Report from './pages/report';
 import DashboardApp from './pages/DashboardApp';
+
+// Report
+import Report from './pages/report';
+import AddSales from './pages/report/sales/Add';
+import EditSales from './pages/report/sales/Edit';
 
 // User Management
 import UserList from './pages/user-management/user-list';
@@ -388,7 +392,12 @@ export default function Router() {
                     <DashboardLayout />,
                 </Middleware.After>
             ),
-            children: [{ path: "", element: <Report /> }],
+            children: [
+                { path: "report-monthly", element: <Report /> },
+                { path: "sales", element: <Report /> },
+                { path: "sales/add", element: <AddSales /> },
+                { path: "sales/edit/:id", element: <EditSales /> },
+            ],
         },
         {
             path: "/logout",

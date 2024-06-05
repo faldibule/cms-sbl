@@ -41,7 +41,8 @@ const RowData = ({ value, rows, i, refetch }) => {
             >
                 {rows.meta.from+i}.
             </TableCell>
-            <TableCell>{value.location.location}</TableCell>
+            <TableCell>{value.name}</TableCell>
+            <TableCell>{value.minimum}</TableCell>
             <TableCell>{NumberFormat(value?.breakfast, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(value?.lunch, 'Rp')}</TableCell>
             <TableCell>{NumberFormat(value?.dinner, 'Rp')}</TableCell>
@@ -187,7 +188,8 @@ const index = () => {
                                                 }}
                                             >
                                                 <TableCell>No.</TableCell>
-                                                <TableCell>Location</TableCell>
+                                                <TableCell>Name</TableCell>
+                                                <TableCell>Minimum</TableCell>
                                                 <TableCell>Breakfast</TableCell>
                                                 <TableCell>Lunch</TableCell>
                                                 <TableCell>Dinner</TableCell>
