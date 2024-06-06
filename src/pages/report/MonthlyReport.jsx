@@ -27,6 +27,10 @@ const reportType = [
         label: 'REALISASI PURCHASE RECORD',
         url: 'export/realisasi-purchase-record-excel',
     },
+    {
+        label: 'MOR',
+        url: 'export/real-mor-excel',
+    },
 ]
 
 const getYearList = () => {

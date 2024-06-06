@@ -6,9 +6,8 @@ const useDownloadReport = ({ onSuccess, onError }) => {
     const { failed } = useCustomSnackbar()
     return useMutation({
         mutationFn: async (params) => {
-            const res = await http.get(params.report_type, {
+            const res = await http.post(params.report_type, params, {
                 responseType: 'blob',
-                params,
             })
             return { 
                 params,
