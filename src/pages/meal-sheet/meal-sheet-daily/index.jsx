@@ -2,16 +2,52 @@ import CustomActionTableComponent from '@components/CustomActionTableComponent';
 import CustomLinkComponent from '@components/CustomLinkComponent';
 import CustomSearchComponent from '@components/CustomSearchComponent';
 import DeleteDialog from '@components/DeleteDialog';
+import Iconify from '@components/Iconify';
 import ImportModal from '@components/ImportModal';
 import Loading from '@components/Loading';
 import useDeleteMealSheetDaily from '@hooks/meal-sheet-daily/useDeleteMealSheetDaily';
+import useDownloadMultipleMealSheetDaily from '@hooks/meal-sheet-daily/useDownloadMultipleMealSheetDaily';
 import useFetchMealSheetDaily from '@hooks/meal-sheet-daily/useFetchMealSheetDaily';
 import useSaveMealSheetDaily from '@hooks/meal-sheet-daily/useSaveMealSheetDaily';
 import { LoadingButton } from '@mui/lab';
-import { Button, Grid, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Button, Checkbox, Grid, IconButton, InputAdornment, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import moment from 'moment/moment';
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+function CustomToolBar({ numSelected, actionNode }) {
+    return (
+        <Toolbar
+            sx={{
+                mt: 6.5,
+                pl: { sm: 2 },
+                pr: { xs: 1, sm: 1 },
+                mb: -1,
+                py: 4,
+                ...(numSelected > 0 && {
+                    bgcolor: '#F7F7F7',
+                    color: 'black'
+                }),
+            }}
+        >
+            {numSelected > 0 ? (
+                <Typography
+                    sx={{ flex: "1 1 100%" }}
+                    color="inherit"
+                    variant="subtitle1"
+                    component="div"
+                >
+                    {numSelected} selected
+                </Typography>
+            ) : null }
+
+            {numSelected > 0 ? (
+                actionNode
+            ) : null
+            }
+        </Toolbar>
+    );
+}
 
 const index = () => {
     const { group_id } = useParams()
@@ -85,6 +121,78 @@ const index = () => {
         deleteMealSheetDaily(staging?.id)
     }
 
+    const { mutate: downloadMultipleMealSheetDaily, isLoading: loadingDownloadMultipleMealSheetDaily } = useDownloadMultipleMealSheetDaily({
+        onSuccess: (res) => {
+            console.log(res)
+            setSelected([])
+            const temp = window.URL.createObjectURL(new Blob([res.data], { type: 'application/x-zip' }));
+            const link = document.createElement("a");
+            link.href = temp;
+            link.setAttribute("download", `meal_sheet_report.zip`); 
+            document.body.appendChild(link);
+            link.click();
+        }
+    })
+    const handleDownloadMultipleMealSheetDaily = () => {
+        // let baseUrl = 'http://localhost:8000/meal-sheet/daily/meal_sheet_pdf/multiple';
+
+        // // Create a string to hold the query parameters
+        // let queryString = '';
+
+        // // Loop through the mealSheetDailyIds array to construct the query parameters
+        // selected.forEach((id, index) => {
+        //     // Append each meal_sheet_daily_id value to the query string
+        //     queryString += `meal_sheet_daily_id[meal_sheet_daily_id][${index}]=${encodeURIComponent(id)}&`;
+        // });
+
+        // // Remove the trailing '&' character
+        // queryString = queryString.slice(0, -1);
+
+        // // Construct the final URL by appending the query string to the base URL
+        // let url = `${baseUrl}?${queryString}`;
+
+
+        // const link = document.createElement("a");
+        // link.href = url;
+        // link.target = '_blank';
+        // document.body.appendChild(link);
+        // link.click();
+        downloadMultipleMealSheetDaily({
+            meal_sheet_daily_id: selected
+        })
+    }
+
+    // Handle Checkbox
+    const [selected, setSelected] = useState([])
+    const handleClick = (event, id) => {
+        const selectedIndex = selected.indexOf(id);
+        let newSelected = [];
+
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, id);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(
+                selected.slice(0, selectedIndex),
+                selected.slice(selectedIndex + 1),
+            );
+        }
+
+        setSelected([...newSelected]);
+    };
+    const isSelected = (index) => selected.indexOf(index) !== -1;
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+          const newSelected = rows?.data?.map((n, i) => n.id);
+          setSelected(newSelected);
+          return;
+        }
+        setSelected([]);
+    };
+
     const { mutate: save, isLoading: loadingSave, error } = useSaveMealSheetDaily({
         onSuccess: () => {
             refreshData()
@@ -100,10 +208,6 @@ const index = () => {
 
     const [modalImport, setModalImport] = useState(false)
     const handleModalImport = () => setModalImport(!modalImport)
-
-    if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
-        setParams({ ...params, page: rows.meta.last_page })
-    }
 
     const renderData = useCallback(() => {
         if(rows === undefined) {
@@ -154,7 +258,17 @@ const index = () => {
             )
         }
         return rows.data.map((value, key) => (
-            <TableRow key={key}>
+            <TableRow key={value.id}>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        onClick={(event) => handleClick(event, value.id)}
+                        color="primary"
+                        checked={isSelected(value.id)}
+                        inputProps={{
+                            'aria-labelledby': value.id,
+                        }}
+                    />
+                </TableCell>
                 <TableCell
                     component="th"
                     scope="row"
@@ -183,11 +297,25 @@ const index = () => {
                 </TableCell>                                                             
             </TableRow>
         ))
-    }, [rows])
+    }, [rows, selected])
+
+    if(isFetchedAfterMount && params.page !== 1 && rows !== undefined && rows?.data.length === 0){
+        setParams({ ...params, page: rows.meta.last_page })
+    }
 
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={8} p={2}>
+                {selected.length > 0 ?
+                    <CustomToolBar 
+                        numSelected={selected.length} 
+                        actionNode={
+                            <Stack direction='row' spacing={1} pr={{ md: 5, xs: 1 }}>
+                                <LoadingButton loading={loadingDownloadMultipleMealSheetDaily} onClick={handleDownloadMultipleMealSheetDaily} variant='outlined' color='primary'>Export</LoadingButton>
+                            </Stack>
+                        }
+                    />
+                :
                 <Grid container spacing={2} sx={{ mb: 2 }} alignItems="center">
                     <Grid item xs={12} md={12}>
                         <Stack spacing={2}>
@@ -245,6 +373,8 @@ const index = () => {
                         </Stack>
                     </Grid>
                 </Grid>
+                }
+                
                 <TableContainer>
                     <Table sx={{ minWidth: 400 }} aria-label="simple table">
                         <TableHead>
@@ -254,6 +384,25 @@ const index = () => {
                                     "& th:last-of-type": { borderRadius: "0 0.5em 0.5em 0" },
                                 }}
                             >
+                                <TableCell padding="checkbox">
+                                    <Checkbox
+                                        sx={{
+                                            '&.Mui-checked': {
+                                                color: '#2065D1',
+                                            },
+                                            '&.MuiCheckbox-indeterminate': {
+                                                color: '#2065D1'
+                                            }
+                                        }}
+                                        color='default'
+                                        indeterminate={selected.length > 0 && selected.length < rows?.data?.length}
+                                        checked={rows?.data?.length > 0 && selected.length === rows?.data?.length}
+                                        onChange={handleSelectAllClick}
+                                        inputProps={{
+                                            'aria-label': 'select meal sheet daily',
+                                        }}
+                                    />
+                                </TableCell>
                                 <TableCell>No.</TableCell>
                                 <TableCell>Date</TableCell>
                                 <TableCell>As Contract</TableCell>

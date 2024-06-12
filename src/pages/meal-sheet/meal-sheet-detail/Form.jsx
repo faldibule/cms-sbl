@@ -99,7 +99,7 @@ const Form = (props) => {
             formData.append(`meal_sheet_record[${i}][breakfast]`, breakfast)
             formData.append(`meal_sheet_record[${i}][lunch]`, lunch)
             formData.append(`meal_sheet_record[${i}][dinner]`, dinner)
-            formData.append(`meal_sheet_record[${i}][super]`, superTemp)
+            formData.append(`meal_sheet_record[${i}][supper]`, superTemp)
             formData.append(`meal_sheet_record[${i}][accomodation]`, accomodation)
         })
         save({ formData, id: data?.id })
