@@ -134,29 +134,6 @@ const index = () => {
         }
     })
     const handleDownloadMultipleMealSheetDaily = () => {
-        // let baseUrl = 'http://localhost:8000/meal-sheet/daily/meal_sheet_pdf/multiple';
-
-        // // Create a string to hold the query parameters
-        // let queryString = '';
-
-        // // Loop through the mealSheetDailyIds array to construct the query parameters
-        // selected.forEach((id, index) => {
-        //     // Append each meal_sheet_daily_id value to the query string
-        //     queryString += `meal_sheet_daily_id[meal_sheet_daily_id][${index}]=${encodeURIComponent(id)}&`;
-        // });
-
-        // // Remove the trailing '&' character
-        // queryString = queryString.slice(0, -1);
-
-        // // Construct the final URL by appending the query string to the base URL
-        // let url = `${baseUrl}?${queryString}`;
-
-
-        // const link = document.createElement("a");
-        // link.href = url;
-        // link.target = '_blank';
-        // document.body.appendChild(link);
-        // link.click();
         downloadMultipleMealSheetDaily({
             meal_sheet_daily_id: selected
         })
